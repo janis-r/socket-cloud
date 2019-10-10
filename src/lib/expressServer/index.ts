@@ -1,5 +1,4 @@
 export * from "./config/ExpressServerConfig";
-export * from "./data/SessionUserData";
 export * from "./impl/DebugSession";
 export * from "./request/RequestContext";
 export * from "./request/RequestContextFactory";

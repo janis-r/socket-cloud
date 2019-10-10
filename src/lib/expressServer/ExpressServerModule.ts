@@ -1,26 +1,33 @@
-import {Module} from "quiver-framework";
+import {InjectionConfig, ModuleConfig} from "qft";
 import {ExpressServer} from "./service/ExpressServer";
 import {RequestContextFactory} from "./request/RequestContextFactory";
 import {LoggerModule} from "../logger";
 import {ExpressServerConfig} from "./config/ExpressServerConfig";
-import {NodeEnvConfig} from "./impl/NodeEnvConfig";
 import {ExpressSession} from "./service/ExpressSession";
-import {MemcachedSession} from "./impl/MemcachedSession";
+import {DebugSession} from "./impl/DebugSession";
+import {toMilliseconds} from "ugd10a";
 
-@Module({
+export const ExpressServerModule: ModuleConfig = {
     mappings: [
         ExpressServer,
-        {map: ExpressSession, useType: MemcachedSession, asSingleton: true},
-        RequestContextFactory,
-        {map: ExpressServerConfig, useType: NodeEnvConfig}
+        {map: ExpressSession, useType: DebugSession},
+        {
+            map: ExpressServerConfig, useValue: {
+                port: 4000,
+                sessionOptions: {
+                    secret: "session-secret",
+                    resave: false,
+                    saveUninitialized: false,
+                    cookie: {
+                        maxAge: toMilliseconds(24 * 30, "hours")
+                    }
+                },
+                sessionStoreHosts: ["127.0.0.1:11211"]
+            }
+        } as InjectionConfig<ExpressServerConfig>,
+        RequestContextFactory
     ],
     requires: [
         LoggerModule
     ]
-})
-/**
- * Application module which defines system level utilities and data flows
- */
-export class ExpressServerModule {
-
-}
+};

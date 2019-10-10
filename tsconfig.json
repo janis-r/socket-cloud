@@ -18,15 +18,13 @@
     ],
     "baseUrl": "./src",
     "paths": {
-      "@util/*": [
-        "lib/util/*"
-      ]
+      "@util/*": ["lib/util/index"]
     }
-  },
+  }/*,
   "include": [
     "./src"
   ],
   "exclude": [
     "./test"
-  ]
+  ]*/
 }

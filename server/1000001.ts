@@ -1,3 +1,7 @@
+/**
+ * @ts-ignore
+ */
+
 // includes
 import {IncomingMessage, RequestListener, ServerResponse} from "http";
 import {Worker} from "cluster";
@@ -59,7 +63,7 @@ const idmap = new Array(MAX_CONNECTIONS);
 var pHead: Entry;
 
 // attempt to read config file
-fs.readFile("config.json", "utf8", function (err, data) {
+fs.readFile("config.json", "utf8", function (err: any, data: string) {
     if (err) {
         return;
     }
@@ -130,6 +134,7 @@ const insertNode = (name: string, pNode: Response) => {
     pHead = pHead.pNext!;
 
     // delete old head
+    // @ts-ignore
     delete pDelete;
 
     // special case for head

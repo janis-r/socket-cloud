@@ -6,8 +6,9 @@ import {Logger} from "../service/Logger";
 import {LoggerConfig} from "../data/LoggerConfig";
 import {LoggerEntity} from "../data/LoggerEntity";
 import {createLogFileName} from "../util/createLogFileName";
-import {addLeadingZero, DatePart, currentDateToMap} from "../../../util";
+import {addLeadingZero} from "../../../util";
 import ErrnoException = NodeJS.ErrnoException;
+import {currentDateToObject} from "ugd10a";
 
 /**
  * System wide logging service
@@ -100,7 +101,7 @@ export class LoggerImpl extends Logger {
 
 
 function getTimestamp(): string {
-    const {date, month, year, hours, minutes, seconds} = currentDateToMap().asObject();
+    const {date, month, year, hours, minutes, seconds} = currentDateToObject();
     const dateParts = [date, month, year].map(v => addLeadingZero(v));
     const timeParts = [hours, minutes, seconds].map(v => addLeadingZero(v));
     return `${dateParts.join("/")}-${timeParts.join(":")}`;
