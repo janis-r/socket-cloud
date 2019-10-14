@@ -1,10 +1,9 @@
 import {Inject, Optional} from "qft";
-import express from "express";
-import {Express, Router} from "express";
+import express, {Express, Router} from "express";
 import compression from "compression";
 import {json} from "body-parser";
 import expressSession from "express-session";
-import {ExpressServerConfig} from "../config/ExpressServerConfig";
+import {ServerConfig} from "../config/ServerConfig";
 import {ExpressSession} from "./ExpressSession";
 
 /**
@@ -16,17 +15,17 @@ export class ExpressServer {
     private customRoutes: [Router, string][] = [];
 
     @Inject()
-    private readonly config: ExpressServerConfig;
+    private readonly config: ServerConfig;
 
     @Inject()
     @Optional()
     private readonly session: ExpressSession;
 
-    /**
-     * Start server
-     * @returns {Promise<boolean>}
-     */
-    async start(): Promise<boolean> {
+    get started(): boolean {
+        return !!this.expressApp;
+    }
+
+    async start(): Promise<true> {
         this.expressApp = express();
 
         const {
@@ -38,12 +37,12 @@ export class ExpressServer {
         expressApp.use(json());
         expressApp.use(compression());
         if (session) {
-            expressApp.use(expressSession(session.getSessionOptions()));
+            expressApp.use(expressSession(session.getOptions()));
         }
 
         customRoutes.forEach(([route, path]) => expressApp.use(path, route));
 
-        return new Promise<boolean>(resolve => {
+        return new Promise<true>((resolve, reject) => {
             try {
                 expressApp.listen(port, () => {
                     console.log(`Express server started on port: ${port}`);
@@ -51,7 +50,7 @@ export class ExpressServer {
                 });
             } catch (e) {
                 console.log(`Express server startup error: ${e}`);
-                resolve(false);
+                reject();
             }
         });
     }
@@ -61,7 +60,7 @@ export class ExpressServer {
      * @param route
      * @param path
      */
-    addRoute(route: Router, path = ''): this {
+    addRoute(route: Router, path = ""): this {
         if (this.started) {
             throw new Error(`Adding routes is permitted only before server is started`);
         }
@@ -76,7 +75,5 @@ export class ExpressServer {
         return this;
     }
 
-    get started(): boolean {
-        return !!this.expressApp;
-    }
+
 }

@@ -1,6 +1,7 @@
-/**
+/*
+/!**
  * @ts-ignore
- */
+ *!/
 
 // includes
 import {IncomingMessage, RequestListener, ServerResponse} from "http";
@@ -470,3 +471,4 @@ else {
     // listen on public port 8081
     http.createServer(onWorkerRequest).listen(8081);
 }
+*/
