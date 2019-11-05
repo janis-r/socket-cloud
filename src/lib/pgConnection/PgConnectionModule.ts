@@ -8,7 +8,10 @@ export const PgConnectionModule: ModuleConfig = {
         LoggerModule
     ],
     mappings: [
-        {map: PgConnection, useFactory: spawnDefaultPgConnection} as InjectionConfig<PgConnection>,
+        {
+            map: PgConnection,
+            useFactory: (injector: Injector) => injector.injectInto(new PgConnection(injector.get(PgConfig)))
+        } as InjectionConfig<PgConnection>,
         {
             map: PgConfig, useValue: {
                 host: '127.0.0.1',
@@ -20,7 +23,3 @@ export const PgConnectionModule: ModuleConfig = {
         } as InjectionConfig<PgConfig>
     ]
 };
-
-function spawnDefaultPgConnection(injector: Injector): PgConnection {
-    return injector.injectInto(new PgConnection(injector.get(PgConfig)));
-}

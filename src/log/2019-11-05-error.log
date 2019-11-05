@@ -1,0 +1,54 @@
+05/11/2019-14:52:33: WebSocketListener err - missing websocket key header {"remoteAddress":"::ffff:127.0.0.1","url":"/","method":"GET","headers":{"connection":"Upgrade","upgrade":"websocket","host":"localhost:8001"}}
+05/11/2019-14:52:33: uncaughtException: socket hang up
+Error: socket hang up
+    at createHangUpError (_http_client.js:323:15)
+    at Socket.socketOnEnd (_http_client.js:426:23)
+    at Socket.emit (events.js:187:15)
+    at Socket.EventEmitter.emit (domain.js:441:20)
+    at endReadableNT (_stream_readable.js:1094:12)
+    at process._tickCallback (internal/process/next_tick.js:63:19)
+05/11/2019-14:55:39: WebSocketListener err - missing websocket key header {"remoteAddress":"::ffff:127.0.0.1","url":"/","method":"GET","headers":{"connection":"Upgrade","upgrade":"websocket","host":"localhost:8001"}}
+05/11/2019-14:55:39: uncaughtException: socket hang up
+Error: socket hang up
+    at createHangUpError (_http_client.js:323:15)
+    at Socket.socketOnEnd (_http_client.js:426:23)
+    at Socket.emit (events.js:187:15)
+    at Socket.EventEmitter.emit (domain.js:441:20)
+    at endReadableNT (_stream_readable.js:1094:12)
+    at process._tickCallback (internal/process/next_tick.js:63:19)
+05/11/2019-14:56:05: WebSocketListener err - missing websocket key header {
+ "remoteAddress": "::ffff:127.0.0.1",
+ "url": "/",
+ "method": "GET",
+ "headers": {
+  "connection": "Upgrade",
+  "upgrade": "websocket",
+  "host": "localhost:8001"
+ }
+}
+05/11/2019-14:56:05: uncaughtException: socket hang up
+Error: socket hang up
+    at createHangUpError (_http_client.js:323:15)
+    at Socket.socketOnEnd (_http_client.js:426:23)
+    at Socket.emit (events.js:187:15)
+    at Socket.EventEmitter.emit (domain.js:441:20)
+    at endReadableNT (_stream_readable.js:1094:12)
+    at process._tickCallback (internal/process/next_tick.js:63:19)
+05/11/2019-14:57:13: WebSocketListener err - missing 'sec-websocket-key' header {
+ "remoteAddress": "::ffff:127.0.0.1",
+ "url": "/",
+ "method": "GET",
+ "headers": {
+  "connection": "Upgrade",
+  "upgrade": "websocket",
+  "host": "localhost:8001"
+ }
+}
+05/11/2019-14:57:13: uncaughtException: socket hang up
+Error: socket hang up
+    at createHangUpError (_http_client.js:323:15)
+    at Socket.socketOnEnd (_http_client.js:426:23)
+    at Socket.emit (events.js:187:15)
+    at Socket.EventEmitter.emit (domain.js:441:20)
+    at endReadableNT (_stream_readable.js:1094:12)
+    at process._tickCallback (internal/process/next_tick.js:63:19)

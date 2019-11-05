@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "serve": "ts-node server/main.ts",
+    "serve": "ts-node server/exp/main.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -13,18 +13,21 @@
     "@types/compression": "^1.0.1",
     "@types/express": "^4.17.1",
     "@types/express-session": "^1.15.14",
+    "@types/node-static": "^0.7.3",
     "@types/pg": "^7.11.2",
     "chalk": "^2.4.2",
     "compression": "^1.7.4",
+    "crypto": "^1.0.1",
     "express": "^4.17.1",
     "express-session": "^1.16.2",
-    "node": "^12.11.0",
+    "node": "^12.13.0",
     "pg": "^7.12.1",
     "ts-node": "^8.4.1",
     "typescript": "^3.6.3",
-    "ugd10a": "^0.3.1"
+    "ugd10a": "^0.4.0"
   },
   "devDependencies": {
-    "@types/node": "^12.7.8"
+    "@types/node": "^12.12.5",
+    "node-static": "^0.7.11"
   }
 }

@@ -9,7 +9,7 @@ import * as net from "net";
 
 let clientCount = 0;
 const server = net.createServer((socket) => {
-    console.log('new socket!')
+    console.log('new socket!');
     // socket.end('goodbye\n');
     socket.write('Heello ' + clientCount++);
 

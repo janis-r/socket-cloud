@@ -37,7 +37,7 @@ export class ExpressServer {
         expressApp.use(json());
         expressApp.use(compression());
         if (session) {
-            expressApp.use(expressSession(session.getOptions()));
+            expressApp.use(expressSession(session.options));
         }
 
         customRoutes.forEach(([route, path]) => expressApp.use(path, route));
