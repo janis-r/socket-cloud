@@ -26,9 +26,7 @@ export class WebSocketListener {
 
         server.on("upgrade", (req: IncomingMessage, socket: Socket) => {
             const {
-                url,
-                method,
-                headers,
+                url, method, headers,
                 headers: {
                     upgrade: upgradeHeader,
                     'sec-websocket-key': webSocketKeyHeader
@@ -39,7 +37,7 @@ export class WebSocketListener {
             } = req;
 
             if (upgradeHeader !== "websocket") {
-                logError(`WebSocketListener err - missing websocket header`, JSON.stringify({
+                logError(`WebSocketListener err - missing 'websocket' header`, JSON.stringify({
                     remoteAddress,
                     url,
                     method,
@@ -60,19 +58,14 @@ export class WebSocketListener {
                 return;
             }
 
-            console.log(headers);
-            console.log({webSocketKeyHeader});
-
             const responseHeaders = [
                 "HTTP/1.1 101 Web Socket Protocol Handshake",
                 "Upgrade: WebSocket",
                 "Connection: Upgrade",
                 `Sec-WebSocket-Accept: ${generateAcceptValue(webSocketKeyHeader)}`
-            ].join(delimiter) + delimiter + delimiter;
+            ].join(delimiter);
 
-            console.log(responseHeaders);
-
-            socket.write(responseHeaders);
+            socket.write(responseHeaders + delimiter + delimiter);
         });
 
         server.listen(port);
