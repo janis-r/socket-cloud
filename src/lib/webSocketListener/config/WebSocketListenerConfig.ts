@@ -1,8 +1,8 @@
 const {env: {WEB_SOCKET_PORT}} = process;
 
 /**
- * Web socket
+ * Default configuration of WebSocket connection listener
  */
-export abstract class WebSocketConfig {
+export abstract class WebSocketListenerConfig {
     readonly port = WEB_SOCKET_PORT ? parseInt(WEB_SOCKET_PORT) : 8001;
 }

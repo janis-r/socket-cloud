@@ -1,17 +1,19 @@
 import {ModuleConfig} from "qft";
-import {WebSocketConfig} from "./config/WebSocketConfig";
+import {WebSocketListenerConfig} from "./config/WebSocketListenerConfig";
 import {WebSocketListener} from "./service/WebSocketListener";
 import {LoggerModule} from "../logger";
+import {ConfigurationContextModule} from "../configurationContext";
 
 /**
  *
  */
 export const WebSocketListenerModule: ModuleConfig = {
     requires: [
-        LoggerModule
+        LoggerModule,
+        ConfigurationContextModule
     ],
     mappings: [
-        WebSocketConfig,
+        WebSocketListenerConfig,
         {map: WebSocketListener, instantiate: true}
     ]
 };

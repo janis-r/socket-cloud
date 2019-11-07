@@ -8,7 +8,7 @@ import {LoggerConfig} from "./data/LoggerConfig";
         {
             map: LoggerConfig,
             useValue: {
-                logDir: __dirname + "/../../log/", // TODO: This should be gone when active dev is over
+                logDir: __dirname + "/../../../log/", // TODO: This should be gone when active dev is over
                 logToConsole: true
             }
         } as InjectionConfig<LoggerConfig>,
@@ -17,7 +17,15 @@ import {LoggerConfig} from "./data/LoggerConfig";
 })
 export class LoggerModule {
     constructor({error}: Logger) {
-        process.on("uncaughtException", ({message, stack}) => error(`uncaughtException: ${message}\n${stack}`));
-        process.on("unhandledRejection", (reason, promise) => error(`unhandledRejection: ${{reason, promise}}`));
+        // Subscribe for system errors, if we're in node.js environment
+        if (!!process?.versions?.node) {
+            process.on(
+                "uncaughtException",
+                ({message, stack}) => error(`uncaughtException: ${message}\n${stack}`)
+            );
+            process.on(
+                "unhandledRejection",
+                (reason, promise) => error(`unhandledRejection: ${JSON.stringify({reason, promise}, null, ' ')}`)
+            );}
     }
 }
