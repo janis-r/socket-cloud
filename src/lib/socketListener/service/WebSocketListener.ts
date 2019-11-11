@@ -3,10 +3,14 @@ import {IncomingMessage} from "http";
 import {Socket} from "net";
 import {createHash} from "crypto";
 import {EventDispatcher, Injectable} from "qft";
-import {WebSocketListenerConfig} from "../config/WebSocketListenerConfig";
 import {Logger} from "../../logger";
 import {ConfigurationContextProvider} from "../../configurationContext";
-import {NewWebSocketConnectionEvent} from "../event/NewWebSocketConnectionEvent";
+import {WebSocketListenerConfig} from "../config/WebSocketListenerConfig";
+import {ValidateSocketConnectionEvent} from "../event/ValidateSocketConnectionEvent";
+import {NewSocketConnectionEvent} from "../event/NewSocketConnectionEvent";
+import {SocketConnectionType} from "../../types/SocketConnectionType";
+import {HttpStatusCode} from "../../types/HttpStatusCodes";
+import {SocketDescriptor} from "../data/SocketDescriptor";
 
 @Injectable()
 export class WebSocketListener {
@@ -19,18 +23,20 @@ export class WebSocketListener {
                 private readonly eventDispatcher: EventDispatcher
     ) {
         this.httpServer = http.createServer((req, res) => {
-            res.writeHead(200, {"Content-Type": "text/plain"});
+            res.writeHead(HttpStatusCode.Ok, {"Content-Type": "text/plain"});
             res.end("Ready to accept connections.");
         });
-        this.httpServer.on("upgrade", this.socketConnectionHandler);
-        this.httpServer.listen(config.port);
-        logger.console(`WebSocketListener running on port ${config.port}`);
+
+        const {config: {webSocketPort}, socketConnectionHandler} = this;
+        this.httpServer.on("upgrade", socketConnectionHandler);
+        this.httpServer.listen(webSocketPort);
+        this.httpServer.once("listening", () => logger.console(`WebSocketListener running on port ${webSocketPort}`));
     }
 
     private readonly socketConnectionHandler = async (request: IncomingMessage, socket: Socket): Promise<void> => {
         const {
             logger: {error: logError, debug: logDebug},
-            configurationContextProvider: {getConfigurationForWebSocket},
+            configurationContextProvider: {getSocketConfigurationContext},
             eventDispatcher
         } = this;
         const {
@@ -48,7 +54,7 @@ export class WebSocketListener {
 
         const debugInfo = JSON.stringify({remoteAddress, url, method, headers}, null, ' ');
 
-        if (upgradeHeader !== "websocket") {
+        if (!upgradeHeader || upgradeHeader !== "websocket") {
             logError(`WebSocketListener err - missing 'websocket' header`, debugInfo);
             socket.end('HTTP/1.1 400 Bad Request');
             return;
@@ -61,17 +67,31 @@ export class WebSocketListener {
         }
 
         const origin = secWebsocketOriginHeader as string ?? originHeader as string;
-        const configuration = await getConfigurationForWebSocket(remoteAddress, origin);
+        if (!origin) {
+            logError(`WebSocketListener err - missing origin info in header`, debugInfo);
+            socket.end("HTTP/1.1 400 Bad Request");
+            return;
+        }
+
+        const socketDescriptor: SocketDescriptor = {type: SocketConnectionType.WebSocket, origin, remoteAddress};
+        const configuration = await getSocketConfigurationContext(socketDescriptor);
         if (configuration === null) {
-            logError(`WebSocketListener err - missing configuration context`, debugInfo);
+            logError(`WebSocketListener err - configuration context cannot not be found`, debugInfo);
             socket.end("HTTP/1.1 403 Forbidden");
             return;
         }
 
-        const validationEvent = new NewWebSocketConnectionEvent(origin, remoteAddress, configuration);
+        const validationEvent = new ValidateSocketConnectionEvent(socketDescriptor, configuration);
         eventDispatcher.dispatchEvent(validationEvent);
-        if (validationEvent.defaultPrevented) {
-            logDebug(`WebSocketListener new connection prevented with reason: ${validationEvent.preventReason}`, debugInfo);
+        const validationResponse = await validationEvent.validate();
+        if (validationResponse !== true) {
+            logDebug(`WebSocketListener new connection prevented with reason: ${validationResponse}`, debugInfo);
+            socket.end("HTTP/1.1 403 Forbidden");
+            return;
+        }
+
+        if (!socket.writable && !socket.readable) {
+            logDebug(`WebSocketListener new connection closed before init process is finished`, debugInfo);
             socket.end("HTTP/1.1 403 Forbidden");
             return;
         }
@@ -85,6 +105,8 @@ export class WebSocketListener {
         ].join(delimiter);
 
         socket.write(responseHeaders + delimiter + delimiter);
+
+        eventDispatcher.dispatchEvent(new NewSocketConnectionEvent(socket, socketDescriptor, configuration));
     };
 }
 

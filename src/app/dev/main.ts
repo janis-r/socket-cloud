@@ -1,15 +1,11 @@
 import * as http from "http";
 import {Context, WebApplicationBundle} from "qft";
-import {WebSocketListenerModule} from "../../lib/webSocketListener";
-import {Logger} from "../../lib/logger";
 import * as fs from "fs";
+import {WebSocketListenerModule} from "../../lib/socketListener";
+import {Logger} from "../../lib/logger";
+import {HttpMethod} from "../../lib/types/HttpMethod";
 
 const initHttpServer = async (port = 8000) => {
-    enum HttpMethod {
-        GET = "GET",
-        POST = "POST"
-    }
-
     const server = http.createServer((req, res) => {
         const {method, url} = req;
         console.log({method, url});
@@ -40,29 +36,7 @@ const initSocket = async () => {
         .install(...WebApplicationBundle)
         .configure(WebSocketListenerModule)
         .initialize();
-    injector.get(Logger).console(`Context initialized`);
+    injector.get(Logger).console(`Web socket context initialized`);
 };
 
-initHttpServer()
-    .then(initSocket)
-/*.then(() => {
-    const options = {
-        port: 8001,
-        host: 'localhost',
-        headers: {
-            'Connection': 'Upgrade',
-            'Upgrade': 'websocket',
-            'sec-websocket-key': 'L+TKCTxD1hH17zO+in0cDA=='
-            // expecting `Sec-WebSocket-Accept: 3Py0MLF/du8gtJnh0oO0B2d1xiQ=` in response
-        }
-    };
-
-    const req = http.request(options);
-    req.end();
-
-    req.on('upgrade', (res, socket, upgradeHead) => {
-        console.log('got upgraded!');
-        socket.end();
-        process.exit(0);
-    });
-});*/
+initHttpServer().then(initSocket);

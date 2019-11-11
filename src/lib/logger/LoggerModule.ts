@@ -25,7 +25,8 @@ export class LoggerModule {
             );
             process.on(
                 "unhandledRejection",
-                (reason, promise) => error(`unhandledRejection: ${JSON.stringify({reason, promise}, null, ' ')}`)
-            );}
+                (reason) => error(`unhandledRejection: ${JSON.stringify(reason, null, ' ')}`)
+            );
+        }
     }
 }
