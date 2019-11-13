@@ -6,41 +6,43 @@
 
 </head>
 <body>
-    <h1>
+<h1>
     Web socket?
-        <textarea id="output" style="width: 100%; height: 300px;"></textarea>
-    </h1>
+    <textarea id="output" style="width: 100%; height: 300px;"></textarea>
+</h1>
 
-    <script type="application/javascript">
-        const output = document.getElementById("output");
+<script type="application/javascript">
+    const output = document.getElementById("output");
 
-        const write = (message) => output.innerHTML += Array.isArray(message) ? "  " + message.join("\n  ") : message + "\n";
+    const write = (message) => output.innerHTML += Array.isArray(message) ? "  " + message.join("\n  ") : message + "\n";
 
-        // const socket = new WebSocket('wss://echo.websocket.org');
-        const socket = new WebSocket('ws://localhost:8001');
-        socket.onopen = function(event) {
-            write("onopen", JSON.stringify(event, null, ' '));
-            console.log({onopen: event});
+    // const socket = new WebSocket('wss://echo.websocket.org');
+    const socket = new WebSocket('ws://localhost:8001');
+    socket.onopen = function (event) {
+        write("onopen", JSON.stringify(event, null, ' '));
+        console.log({onopen: event});
+        const message = "Hello server! This is client writing. How do you do?";
+        socket.send(message);
+        write('msg:' + message)
+        write('len:' + message.length)
+    };
+    socket.onmessage = (event) => {
+        write("onmessage", event);
+        console.log({onmessage: event});
+    };
+    socket.onerror = (event) => {
+        write("onerror", JSON.stringify(event, null, ' '));
+        console.log({onerror: event})
+    };
 
-            socket.send("Hello server! This is client writing. How do you do?");
-        };
-        socket.onmessage = (event) => {
-            write("onmessage", event);
-            console.log({onmessage: event});
-        };
-        socket.onerror = (event) => {
-            write("onerror", JSON.stringify(event, null, ' '));
-            console.log({onerror: event})
-        };
+    socket.onclose = (event) => {
+        write("onclose");
+        console.log({onclose: event})
+    };
 
-        socket.onclose = (event) => {
-            write("onclose");
-            console.log({onclose: event})
-        };
+    write("extensions: " + JSON.stringify(socket.extensions));
 
-        write("extensions: " + JSON.stringify(socket.extensions));
-
-    </script>
+</script>
 </body>
 </html>
 

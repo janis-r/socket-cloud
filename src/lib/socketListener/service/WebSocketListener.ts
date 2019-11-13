@@ -11,6 +11,7 @@ import {NewSocketConnectionEvent} from "../event/NewSocketConnectionEvent";
 import {SocketConnectionType} from "../../types/SocketConnectionType";
 import {HttpStatusCode} from "../../types/HttpStatusCodes";
 import {SocketDescriptor} from "../data/SocketDescriptor";
+import {ClientConnection} from "../model/ClientConnection";
 
 @Injectable()
 export class WebSocketListener {
@@ -105,6 +106,8 @@ export class WebSocketListener {
         ].join(delimiter);
 
         socket.write(responseHeaders + delimiter + delimiter);
+
+        const connection = new ClientConnection(socket);
 
         eventDispatcher.dispatchEvent(new NewSocketConnectionEvent(socket, socketDescriptor, configuration));
     };

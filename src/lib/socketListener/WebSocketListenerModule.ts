@@ -9,6 +9,6 @@ export const WebSocketListenerModule: ModuleConfig = {
     ],
     mappings: [
         WebSocketListenerConfig,
-        {map: WebSocketListener, instantiate: true}
+        {map: WebSocketListener, asSingleton: true, instantiate: true}
     ]
 };

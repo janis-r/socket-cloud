@@ -1,11 +1,14 @@
 import * as http from "http";
-import {Context, WebApplicationBundle} from "qft";
+import {Context, Injector, WebApplicationBundle} from "qft";
 import * as fs from "fs";
-import {WebSocketListenerModule} from "../../lib/socketListener";
+import {WebSocketListenerConfig, WebSocketListenerModule} from "../../lib/socketListener";
 import {Logger} from "../../lib/logger";
 import {HttpMethod} from "../../lib/types/HttpMethod";
 
-const initHttpServer = async (port = 8000) => {
+const httpServerPort = 8000;
+let contextInjector: Injector;
+
+const initHttpServer = async (port = httpServerPort) => {
     const server = http.createServer((req, res) => {
         const {method, url} = req;
         console.log({method, url});
@@ -37,6 +40,41 @@ const initSocket = async () => {
         .configure(WebSocketListenerModule)
         .initialize();
     injector.get(Logger).console(`Web socket context initialized`);
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    contextInjector = injector;
 };
 
-initHttpServer().then(initSocket);
+const createConnection = async () => {
+    const {webSocketPort: port} = contextInjector.get(WebSocketListenerConfig);
+    const options = {
+        port,
+        host: 'localhost',
+        headers: {
+            'Connection': 'Upgrade',
+            'Upgrade': 'websocket',
+            'Sec-WebSocket-Key': 'L+TKCTxD1hH17zO+in0cDA==',
+            'origin': `http://localhost:${port}`,
+        }
+    };
+
+    const req = http.request(options);
+    req.end();
+
+    req.on('upgrade', (res, socket, upgradeHead) => {
+        console.log('got upgraded!');
+
+        socket.on("connect", () => console.log('socket on connect'));
+        socket.on("data", (data: Buffer) => console.log('socket on data', data));
+        socket.on("error", (err: Error) => console.log('socket on error', err));
+        socket.on("end", () => console.log('socket on end   '));
+
+        socket.write('Hello server, this is client!');
+    });
+};
+
+
+initHttpServer()
+    .then(initSocket)
+    // .then(createConnection);
