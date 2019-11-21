@@ -17,25 +17,25 @@
     const write = (message) => output.innerHTML += Array.isArray(message) ? "  " + message.join("\n  ") : message + "\n";
 
     // const socket = new WebSocket('wss://echo.websocket.org');
-    const socket = new WebSocket('ws://localhost:8001');
-    socket.onopen = function (event) {
+    const socket = new WebSocket('ws://localhost:8001?foo=1&bar=2&lee=3');
+    socket.onopen = event => {
         write("onopen", JSON.stringify(event, null, ' '));
         console.log({onopen: event});
-        const message = "Hello server! This is client writing. How do you do?";
-        socket.send(message);
-        write('msg:' + message)
+        const message = new Array(10).fill(null).map(x => "Hello server! This is client writing. How do you do?").join('\n');
         write('len:' + message.length)
+        write('msg:' + message)
+        socket.send(message);
     };
-    socket.onmessage = (event) => {
+    socket.onmessage = event => {
         write("onmessage", event);
         console.log({onmessage: event});
     };
-    socket.onerror = (event) => {
+    socket.onerror = event => {
         write("onerror", JSON.stringify(event, null, ' '));
         console.log({onerror: event})
     };
 
-    socket.onclose = (event) => {
+    socket.onclose = event => {
         write("onclose");
         console.log({onclose: event})
     };

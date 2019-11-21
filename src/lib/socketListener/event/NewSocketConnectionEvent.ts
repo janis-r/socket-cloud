@@ -8,7 +8,7 @@ import {SocketDescriptor} from "../data/SocketDescriptor";
  * to connection pool.
  */
 export class NewSocketConnectionEvent extends Event {
-    static readonly TYPE = 'new-socket-connection-event';
+    static readonly TYPE = Symbol('new-socket-connection-event');
 
     constructor(readonly socket: Socket, readonly descriptor: SocketDescriptor, readonly context: ConfigurationContext) {
         super(NewSocketConnectionEvent.TYPE);

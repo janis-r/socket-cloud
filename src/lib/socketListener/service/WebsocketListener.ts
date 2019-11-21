@@ -1,20 +1,16 @@
 import * as http from "http";
-import {IncomingMessage} from "http";
 import {Socket} from "net";
 import {createHash} from "crypto";
 import {EventDispatcher, Injectable} from "qft";
 import {Logger} from "../../logger";
 import {ConfigurationContextProvider} from "../../configurationContext";
 import {WebSocketListenerConfig} from "../config/WebSocketListenerConfig";
-import {ValidateSocketConnectionEvent} from "../event/ValidateSocketConnectionEvent";
-import {NewSocketConnectionEvent} from "../event/NewSocketConnectionEvent";
-import {SocketConnectionType} from "../../types/SocketConnectionType";
 import {HttpStatusCode} from "../../types/HttpStatusCodes";
-import {SocketDescriptor} from "../data/SocketDescriptor";
-import {ClientConnection} from "../model/ClientConnection";
+import {WebsocketUpgradeRequest} from "../data/WebsocketUpgradeRequest";
+import {WebsocketConnectionValidationRequest} from "../event/WebsocketConnectionValidationRequest";
 
 @Injectable()
-export class WebSocketListener {
+export class WebsocketListener {
 
     private readonly httpServer: http.Server;
 
@@ -34,24 +30,27 @@ export class WebSocketListener {
         this.httpServer.once("listening", () => logger.console(`WebSocketListener running on port ${webSocketPort}`));
     }
 
-    private readonly socketConnectionHandler = async (request: IncomingMessage, socket: Socket): Promise<void> => {
-        const {
-            logger: {error: logError, debug: logDebug},
-            configurationContextProvider: {getSocketConfigurationContext},
-            eventDispatcher
-        } = this;
-        const {
-            url, method, headers,
-            headers: {
-                upgrade: upgradeHeader,
-                'sec-websocket-key': secWebSocketKeyHeader,
-                origin: originHeader,
-                'sec-websocket-origin': secWebsocketOriginHeader
-            },
-            connection: {remoteAddress}
-        } = request;
+    private readonly socketConnectionHandler = async (request: WebsocketUpgradeRequest, socket: Socket): Promise<void> => {
+        const {eventDispatcher: {dispatchEvent}} = this;
+        const {connection: {remoteAddress}, url, method, headers} = request;
 
-        console.log(headers);
+        console.log('>>', {remoteAddress, url, method, headers}, '\n');
+        dispatchEvent(new WebsocketConnectionValidationRequest(
+            request,
+            socket,
+            JSON.stringify({remoteAddress, url, method, headers}, null, ' ')
+        ));
+        /*return;
+
+        //TODO: store `host` somewhere
+
+        console.log({method, url}, '\n');
+        console.log('>> parseWebsocketExtensions', parseWebsocketExtensions(secWebsocketExtensions));
+
+        process.exit();
+        // The request MUST include a header field with the name
+        // |Sec-WebSocket-Version|. The value of this header field MUST be
+        // 13.
 
         const debugInfo = JSON.stringify({remoteAddress, url, method, headers}, null, ' ');
 
@@ -63,13 +62,20 @@ export class WebSocketListener {
 
         if (!secWebSocketKeyHeader || typeof secWebSocketKeyHeader !== "string") {
             logError(`WebSocketListener err - missing 'sec-websocket-key' header`, debugInfo);
+            // TODO: Add length check?
+            // 5. A |Sec-WebSocket-Key| header field with a base64-encoded (see
+            // Section 4 of [RFC4648]) value that, when decoded, is 16 bytes in
+            // length.
             socket.end("HTTP/1.1 400 Bad Request");
             return;
         }
 
-        const origin = secWebsocketOriginHeader as string ?? originHeader as string;
+        if (!secWebsocketVersion || typeof secWebsocketVersion !== "string") {
+
+        }
+        const origin = originHeader ?? secWebsocketOriginHeader;
         if (!origin) {
-            logError(`WebSocketListener err - missing origin info in header`, debugInfo);
+            logError(`WebsocketListener err - missing origin info in header`, debugInfo);
             socket.end("HTTP/1.1 400 Bad Request");
             return;
         }
@@ -77,7 +83,7 @@ export class WebSocketListener {
         const socketDescriptor: SocketDescriptor = {type: SocketConnectionType.WebSocket, origin, remoteAddress};
         const configuration = await getSocketConfigurationContext(socketDescriptor);
         if (configuration === null) {
-            logError(`WebSocketListener err - configuration context cannot not be found`, debugInfo);
+            logError(`WebsocketListener err - configuration context cannot not be found`, debugInfo);
             socket.end("HTTP/1.1 403 Forbidden");
             return;
         }
@@ -102,7 +108,8 @@ export class WebSocketListener {
             "HTTP/1.1 101 Web Socket Protocol Handshake",
             "Upgrade: WebSocket",
             "Connection: Upgrade",
-            `Sec-WebSocket-Accept: ${generateWebSocketAcceptResponse(secWebSocketKeyHeader)}`
+            `Sec-WebSocket-Accept: ${generateWebSocketAcceptResponse(secWebSocketKeyHeader)}`,
+            // 'Sec-WebSocket-Extensions: permessage-deflate'
         ].join(delimiter);
 
         socket.write(responseHeaders + delimiter + delimiter);
@@ -110,6 +117,7 @@ export class WebSocketListener {
         const connection = new ClientConnection(socket);
 
         eventDispatcher.dispatchEvent(new NewSocketConnectionEvent(socket, socketDescriptor, configuration));
+        */
     };
 }
 

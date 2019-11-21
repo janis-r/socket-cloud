@@ -8,7 +8,7 @@ import {SocketDescriptor} from "../data/SocketDescriptor";
  * This event is dispatched in order to let third parties prevent this connection being established.
  */
 export class ValidateSocketConnectionEvent extends AsyncValidationEvent<ValidationError> {
-    static readonly TYPE = 'validate-socket-connection-event';
+    static readonly TYPE = Symbol('validate-socket-connection-event');
 
     constructor(readonly descriptor: SocketDescriptor, readonly context: ConfigurationContext) {
         super(ValidateSocketConnectionEvent.TYPE);

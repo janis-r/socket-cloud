@@ -1,6 +1,6 @@
 import {ModuleConfig} from "qft";
 import {WebSocketListenerConfig} from "./config/WebSocketListenerConfig";
-import {WebSocketListener} from "./service/WebSocketListener";
+import {WebsocketListener} from "./service/WebsocketListener";
 import {SocketListenerBaseModule} from "./SocketListenerBaseModule";
 
 export const WebSocketListenerModule: ModuleConfig = {
@@ -9,6 +9,6 @@ export const WebSocketListenerModule: ModuleConfig = {
     ],
     mappings: [
         WebSocketListenerConfig,
-        {map: WebSocketListener, asSingleton: true, instantiate: true}
+        {map: WebsocketListener, asSingleton: true, instantiate: true}
     ]
 };
