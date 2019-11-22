@@ -23,10 +23,17 @@ export class LoggerModule {
                 "uncaughtException",
                 ({message, stack}) => error(`uncaughtException: ${message}\n${stack}`)
             );
-            process.on(
+            /*process.on(
                 "unhandledRejection",
-                (reason) => error(`unhandledRejection: ${JSON.stringify(reason, null, ' ')}`)
-            );
+                (reason, p) => {
+                    // TODO: Here's a room for improvement
+                    error(`unhandledRejection: ${JSON.stringify({reason}, null, ' ')}`)
+                    /!*if (p) {
+                        p.then(res => 'then: ' + JSON.stringify(res))
+                        p.catch(res => 'catch: ' + JSON.stringify(res))
+                    }*!/
+                }
+            );*/
         }
     }
 }

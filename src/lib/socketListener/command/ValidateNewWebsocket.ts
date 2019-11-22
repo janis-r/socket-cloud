@@ -1,4 +1,4 @@
-import {Inject, MacroCommand, SubCommand, EventDispatcher} from "qft";
+import {EventDispatcher, Inject, MacroCommand, SubCommand} from "qft";
 import {WebsocketConnectionValidationRequest} from "../event/WebsocketConnectionValidationRequest";
 import {Logger} from "../../logger";
 import {AuthorizeConnectionContext} from "./websocketValidators/AuthorizeConnectionContext";
@@ -6,6 +6,7 @@ import {ValidateConnectionHeaders} from "./websocketValidators/ValidateConnectio
 import {generateWebsocketHandshakeResponse} from "../util/websocket-utils";
 import {NewSocketConnectionEvent} from "../event/NewSocketConnectionEvent";
 import {ClientConnection} from "../model/ClientConnection";
+import {PrepareWebsocketExtensions} from "./websocketValidators/PrepareWebsocketExtensions";
 
 export class ValidateNewWebsocket extends MacroCommand<boolean> {
 
@@ -17,10 +18,7 @@ export class ValidateNewWebsocket extends MacroCommand<boolean> {
     private readonly eventDispatcher: EventDispatcher;
 
     constructor() {
-        super([
-            ValidateConnectionHeaders,
-            AuthorizeConnectionContext
-        ]);
+        super(ValidateConnectionHeaders, AuthorizeConnectionContext, PrepareWebsocketExtensions);
     }
 
     async execute(): Promise<void> {
@@ -67,8 +65,13 @@ export class ValidateNewWebsocket extends MacroCommand<boolean> {
     }
 
     protected async executeSubCommand(command: SubCommand<boolean>): Promise<boolean> {
-        const result = await super.executeSubCommand(command);
+        const result = super.executeSubCommand(command);
+        if (isPromise(result)) {
+            const aaaaaaa = await result;
+            console.log('aaaaaaa', aaaaaaa);
+        }
         if (!result) {
+            console.log('result:::', result);
             console.log('Halt ValidateNewWebsocket at', command);
             this.haltExecution();
         }
@@ -76,3 +79,6 @@ export class ValidateNewWebsocket extends MacroCommand<boolean> {
     }
 
 }
+
+
+const isPromise = (entry: unknown): entry is Promise<any> => Promise.resolve(entry) === entry;

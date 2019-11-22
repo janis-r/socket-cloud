@@ -1,10 +1,14 @@
-export class PermessageDeflateExtension {
+import {WebsocketExtensionConfig} from "../data/WebsocketExtensionConfig";
+import {WebsocketExtension} from "./WebsocketExtension";
+
+export class PermessageDeflateExtension implements WebsocketExtension {
 
     static readonly ID = "permessage-deflate";
 
-    constructor() {
+    validateConfigurationOffer(...configs: WebsocketExtensionConfig[]): void {
 
     }
+
 }
 
 enum PermessageDeflateParams {

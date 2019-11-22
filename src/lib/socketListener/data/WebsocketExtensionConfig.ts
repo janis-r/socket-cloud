@@ -1,1 +1,1 @@
-export type WebsocketExtensionConfig = Map<string, string | undefined>;
+export type WebsocketExtensionConfig = Map<string, string | number | undefined>;

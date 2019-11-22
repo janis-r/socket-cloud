@@ -29,7 +29,7 @@ export class AuthorizeConnectionContext implements Command<boolean> {
                 requestInfo
             },
             logger: {error, debug},
-            eventDispatcher: {dispatchEvent},
+            eventDispatcher,
             configurationContextProvider: {getSocketConfigurationContext}
         } = this;
 
@@ -47,7 +47,7 @@ export class AuthorizeConnectionContext implements Command<boolean> {
         }
 
         const validationEvent = new ValidateSocketConnectionEvent(socketDescriptor, configuration);
-        dispatchEvent(validationEvent);
+        eventDispatcher.dispatchEvent(validationEvent);
         const validationResponse = await validationEvent.validate();
 
         if (validationResponse !== true) {

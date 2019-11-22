@@ -31,15 +31,17 @@ export class WebsocketListener {
     }
 
     private readonly socketConnectionHandler = async (request: WebsocketUpgradeRequest, socket: Socket): Promise<void> => {
-        const {eventDispatcher: {dispatchEvent}} = this;
+        const {eventDispatcher} = this;
         const {connection: {remoteAddress}, url, method, headers} = request;
 
         console.log('>>', {remoteAddress, url, method, headers}, '\n');
-        dispatchEvent(new WebsocketConnectionValidationRequest(
+
+        eventDispatcher.dispatchEvent(new WebsocketConnectionValidationRequest(
             request,
             socket,
             JSON.stringify({remoteAddress, url, method, headers}, null, ' ')
         ));
+
         /*return;
 
         //TODO: store `host` somewhere

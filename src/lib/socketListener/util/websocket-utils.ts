@@ -70,16 +70,35 @@ function extractMessagePayload(buffer: Buffer, payloadOffset: number, payloadLen
  * Parse sec-websocket-extensions header value into Map describing extensions and their params
  * @param headerString
  */
-export function parseWebsocketExtensions(headerString: string): null | Map<string, WebsocketExtensionConfig> {
+export function parseWebsocketExtensions(headerString: string): Map<string, Set<WebsocketExtensionConfig>> {
+    const extensionMap = new Map<string, Set<WebsocketExtensionConfig>>();
     if (!headerString || !headerString.length) {
-        return null;
+        return new Map();
     }
-    return new Map(headerString.split(/,\s*/).map(entry => entry.split(/;\s*/))
-        .map(([name, ...params]) => ([
-            name,
-            new Map(params.map((param): [string, string | undefined] => {
-                const [name, value] = param.split('=');
-                return [name, value];
-            }))
-        ])));
+
+    headerString.split(/,\s*/g).map(entry => entry.split(/;\s*/g))
+        .forEach(([extensionName, ...params]) => {
+            const config: WebsocketExtensionConfig = new Map(params.map((param): [string, string | number | undefined] => {
+                const [paramName, value] = param.split('=');
+                return [
+                    paramName,
+                    value ? normalizeHeaderParamValue(value) : undefined
+                ];
+            }));
+
+            if (extensionMap.has(extensionName)) {
+                extensionMap.get(extensionName).add(config);
+            } else {
+                extensionMap.set(extensionName, new Set<WebsocketExtensionConfig>([config]));
+            }
+        });
+    return extensionMap;
+}
+
+function normalizeHeaderParamValue(value: string): string | number {
+    value = value.replace(/^\s*('|")|('|")\s*$/gm, ''); // According to docs this value can be quoted
+    if (value.match(/^\d+$/)) {
+        return parseInt(value);
+    }
+    return value;
 }

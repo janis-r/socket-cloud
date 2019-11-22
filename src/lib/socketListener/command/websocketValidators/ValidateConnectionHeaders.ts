@@ -50,7 +50,7 @@ export class ValidateConnectionHeaders implements Command<boolean> {
             return false;
         }
 
-        if ((typeof secWebsocketVersion === "string" ? parseInt(secWebsocketVersion) : secWebsocketVersion) !== 13) {
+        if ((typeof secWebsocketVersion === "string" ? parseInt(secWebsocketVersion as string) : secWebsocketVersion) !== 13) {
             error(`Websocket validation err - 'sec-websocket-version' header must be equal 13`, requestInfo);
             socket.end("HTTP/1.1 400 Bad Request");
             return false;

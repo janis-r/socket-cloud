@@ -1,7 +1,7 @@
 import * as http from "http";
 import {Context, Injector, WebApplicationBundle} from "qft";
 import * as fs from "fs";
-import {WebSocketListenerConfig, WebSocketListenerModule} from "../../lib/socketListener";
+import {WebSocketListenerConfig, WebsocketListenerModule} from "../../lib/socketListener";
 import {Logger} from "../../lib/logger";
 import {HttpMethod} from "../../lib/types/HttpMethod";
 
@@ -37,7 +37,7 @@ const initHttpServer = async (port = httpServerPort) => {
 const initSocket = async () => {
     const {injector} = new Context()
         .install(...WebApplicationBundle)
-        .configure(WebSocketListenerModule)
+        .configure(WebsocketListenerModule)
         .initialize();
     injector.get(Logger).console(`Web socket context initialized`);
 
