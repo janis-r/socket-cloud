@@ -5,10 +5,11 @@ import {AuthorizeConnectionContext} from "./websocketValidators/AuthorizeConnect
 import {ValidateConnectionHeaders} from "./websocketValidators/ValidateConnectionHeaders";
 import {generateWebsocketHandshakeResponse} from "../util/websocket-utils";
 import {NewSocketConnectionEvent} from "../event/NewSocketConnectionEvent";
-import {ClientConnection} from "../model/ClientConnection";
+import {WebsocketClientConnection} from "../model/WebsocketClientConnection";
 import {PrepareWebsocketExtensions} from "./websocketValidators/PrepareWebsocketExtensions";
+import {isPromise} from "../util/is-promise";
 
-export class ValidateNewWebsocket extends MacroCommand<boolean> {
+export class ValidateNewWebsocket<T = false | never> extends MacroCommand<T> {
 
     @Inject()
     private readonly event: WebsocketConnectionValidationRequest;
@@ -30,7 +31,7 @@ export class ValidateNewWebsocket extends MacroCommand<boolean> {
                     headers: {'sec-websocket-key': secWebSocketKeyHeader},
                     socket
                 },
-                requestInfo, socketDescriptor, configurationContext
+                requestInfo, socketDescriptor, configurationContext, extensions
             },
             logger: {debug},
             eventDispatcher
@@ -53,25 +54,24 @@ export class ValidateNewWebsocket extends MacroCommand<boolean> {
             "Upgrade: WebSocket",
             "Connection: Upgrade",
             `Sec-WebSocket-Accept: ${generateWebsocketHandshakeResponse(secWebSocketKeyHeader)}`,
-            // 'Sec-WebSocket-Extensions: permessage-deflate'
+            'Sec-WebSocket-Extensions: permessage-deflate'
         ].join(delimiter);
 
         socket.write(responseHeaders + delimiter + delimiter);
 
-        const connection = new ClientConnection(socket);
+        const connection = new WebsocketClientConnection(socket, extensions);
 
         eventDispatcher.dispatchEvent(new NewSocketConnectionEvent(socket, socketDescriptor, configurationContext));
 
     }
 
-    protected async executeSubCommand(command: SubCommand<boolean>): Promise<boolean> {
+    protected async executeSubCommand(command: SubCommand<T>): Promise<T> {
         const result = super.executeSubCommand(command);
-        if (isPromise(result)) {
-            const aaaaaaa = await result;
-            console.log('aaaaaaa', aaaaaaa);
-        }
-        if (!result) {
-            console.log('result:::', result);
+
+        const value = isPromise(result) ? await result : result;
+        console.log('>> executeSubCommand result', value);
+
+        if (value as any === false) { // TODO "as any" should not be needed in here
             console.log('Halt ValidateNewWebsocket at', command);
             this.haltExecution();
         }
@@ -81,4 +81,4 @@ export class ValidateNewWebsocket extends MacroCommand<boolean> {
 }
 
 
-const isPromise = (entry: unknown): entry is Promise<any> => Promise.resolve(entry) === entry;
+

@@ -1,11 +1,9 @@
-import {Command, Inject, Type} from "qft";
+import {Command, Inject} from "qft";
 import {WebsocketConnectionValidationRequest} from "../../event/WebsocketConnectionValidationRequest";
 import {Logger} from "../../../logger";
-import {parseWebsocketExtensions} from "../../util/websocket-utils";
-import {WebsocketExtension} from "../../extension/WebsocketExtension";
-import {PermessageDeflateExtension} from "../../extension/PermessageDeflateExtension";
+import {WebsocketExtensionRegistry} from "../../../websocketExtension";
 
-export class PrepareWebsocketExtensions implements Command<boolean> {
+export class PrepareWebsocketExtensions implements Command<false | never> {
 
     @Inject()
     private readonly event: WebsocketConnectionValidationRequest;
@@ -13,49 +11,35 @@ export class PrepareWebsocketExtensions implements Command<boolean> {
     @Inject()
     private readonly logger: Logger;
 
-    private readonly knownExtensions = new Map<string, Type<WebsocketExtension>>([
-        [PermessageDeflateExtension.ID, PermessageDeflateExtension]
-    ]);
+    @Inject()
+    private readonly websocketExtensionRegistry: WebsocketExtensionRegistry;
 
-    execute(): boolean {
+    execute(): false | never {
         const {
-            logger: {error},
+            logger: {error: logError},
+            event,
             event: {
                 request: {
                     headers: {
                         'sec-websocket-extensions': secWebsocketExtensions,
-                    },
+                    }
                 },
                 socket,
-                requestInfo
+                extensions
             },
-            knownExtensions
+            websocketExtensionRegistry
         } = this;
 
-        const extensions = parseWebsocketExtensions(secWebsocketExtensions);
-        console.log(extensions);
-
-        if (extensions.size === 0) {
-            return true;
-        }
-
-        for (const [name, config] of extensions) {
-            if (!knownExtensions.has(name)) {
-                continue;
-            }
-
-            const extension = new (knownExtensions.get(name))();
-            extension.validateConfigurationOffer(...config);
-        }
-
-
-        /*if (!originHeader && !secWebsocketOriginHeader) {
-            error(`Websocket validation err - origin is not set in header`, requestInfo);
+        try {
+            event.extensions = websocketExtensionRegistry.getExtensionExecutorsForConfiguration(secWebsocketExtensions);
+        } catch ({error, stack}) {
+            logError(`PrepareWebsocketExtensions err while validating configuration offer ${JSON.stringify({
+                error,
+                stack
+            }, null, ' ')}`);
             socket.end("HTTP/1.1 400 Bad Request");
             return false;
-        }*/
-
-        return true;
+        }
     }
 
 }

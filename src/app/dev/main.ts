@@ -1,9 +1,11 @@
 import * as http from "http";
-import {Context, Injector, WebApplicationBundle} from "qft";
+import {Context, Injector, WebApplicationBundle, ModuleConfig} from "qft";
 import * as fs from "fs";
 import {WebSocketListenerConfig, WebsocketListenerModule} from "../../lib/socketListener";
 import {Logger} from "../../lib/logger";
 import {HttpMethod} from "../../lib/types/HttpMethod";
+import {PermessageDeflateExtensionModule} from "../../lib/websocketExtensionPermessageDeflate/PermessageDeflateExtensionModule";
+import {PermessageDeflateConfig} from "../../lib/websocketExtensionPermessageDeflate/config/PermessageDeflateConfig";
 
 const httpServerPort = 8000;
 let contextInjector: Injector;
@@ -37,7 +39,15 @@ const initHttpServer = async (port = httpServerPort) => {
 const initSocket = async () => {
     const {injector} = new Context()
         .install(...WebApplicationBundle)
-        .configure(WebsocketListenerModule)
+        .configure(
+            WebsocketListenerModule,
+            PermessageDeflateExtensionModule,
+            <ModuleConfig> {
+                mappings: [
+                    { map: PermessageDeflateConfig, useValue: {}}
+                ]
+            }
+        )
         .initialize();
     injector.get(Logger).console(`Web socket context initialized`);
 

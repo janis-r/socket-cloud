@@ -4,10 +4,12 @@ import {WebsocketListener} from "./service/WebsocketListener";
 import {SocketListenerBaseModule} from "./SocketListenerBaseModule";
 import {WebsocketConnectionValidationRequest} from "./event/WebsocketConnectionValidationRequest";
 import {ValidateNewWebsocket} from "./command/ValidateNewWebsocket";
+import {WebsocketExtensionModule} from "../websocketExtension";
 
 export const WebsocketListenerModule: ModuleConfig = {
     requires: [
-        SocketListenerBaseModule
+        SocketListenerBaseModule,
+        WebsocketExtensionModule
     ],
     mappings: [
         WebSocketListenerConfig,

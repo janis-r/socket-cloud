@@ -17,7 +17,7 @@ export class AuthorizeConnectionContext implements Command<boolean> {
     @Inject()
     private readonly configurationContextProvider: ConfigurationContextProvider;
 
-    async execute(): Promise<boolean> {
+    async execute(): Promise<false | never> {
 
         const {
             event: {
@@ -58,6 +58,5 @@ export class AuthorizeConnectionContext implements Command<boolean> {
 
         this.event.socketDescriptor = socketDescriptor;
         this.event.configurationContext = configuration;
-        return true;
     }
 }

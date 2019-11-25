@@ -1,15 +1,6 @@
-import {Socket} from "net";
+export interface ClientConnection {
+    readonly remoteAddress: string;
+    readonly closed: boolean;
 
-export class ClientConnection {
-
-    readonly remoteAddress;
-
-    constructor(private readonly socket: Socket) {
-        this.remoteAddress = socket.remoteAddress;
-    }
-
-    readonly write = (message: string) => new Promise<true>((resolve, reject) => {
-        this.socket.write(message, (err?: Error) => err ? reject(err) : resolve(true));
-    });
 
 }

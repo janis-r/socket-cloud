@@ -1,18 +1,18 @@
 import {createServer, Server, Socket} from "net";
 import * as cluster from "cluster";
-import {ClientConnection} from "./ClientConnection";
+import {RedundandClientConnection} from "./RedundandClientConnection";
 
 export class SocketServer {
 
     private readonly server: Server;
-    private readonly connections: Array<ClientConnection> = [];
+    private readonly connections: Array<RedundandClientConnection> = [];
 
     constructor() {
         this.server = createServer(this.newConnectionHandler);
     }
 
     private readonly newConnectionHandler = (socket: Socket) => {
-        const connection = new ClientConnection(socket);
+        const connection = new RedundandClientConnection(socket);
         this.connections.push(connection);
 
         // 'connection' listener.

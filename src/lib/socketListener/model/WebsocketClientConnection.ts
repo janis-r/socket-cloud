@@ -1,19 +1,23 @@
 import {Socket} from "net";
 import {EventDispatcher} from "qft";
 import {decomposeWebSocketFrame} from "../util/websocket-utils";
-import {ConnectionCloseEvent} from "../event/ConnectionCloseEvent";
-import {ConnectionErrorEvent} from "../event/ConnectionErrorEvent";
-import {ClientMessageEvent} from "../event/ClientMessageEvent";
 import {WebsocketDataFrame} from "../data/WebsocketDataFrame";
 import {frameTypeToString, WebsocketDataFrameType} from "../data/WebsocketDataFrameType";
+import {isPromise} from "../util/is-promise";
+import {ClientConnection, ClientMessageEvent, ConnectionCloseEvent, ConnectionErrorEvent} from "../../socketServer";
+import {WebsocketExtension, WebsocketExtensionExecutor} from "../../websocketExtension";
 
-export class ClientConnection extends EventDispatcher {
+export class WebsocketClientConnection extends EventDispatcher implements ClientConnection {
+
+    readonly remoteAddress: string;
 
     private _closed = false;
     private dataFrames = new Set<WebsocketDataFrame>();
 
-    constructor(private readonly socket: Socket) {
+    constructor(private readonly socket: Socket, private readonly extensions?: ReadonlyArray<WebsocketExtensionExecutor>) {
         super();
+        this.remoteAddress = socket.remoteAddress;
+
         socket.addListener("data", this.incomingDataHandler);
     }
 
@@ -24,8 +28,8 @@ export class ClientConnection extends EventDispatcher {
     // If there is backpressure, write returns false and the you should wait for drain
     // to be emitted before writing additional data.
 
-    private readonly incomingDataHandler = (data: Buffer): void => {
-        const {socket, dataFrames, dispatchEvent} = this;
+    private readonly incomingDataHandler = async (data: Buffer) => {
+        const {socket, dataFrames, extensions} = this;
 
         console.log('>> incomingDataHandler', data.length, 'bytes');
 
@@ -42,8 +46,21 @@ export class ClientConnection extends EventDispatcher {
         try {
             console.log('>> type', frameTypeToString(type));
             console.log('>> header', message.header);
-            console.log('>> getPayload', message.payload.toString('utf8'));
+            console.log('>> raw payload', message.payload.toString('utf8'));
+            console.log('>> extensions', extensions);
 
+            let payload = message.payload;
+            if (extensions && extensions.length > 0) {
+                for (const extension of extensions) {
+                    if (!extension.transformIncomingData) {
+                        continue;
+                    }
+
+                    const transformation = extension.transformIncomingData(payload);
+                    payload = isPromise(transformation) ? await transformation : transformation;
+                }
+            }
+            console.log('>> payload', payload);
             process.exit();
         } catch (e) {
             console.log('>> e2', e);
@@ -57,7 +74,7 @@ export class ClientConnection extends EventDispatcher {
             case WebsocketDataFrameType.ConnectionClose:
                 this._closed = true;
                 socket.end();
-                dispatchEvent(new ConnectionCloseEvent(this));
+                this.dispatchEvent(new ConnectionCloseEvent(this));
                 break;
             case WebsocketDataFrameType.TextFrame:
             case WebsocketDataFrameType.BinaryFrame:
@@ -74,14 +91,14 @@ export class ClientConnection extends EventDispatcher {
                 this._closed = true;
                 socket.end("HTTP/1.1 400 Bad Request");
                 const msg = `Unknown frame type (${type}) encountered`;
-                dispatchEvent(new ConnectionErrorEvent(this, msg));
-                dispatchEvent(new ConnectionCloseEvent(this, msg));
+                this.dispatchEvent(new ConnectionErrorEvent(this, msg));
+                this.dispatchEvent(new ConnectionCloseEvent(this, msg));
         }
     };
 
     private submitMessage() {
-        const {dataFrames, dispatchEvent} = this;
-        dispatchEvent(new ClientMessageEvent(this, [...dataFrames].map(({payload}) => payload).join('')));
+        const {dataFrames} = this;
+        this.dispatchEvent(new ClientMessageEvent(this, [...dataFrames].map(({payload}) => payload).join('')));
     }
 
 }
