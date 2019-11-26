@@ -1,11 +1,10 @@
 import * as http from "http";
-import {Context, Injector, WebApplicationBundle, ModuleConfig} from "qft";
+import {Context, Injector, ModuleConfig, WebApplicationBundle} from "qft";
 import * as fs from "fs";
 import {WebSocketListenerConfig, WebsocketListenerModule} from "../../lib/socketListener";
 import {Logger} from "../../lib/logger";
 import {HttpMethod} from "../../lib/types/HttpMethod";
-import {PermessageDeflateExtensionModule} from "../../lib/websocketExtensionPermessageDeflate/PermessageDeflateExtensionModule";
-import {PermessageDeflateConfig} from "../../lib/websocketExtensionPermessageDeflate/config/PermessageDeflateConfig";
+import {PermessageDeflateConfig, PermessageDeflateExtensionModule} from "../../lib/permessageDeflateExtension";
 
 const httpServerPort = 8000;
 let contextInjector: Injector;

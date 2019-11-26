@@ -3,11 +3,11 @@ import {WebsocketConnectionValidationRequest} from "../event/WebsocketConnection
 import {Logger} from "../../logger";
 import {AuthorizeConnectionContext} from "./websocketValidators/AuthorizeConnectionContext";
 import {ValidateConnectionHeaders} from "./websocketValidators/ValidateConnectionHeaders";
-import {generateWebsocketHandshakeResponse} from "../util/websocket-utils";
 import {NewSocketConnectionEvent} from "../event/NewSocketConnectionEvent";
 import {WebsocketClientConnection} from "../model/WebsocketClientConnection";
 import {PrepareWebsocketExtensions} from "./websocketValidators/PrepareWebsocketExtensions";
 import {isPromise} from "../util/is-promise";
+import {RespondToHandshake} from "./websocketValidators/RespondToHandshake";
 
 export class ValidateNewWebsocket<T = false | never> extends MacroCommand<T> {
 
@@ -19,7 +19,7 @@ export class ValidateNewWebsocket<T = false | never> extends MacroCommand<T> {
     private readonly eventDispatcher: EventDispatcher;
 
     constructor() {
-        super(ValidateConnectionHeaders, AuthorizeConnectionContext, PrepareWebsocketExtensions);
+        super(ValidateConnectionHeaders, AuthorizeConnectionContext, PrepareWebsocketExtensions, RespondToHandshake);
     }
 
     async execute(): Promise<void> {
@@ -27,11 +27,8 @@ export class ValidateNewWebsocket<T = false | never> extends MacroCommand<T> {
 
         const {
             event: {
-                request: {
-                    headers: {'sec-websocket-key': secWebSocketKeyHeader},
-                    socket
-                },
-                requestInfo, socketDescriptor, configurationContext, extensions
+                request: {socket},
+                requestInfo, configurationContext, extensions
             },
             logger: {debug},
             eventDispatcher
@@ -42,27 +39,8 @@ export class ValidateNewWebsocket<T = false | never> extends MacroCommand<T> {
             return;
         }
 
-        if (!socket.writable && !socket.readable) {
-            debug(`WebSocketListener new connection closed before init process is finished`, requestInfo);
-            socket.end("HTTP/1.1 403 Forbidden");
-            return;
-        }
-
-        const delimiter = "\r\n";
-        const responseHeaders = [
-            "HTTP/1.1 101 Web Socket Protocol Handshake",
-            "Upgrade: WebSocket",
-            "Connection: Upgrade",
-            `Sec-WebSocket-Accept: ${generateWebsocketHandshakeResponse(secWebSocketKeyHeader)}`,
-            'Sec-WebSocket-Extensions: permessage-deflate'
-        ].join(delimiter);
-
-        socket.write(responseHeaders + delimiter + delimiter);
-
-        const connection = new WebsocketClientConnection(socket, extensions);
-
-        eventDispatcher.dispatchEvent(new NewSocketConnectionEvent(socket, socketDescriptor, configurationContext));
-
+        const connection = new WebsocketClientConnection(socket, configurationContext, extensions);
+        eventDispatcher.dispatchEvent(new NewSocketConnectionEvent(connection));
     }
 
     protected async executeSubCommand(command: SubCommand<T>): Promise<T> {

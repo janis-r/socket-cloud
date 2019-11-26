@@ -3,7 +3,7 @@ import {Socket} from "net";
 import {WebsocketUpgradeRequest} from "../data/WebsocketUpgradeRequest";
 import {SocketDescriptor} from "../data/SocketDescriptor";
 import {ConfigurationContext} from "../../configurationContext";
-import {WebsocketExtensionExecutor} from "../../websocketExtension";
+import {WebsocketExtensionAgent} from "../../websocketExtension";
 
 /**
  * Event notification dispatched as new websocket connection is encountered and needs to be validated before it
@@ -15,7 +15,7 @@ export class WebsocketConnectionValidationRequest extends Event {
 
     private _socketDescriptor: SocketDescriptor;
     private _configurationContext: ConfigurationContext;
-    private _extensions: ReadonlyArray<WebsocketExtensionExecutor>;
+    private _extensions: ReadonlyArray<WebsocketExtensionAgent>;
 
     constructor(readonly request: WebsocketUpgradeRequest, readonly socket: Socket, readonly requestInfo: string) {
         super(WebsocketConnectionValidationRequest.TYPE);
@@ -45,11 +45,11 @@ export class WebsocketConnectionValidationRequest extends Event {
         this._configurationContext = value;
     }
 
-    get extensions(): ReadonlyArray<WebsocketExtensionExecutor> {
+    get extensions(): ReadonlyArray<WebsocketExtensionAgent> {
         return this._extensions;
     }
 
-    set extensions(value: ReadonlyArray<WebsocketExtensionExecutor>) {
+    set extensions(value: ReadonlyArray<WebsocketExtensionAgent>) {
         if (this._extensions) {
             throw new Error('extensions cannot be overwritten');
         }

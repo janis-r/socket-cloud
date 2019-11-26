@@ -1,24 +1,28 @@
-/**
- * Parse sec-websocket-extensions header value into Map describing extensions and their params
- * @param headerString
- */
 import {WebsocketExtensionConfig} from "..";
 
+/**
+ * Parse sec-websocket-extensions header value
+ * @param headerString
+ */
 export function parseWebsocketExtensionOffers(headerString: string): Map<string, Set<WebsocketExtensionConfig>> {
     const extensionMap = new Map<string, Set<WebsocketExtensionConfig>>();
     if (!headerString || !headerString.length) {
         return new Map();
     }
 
-    headerString.split(/,\s*/g).map(entry => entry.split(/;\s*/g))
+    headerString.split(/,\s*/g)
+        .map(entry => entry.split(/;\s*/g))
         .forEach(([extensionName, ...params]) => {
-            const config: WebsocketExtensionConfig = new Map(params.map((param): [string, string | number | undefined] => {
+            const values: WebsocketExtensionConfig['values'] = {};
+            params.forEach(param => {
                 const [paramName, value] = param.split('=');
-                return [
-                    paramName,
-                    value ? normalizeHeaderParamValue(value) : undefined
-                ];
-            }));
+                values[paramName] = value ? normalizeHeaderParamValue(value) : undefined;
+            });
+
+            const config: WebsocketExtensionConfig = {
+                origin: [extensionName, ...params].join(';'),
+                values
+            };
 
             if (extensionMap.has(extensionName)) {
                 extensionMap.get(extensionName).add(config);

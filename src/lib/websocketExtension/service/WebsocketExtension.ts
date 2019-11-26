@@ -1,5 +1,5 @@
 import {WebsocketExtensionConfig} from "../config/WebsocketExtensionConfig";
-import {WebsocketExtensionExecutor} from "./WebsocketExtensionExecutor";
+import {WebsocketExtensionAgent} from "./WebsocketExtensionAgent";
 
 export interface WebsocketExtension {
     /**
@@ -13,5 +13,5 @@ export interface WebsocketExtension {
      * (This method will throw an error in case provided params are out or valid bounds.)
      * @param configs
      */
-    configure(...configs: WebsocketExtensionConfig[]): null | WebsocketExtensionExecutor;
+    configure(...configs: WebsocketExtensionConfig[]): null | WebsocketExtensionAgent;
 }

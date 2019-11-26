@@ -1,4 +1,4 @@
-import {Command, Inject} from "qft";
+import {Command, Inject, Optional} from "qft";
 import {WebsocketConnectionValidationRequest} from "../../event/WebsocketConnectionValidationRequest";
 import {Logger} from "../../../logger";
 import {WebsocketExtensionRegistry} from "../../../websocketExtension";
@@ -12,11 +12,13 @@ export class PrepareWebsocketExtensions implements Command<false | never> {
     private readonly logger: Logger;
 
     @Inject()
+    @Optional()
     private readonly websocketExtensionRegistry: WebsocketExtensionRegistry;
 
     execute(): false | never {
         const {
             logger: {error: logError},
+            websocketExtensionRegistry,
             event,
             event: {
                 request: {
@@ -24,14 +26,17 @@ export class PrepareWebsocketExtensions implements Command<false | never> {
                         'sec-websocket-extensions': secWebsocketExtensions,
                     }
                 },
-                socket,
-                extensions
-            },
-            websocketExtensionRegistry
+                socket
+            }
         } = this;
 
+        if (!websocketExtensionRegistry) {
+            // websocketExtensionRegistry and extensions are not present
+            return;
+        }
+
         try {
-            event.extensions = websocketExtensionRegistry.getExtensionExecutorsForConfiguration(secWebsocketExtensions);
+            event.extensions = websocketExtensionRegistry.getExtensionAgentsForConfiguration(secWebsocketExtensions);
         } catch ({error, stack}) {
             logError(`PrepareWebsocketExtensions err while validating configuration offer ${JSON.stringify({
                 error,

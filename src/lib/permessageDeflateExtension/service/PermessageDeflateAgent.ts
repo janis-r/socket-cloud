@@ -1,16 +1,15 @@
 import * as zlib from "zlib";
 import {PermessageDeflateConfig} from "../config/PermessageDeflateConfig";
-import {WebsocketExtensionExecutor} from "../../websocketExtension";
+import {WebsocketExtensionAgent} from "../../websocketExtension";
+import {PermessageDeflateExtensionConfig} from "../data/PermessageDeflateExtensionConfig";
 
-export class PermessageDeflateExecutor implements WebsocketExtensionExecutor {
+export class PermessageDeflateAgent implements WebsocketExtensionAgent {
 
     constructor(readonly systemConfig: PermessageDeflateConfig,
-                readonly connectionConfig: PermessageDeflateConfig) {
+                readonly config: PermessageDeflateExtensionConfig) {
     }
 
     async transformIncomingData(payload: Buffer): Promise<Buffer> {
-        // console.log('>> transform', Buffer);
-
         return new Promise<Buffer>((resolve, reject) => {
             // TODO: windowBits must be set from negotiated configuration
             const inflate = zlib.createInflateRaw({windowBits: 15});
@@ -26,10 +25,10 @@ export class PermessageDeflateExecutor implements WebsocketExtensionExecutor {
 
             inflate.on("end", () => console.log('>> end'));
             inflate.on("data", chunk => {
-                console.log('>> data', chunk.toString() + '||');
+                // console.log('>> data', chunk.toString() + '||');
                 resolve(chunk);
             });
-            inflate.end(payload, () => console.log('inflate.end'));
+            inflate.end(payload);
         });
     }
 }

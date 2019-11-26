@@ -1,8 +1,8 @@
-import {WebsocketExtension} from "./WebsocketExtension";
-import {WebsocketExtensionExecutor} from "./WebsocketExtensionExecutor";
-import {parseWebsocketExtensionOffers} from "../util";
-import {Logger} from "../../logger";
 import {Inject} from "qft";
+import {Logger} from "../../logger";
+import {WebsocketExtension} from "./WebsocketExtension";
+import {parseWebsocketExtensionOffers} from "../util/parse-websocket-extension-offers";
+import {WebsocketExtensionAgent} from "./WebsocketExtensionAgent";
 
 export class WebsocketExtensionRegistry {
 
@@ -23,30 +23,29 @@ export class WebsocketExtensionRegistry {
     }
 
     /**
-     * Get list of websocket extension executors to be enabled for connection context by configuration offers
+     * Get list of websocket extension execution agents to be enabled for connection context by configuration offers
      * described by  Sec-WebSocket-Extensions header.
      * @param configOffers
      */
-    getExtensionExecutorsForConfiguration(configOffers: string): WebsocketExtensionExecutor[] {
+    getExtensionAgentsForConfiguration(configOffers: string): WebsocketExtensionAgent[] {
         const {knownExtensions} = this;
         const configurationOffers = parseWebsocketExtensionOffers(configOffers);
 
         console.log({configurationOffers});
-        const executors: WebsocketExtensionExecutor[] = [];
+        const agents: WebsocketExtensionAgent[] = [];
         if (configurationOffers.size === 0) {
-            return executors;
+            return agents;
         }
-
 
         for (const [extensionName, config] of configurationOffers) {
             if (!knownExtensions.has(extensionName)) {
                 continue;
             }
-            const extensionExecutor = knownExtensions.get(extensionName).configure(...config);
-            if (extensionExecutor) {
-                executors.push(extensionExecutor);
+            const extensionAgent = knownExtensions.get(extensionName).configure(...config);
+            if (extensionAgent) {
+                agents.push(extensionAgent);
             }
         }
-        return executors;
+        return agents;
     }
 }

@@ -1,11 +1,12 @@
 import {Socket} from "net";
-import {EventDispatcher} from "qft";
+import {EventDispatcher, EventListener} from "qft";
 import {decomposeWebSocketFrame} from "../util/websocket-utils";
 import {WebsocketDataFrame} from "../data/WebsocketDataFrame";
 import {frameTypeToString, WebsocketDataFrameType} from "../data/WebsocketDataFrameType";
 import {isPromise} from "../util/is-promise";
 import {ClientConnection, ClientMessageEvent, ConnectionCloseEvent, ConnectionErrorEvent} from "../../socketServer";
-import {WebsocketExtension, WebsocketExtensionExecutor} from "../../websocketExtension";
+import {WebsocketExtensionAgent} from "../../websocketExtension";
+import {ConfigurationContext} from "../../configurationContext";
 
 export class WebsocketClientConnection extends EventDispatcher implements ClientConnection {
 
@@ -14,7 +15,9 @@ export class WebsocketClientConnection extends EventDispatcher implements Client
     private _closed = false;
     private dataFrames = new Set<WebsocketDataFrame>();
 
-    constructor(private readonly socket: Socket, private readonly extensions?: ReadonlyArray<WebsocketExtensionExecutor>) {
+    constructor(private readonly socket: Socket,
+                private readonly context: ConfigurationContext,
+                private readonly extensions?: ReadonlyArray<WebsocketExtensionAgent>) {
         super();
         this.remoteAddress = socket.remoteAddress;
 
@@ -23,6 +26,22 @@ export class WebsocketClientConnection extends EventDispatcher implements Client
 
     get closed(): boolean {
         return this._closed;
+    }
+
+    addEventListener(event: "close", listener: EventListener<ConnectionCloseEvent>, scope?: Object);
+    addEventListener(event: "message", listener: EventListener<ClientMessageEvent>, scope?: Object);
+    addEventListener(event: "error", listener: EventListener<ConnectionErrorEvent>, scope?: Object);
+    addEventListener(event: string | Symbol, listener: EventListener<any>, scope?: Object) {
+        switch (event) {
+            case "message" :
+                return super.addEventListener(ClientMessageEvent.TYPE, listener, scope);
+            case "close" :
+                return super.addEventListener(ConnectionCloseEvent.TYPE, listener, scope);
+            case "error" :
+                return super.addEventListener(ConnectionErrorEvent.TYPE, listener, scope);
+            default:
+                return super.addEventListener(event, listener, scope);
+        }
     }
 
     // If there is backpressure, write returns false and the you should wait for drain
