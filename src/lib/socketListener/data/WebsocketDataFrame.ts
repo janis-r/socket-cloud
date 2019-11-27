@@ -1,6 +1,10 @@
-import {WebsocketDataFrameHeader} from "./WebsocketDataFrameHeader";
+import {WebsocketDataFrameType} from "./WebsocketDataFrameType";
 
 export type WebsocketDataFrame = {
-    readonly header: WebsocketDataFrameHeader;
-    readonly payload: Buffer;
+    type: WebsocketDataFrameType;
+    isFinal: boolean;
+    rsv1: boolean;
+    rsv2: boolean;
+    rsv3: boolean;
+    payload: Buffer;
 }

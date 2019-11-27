@@ -1,6 +1,6 @@
 import {Socket} from "net";
-import {EventDispatcher, EventListener} from "qft";
-import {decomposeWebSocketFrame} from "../util/websocket-utils";
+import {EventDispatcher, EventListener, referenceToString} from "qft";
+import {composeWebsocketFrame, decomposeWebSocketFrame} from "../util/websocket-utils";
 import {WebsocketDataFrame} from "../data/WebsocketDataFrame";
 import {frameTypeToString, WebsocketDataFrameType} from "../data/WebsocketDataFrameType";
 import {isPromise} from "../util/is-promise";
@@ -32,16 +32,36 @@ export class WebsocketClientConnection extends EventDispatcher implements Client
     addEventListener(event: "message", listener: EventListener<ClientMessageEvent>, scope?: Object);
     addEventListener(event: "error", listener: EventListener<ConnectionErrorEvent>, scope?: Object);
     addEventListener(event: string | Symbol, listener: EventListener<any>, scope?: Object) {
-        switch (event) {
-            case "message" :
-                return super.addEventListener(ClientMessageEvent.TYPE, listener, scope);
-            case "close" :
-                return super.addEventListener(ConnectionCloseEvent.TYPE, listener, scope);
-            case "error" :
-                return super.addEventListener(ConnectionErrorEvent.TYPE, listener, scope);
-            default:
-                return super.addEventListener(event, listener, scope);
+        return super.addEventListener(eventNameProxy(event), listener, scope);
+    }
+
+    removeEventListener(event: "close", listener: EventListener<ConnectionCloseEvent>, scope?: Object);
+    removeEventListener(event: "message", listener: EventListener<ClientMessageEvent>, scope?: Object);
+    removeEventListener(event: "error", listener: EventListener<ConnectionErrorEvent>, scope?: Object);
+    removeEventListener(event: string | Symbol, listener: EventListener<any>, scope?: Object): boolean {
+        return super.removeEventListener(eventNameProxy(event), listener, scope);
+    }
+
+    write(message: Buffer);
+    write(message: string);
+    async write(message: string | Buffer): Promise<void> {
+        const {socket, extensions} = this;
+        const {TextFrame, BinaryFrame} = WebsocketDataFrameType;
+
+        const [type, payload] = typeof message === "string" ?
+            [TextFrame, Buffer.from(message)] :
+            [BinaryFrame, message];
+
+        let dataFrame = createFrame({type, payload});
+
+        if (extensions && extensions.length > 0) {
+            for (const extension of extensions.filter(({transformOutgoingData}) => !!transformOutgoingData)) {
+                const transformation = extension.transformOutgoingData(dataFrame);
+                dataFrame = isPromise(transformation) ? await transformation : transformation;
+            }
         }
+
+        socket.write(composeWebsocketFrame(dataFrame));
     }
 
     // If there is backpressure, write returns false and the you should wait for drain
@@ -52,43 +72,30 @@ export class WebsocketClientConnection extends EventDispatcher implements Client
 
         console.log('>> incomingDataHandler', data.length, 'bytes');
 
-        let message: WebsocketDataFrame;
+        let dataFrame: WebsocketDataFrame;
         try {
-            message = decomposeWebSocketFrame(data);
-        } catch (e) {
-            console.log('>> e1', e);
-            process.exit();
-            return;
-        }
-
-        const {type, isFinal} = message.header;
-        try {
-            console.log('>> type', frameTypeToString(type));
-            console.log('>> header', message.header);
-            console.log('>> raw payload', message.payload.toString('utf8'));
-            console.log('>> extensions', extensions);
-
-            let payload = message.payload;
+            dataFrame = decomposeWebSocketFrame(data);
+            console.log('>> type', {type: frameTypeToString(dataFrame.type), isFinal: dataFrame.isFinal});
+            console.log('>> extensions', extensions ? extensions.map(e => referenceToString(e.constructor)) : null);
             if (extensions && extensions.length > 0) {
-                for (const extension of extensions) {
-                    if (!extension.transformIncomingData) {
-                        continue;
-                    }
-
-                    const transformation = extension.transformIncomingData(payload);
-                    payload = isPromise(transformation) ? await transformation : transformation;
+                for (const extension of extensions.filter(({transformIncomingData}) => !!transformIncomingData)) {
+                    const transformation = extension.transformIncomingData(dataFrame);
+                    dataFrame = isPromise(transformation) ? await transformation : transformation;
                 }
             }
-            console.log('>> payload', payload);
-            process.exit();
+            console.log('>> payload', dataFrame.payload.toString("utf8"));
         } catch (e) {
-            console.log('>> e2', e);
+            console.log('>> e@decomposeWebSocketFrame', e.message);
             process.exit();
             return;
         }
+
+        const {type, isFinal} = dataFrame;
         switch (type) {
             case WebsocketDataFrameType.Ping:
-                // TODO: respond with pong
+                socket.write(composeWebsocketFrame(
+                    createFrame({type: WebsocketDataFrameType.Pong})
+                ));
                 break;
             case WebsocketDataFrameType.ConnectionClose:
                 this._closed = true;
@@ -98,9 +105,10 @@ export class WebsocketClientConnection extends EventDispatcher implements Client
             case WebsocketDataFrameType.TextFrame:
             case WebsocketDataFrameType.BinaryFrame:
             case WebsocketDataFrameType.ContinuationFrame:
-                dataFrames.add(message);
+                dataFrames.add(dataFrame);
                 if (isFinal) {
                     this.submitMessage();
+                    this.write('Grāžķūnis!')
                 }
                 break;
             case WebsocketDataFrameType.Pong:
@@ -117,9 +125,29 @@ export class WebsocketClientConnection extends EventDispatcher implements Client
 
     private submitMessage() {
         const {dataFrames} = this;
-        this.dispatchEvent(new ClientMessageEvent(this, [...dataFrames].map(({payload}) => payload).join('')));
+
+        const messageBuffer = dataFrames.size === 1 ? [...dataFrames][0].payload : Buffer.concat([...dataFrames].map(({payload}) => payload));
+        this.dispatchEvent(new ClientMessageEvent(
+            this,
+            messageBuffer.toString("utf8")
+        ));
     }
 
 }
 
+const createFrame = ({type, payload, isFinal = true, rsv1 = false, rsv2 = false, rsv3 = false}: Partial<WebsocketDataFrame>): WebsocketDataFrame => ({
+    type, payload, isFinal, rsv1, rsv2, rsv3
+});
 
+const eventNameProxy = (event: string | Symbol): string | Symbol => {
+    switch (event) {
+        case "message" :
+            return ClientMessageEvent.TYPE;
+        case "close" :
+            return ConnectionCloseEvent.TYPE;
+        case "error" :
+            return ConnectionErrorEvent.TYPE;
+        default:
+            return event;
+    }
+};

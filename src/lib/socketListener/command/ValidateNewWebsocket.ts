@@ -1,4 +1,4 @@
-import {EventDispatcher, Inject, MacroCommand, SubCommand} from "qft";
+import {EventDispatcher, Inject, MacroCommand, SubCommand, referenceToString} from "qft";
 import {WebsocketConnectionValidationRequest} from "../event/WebsocketConnectionValidationRequest";
 import {Logger} from "../../logger";
 import {AuthorizeConnectionContext} from "./websocketValidators/AuthorizeConnectionContext";
@@ -47,10 +47,10 @@ export class ValidateNewWebsocket<T = false | never> extends MacroCommand<T> {
         const result = super.executeSubCommand(command);
 
         const value = isPromise(result) ? await result : result;
-        console.log('>> executeSubCommand result', value);
+        console.log('>> executeSubCommand', {command: referenceToString(command.type), value});
 
         if (value as any === false) { // TODO "as any" should not be needed in here
-            console.log('Halt ValidateNewWebsocket at', command);
+            console.log('Halt ValidateNewWebsocket at', referenceToString(command.type));
             this.haltExecution();
         }
         return result;

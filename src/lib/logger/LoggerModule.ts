@@ -21,7 +21,7 @@ export class LoggerModule {
         if (!!process?.versions?.node) {
             process.on(
                 "uncaughtException",
-                ({message, stack}) => error(`uncaughtException: ${message}\n${stack}`)
+                ({message, stack}) => error(`uncaughtException: message: ${message}\nstack: ${stack}`)
             );
             /*process.on(
                 "unhandledRejection",

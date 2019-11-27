@@ -1,10 +1,19 @@
+import * as crypto from "crypto";
 import {createHash} from "crypto";
 import {WebSocketFrameParseError} from "../error/WebSocketFrameParseError";
 import {WebsocketDataFrame} from "../data/WebsocketDataFrame";
 
+/**
+ * Generate Websocket connection handshake response
+ * @param key
+ */
 export const generateWebsocketHandshakeResponse = (key: string) => createHash('sha1').update(`${key}258EAFA5-E914-47DA-95CA-C5AB0DC85B11`).digest('base64');
 
-export function decomposeWebSocketFrame(buffer: Buffer): WebsocketDataFrame {
+/**
+ * Decompose binary representation of websocket data frame into value object
+ * @param buffer
+ */
+export function decomposeWebSocketFrame(buffer: Buffer): Readonly<WebsocketDataFrame> {
     const firstByte = buffer.readUInt8(0);
     const [type, isFinal, rsv1, rsv2, rsv3] = [
         firstByte & 0xF,
@@ -38,19 +47,20 @@ export function decomposeWebSocketFrame(buffer: Buffer): WebsocketDataFrame {
         payloadOffset += 4;
     }
 
-    return (new class Foo implements WebsocketDataFrame {
-        readonly header = {type, isFinal, maskingKey, payloadLength, payloadOffset, rsv1, rsv2, rsv3};
-        private _payload: Buffer;
-        get payload(): Buffer {
-            if (!this._payload) {
-                this._payload = extractMessagePayload(buffer, payloadOffset, payloadLength, maskingKey)
-            }
-            return this._payload;
-        }
-    });
+    return {
+        type,
+        isFinal,
+        rsv1,
+        rsv2,
+        rsv3,
+        payload: extractMessagePayload(buffer, payloadOffset, payloadLength, maskingKey)
+    };
 }
 
-function extractMessagePayload(buffer: Buffer, payloadOffset: number, payloadLength: number | bigint, maskingKey: number): Buffer {
+function extractMessagePayload(buffer: Buffer, payloadOffset: number, payloadLength: number | bigint, maskingKey: number): Buffer | null {
+    if (!payloadLength) {
+        return null;
+    }
     if (typeof payloadLength === "bigint") {
         throw new WebSocketFrameParseError("Bigint is yet to be introduced as message length param");
     }
@@ -64,3 +74,64 @@ function extractMessagePayload(buffer: Buffer, payloadOffset: number, payloadLen
     }
     return data;
 }
+
+export function composeWebsocketFrame({type, payload, isFinal, rsv1, rsv2, rsv3}: WebsocketDataFrame, masked: boolean = false): Buffer {
+    const headerBytes = Buffer.alloc(2);
+    // First byte consists of FIN and RSV(1-3) bits
+    [isFinal, rsv1, rsv2, rsv3].forEach((value, index) => {
+        if (value) {
+            headerBytes[0] |= 0x1 << 7 - index;
+        }
+    });
+    // Followed by opcode that take last 4 bits of first byte
+    headerBytes[0] |= type;
+
+    if (masked) {
+        // First bit of second bytes indicate if this is masked data
+        headerBytes[1] |= 0x1 << 7;
+    }
+    // Rest of second bytes is a payload length or marker of extended payload length type
+    const {declaredPayloadValue, extendedPayloadSize} = calculatePayload(payload.length);
+    headerBytes[1] |= declaredPayloadValue;
+
+    const extendedPayloadBytes = extendedPayloadSize ? Buffer.alloc(extendedPayloadSize) : null;
+    if (extendedPayloadSize) {
+        if (declaredPayloadValue === 126) {
+            extendedPayloadBytes.writeUInt16BE(payload.length, 0);
+        } else if (declaredPayloadValue === 127) {
+            // TODO: What if payload length is actual 64 bit int?
+            extendedPayloadBytes.writeUInt32BE(0, 0);
+            extendedPayloadBytes.writeUInt32BE(payload.length, 4);
+        }
+    }
+
+    const maskingKeyBytes = masked ? crypto.randomBytes(4) : null;
+
+    const payloadBytes = payload.length > 0 ? payload : null;
+    if (payloadBytes && masked) { // Apply masking
+        for (let i = 0; i < payloadBytes.length; i++) {
+            payloadBytes[i] ^= maskingKeyBytes[i & 3];
+        }
+    }
+
+    return Buffer.concat([headerBytes, extendedPayloadBytes, maskingKeyBytes, payloadBytes].filter(e => !!e));
+}
+
+const calculatePayload = (length: number): { declaredPayloadValue: number, extendedPayloadSize: number } => {
+    if (length >= 2 ** 16) {
+        return {
+            declaredPayloadValue: 127,
+            extendedPayloadSize: 8
+        };
+    }
+    if (length > 125) {
+        return {
+            declaredPayloadValue: 126,
+            extendedPayloadSize: 2
+        };
+    }
+    return {
+        declaredPayloadValue: length,
+        extendedPayloadSize: 0
+    };
+};

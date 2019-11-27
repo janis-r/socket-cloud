@@ -27,8 +27,9 @@
         socket.send(message);
     };
     socket.onmessage = event => {
+        const {data} = event;
         write("onmessage", event);
-        console.log({onmessage: event});
+        console.log({onmessage: data});
     };
     socket.onerror = event => {
         write("onerror", JSON.stringify(event, null, ' '));
