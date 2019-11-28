@@ -9,7 +9,7 @@ import {PrepareWebsocketExtensions} from "./websocketValidators/PrepareWebsocket
 import {isPromise} from "../util/is-promise";
 import {RespondToHandshake} from "./websocketValidators/RespondToHandshake";
 
-export class ValidateNewWebsocket<T = false | never> extends MacroCommand<T> {
+export class ValidateNewWebsocket<T = boolean> extends MacroCommand<T> {
 
     @Inject()
     private readonly event: WebsocketConnectionValidationRequest;

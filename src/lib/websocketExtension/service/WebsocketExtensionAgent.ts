@@ -3,9 +3,9 @@ import {WebsocketDataFrame} from "../../socketListener/data/WebsocketDataFrame";
 
 export interface WebsocketExtensionAgent {
     /**
-     * Information on extension configuration that has enabled particular agent.
+     * Websocket configuration offer (that enabled current agent) response string.
      */
-    readonly config: WebsocketExtensionConfig;
+    readonly configOfferResponse: string;
 
     /**
      * Transformation action to be applied on incoming data frame

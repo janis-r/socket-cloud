@@ -3,7 +3,7 @@ import {WebsocketConnectionValidationRequest} from "../../event/WebsocketConnect
 import {Logger} from "../../../logger";
 import {WebsocketExtensionRegistry} from "../../../websocketExtension";
 
-export class PrepareWebsocketExtensions implements Command<false | never> {
+export class PrepareWebsocketExtensions implements Command<boolean> {
 
     @Inject()
     private readonly event: WebsocketConnectionValidationRequest;
@@ -15,7 +15,7 @@ export class PrepareWebsocketExtensions implements Command<false | never> {
     @Optional()
     private readonly websocketExtensionRegistry: WebsocketExtensionRegistry;
 
-    execute(): false | never {
+    execute() {
         const {
             logger: {error: logError},
             websocketExtensionRegistry,
@@ -45,6 +45,8 @@ export class PrepareWebsocketExtensions implements Command<false | never> {
             socket.end("HTTP/1.1 400 Bad Request");
             return false;
         }
+
+        return true;
     }
 
 }

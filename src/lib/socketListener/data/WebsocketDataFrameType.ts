@@ -7,11 +7,13 @@ export enum WebsocketDataFrameType {
     Pong = 10
 }
 
-export const frameTypeToString = (frameType: WebsocketDataFrameType): string | null => new Map<WebsocketDataFrameType, string>([
+const frameTypeToStringMapping = new Map<WebsocketDataFrameType, string>([
     [WebsocketDataFrameType.ContinuationFrame, "ContinuationFrame"],
     [WebsocketDataFrameType.TextFrame, "TextFrame"],
     [WebsocketDataFrameType.BinaryFrame, "BinaryFrame"],
     [WebsocketDataFrameType.ConnectionClose, "ConnectionClose"],
     [WebsocketDataFrameType.Ping, "Ping"],
     [WebsocketDataFrameType.Pong, "Pong"],
-]).get(frameType) ?? null;
+]);
+
+export const frameTypeToString = (frameType: WebsocketDataFrameType): string | null => frameTypeToStringMapping.get(frameType) ?? null;

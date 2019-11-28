@@ -10,7 +10,7 @@ export class ValidateConnectionHeaders implements Command<boolean> {
     @Inject()
     private readonly logger: Logger;
 
-    execute(): boolean {
+    execute() {
         const {
             logger: {error},
             event: {
@@ -36,10 +36,12 @@ export class ValidateConnectionHeaders implements Command<boolean> {
 
         if (!secWebSocketKeyHeader || typeof secWebSocketKeyHeader !== "string") {
             error(`Websocket validation err - missing 'sec-websocket-key' header`, requestInfo);
-            // TODO: Add length check?
-            // 5. A |Sec-WebSocket-Key| header field with a base64-encoded (see
-            // Section 4 of [RFC4648]) value that, when decoded, is 16 bytes in
-            // length.
+            socket.end("HTTP/1.1 400 Bad Request");
+            return false;
+        }
+
+        if (Buffer.from(secWebSocketKeyHeader, "base64").length !== 16) {
+            error(`Websocket validation err - 'sec-websocket-key' header is of wrong format`, requestInfo);
             socket.end("HTTP/1.1 400 Bad Request");
             return false;
         }
@@ -50,7 +52,7 @@ export class ValidateConnectionHeaders implements Command<boolean> {
             return false;
         }
 
-        if ((typeof secWebsocketVersion === "string" ? parseInt(secWebsocketVersion as string) : secWebsocketVersion) !== 13) {
+        if ((typeof secWebsocketVersion === "string" ? parseInt(secWebsocketVersion) : secWebsocketVersion) !== 13) {
             error(`Websocket validation err - 'sec-websocket-version' header must be equal 13`, requestInfo);
             socket.end("HTTP/1.1 400 Bad Request");
             return false;

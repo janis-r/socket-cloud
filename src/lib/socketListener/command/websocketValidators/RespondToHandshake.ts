@@ -3,7 +3,7 @@ import {WebsocketConnectionValidationRequest} from "../../event/WebsocketConnect
 import {Logger} from "../../../logger";
 import {generateWebsocketHandshakeResponse} from "../../util/websocket-utils";
 
-export class RespondToHandshake implements Command<false | never> {
+export class RespondToHandshake implements Command<boolean> {
 
     @Inject()
     private readonly event: WebsocketConnectionValidationRequest;
@@ -11,7 +11,7 @@ export class RespondToHandshake implements Command<false | never> {
     @Inject()
     private readonly logger: Logger;
 
-    execute(): false | never {
+    execute() {
         const {
             logger: {debug},
             event: {
@@ -37,11 +37,13 @@ export class RespondToHandshake implements Command<false | never> {
         ];
 
         if (extensions && extensions.length > 0) {
-            responseHeaders.push('Sec-WebSocket-Extensions: ' + extensions.map(({config: {origin}}) => origin).join(", "))
+            responseHeaders.push('Sec-WebSocket-Extensions: ' + extensions.map(({configOfferResponse}) => configOfferResponse).join(", "))
         }
 
-        console.info('>> response headers', responseHeaders)
+        console.info('>> response headers', responseHeaders);
         socket.write(responseHeaders.join(delimiter) + delimiter + delimiter);
+
+        return true;
     }
 
 }

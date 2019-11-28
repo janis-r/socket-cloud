@@ -43,7 +43,8 @@ const initSocket = async () => {
             PermessageDeflateExtensionModule,
             <ModuleConfig> {
                 mappings: [
-                    { map: PermessageDeflateConfig, useValue: {}}
+                    // { map: PermessageDeflateConfig, useValue: {}}
+                    PermessageDeflateConfig
                 ]
             }
         )

@@ -2,5 +2,10 @@ import {WebsocketExtensionConfig} from "../../websocketExtension";
 import {PermessageDeflateParam} from "./PermessageDeflateParam";
 
 export type PermessageDeflateExtensionConfig = Omit<WebsocketExtensionConfig, "values"> & {
-    values: Record<PermessageDeflateParam, string | number | undefined>
+    values: {
+        [PermessageDeflateParam.ClientMaxWindowBits]?: number | undefined,
+        [PermessageDeflateParam.ServerMaxWindowBits]?: number,
+        [PermessageDeflateParam.ClientNoContextTakeover]?: true,
+        [PermessageDeflateParam.ServerNoContextTakeover]?: true,
+    }
 };

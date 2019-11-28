@@ -1,6 +1,10 @@
+import {WindowBits} from "../data/WindowBits";
+
 export abstract class PermessageDeflateConfig {
-    readonly serverNoContextTakeover?: boolean;
+
+    readonly clientMaxWindowBits: WindowBits = 15;
+    readonly serverMaxWindowBits: WindowBits = 15;
+
     readonly clientNoContextTakeover?: boolean;
-    readonly serverMaxWindowBits?: number;
-    readonly clientMaxWindowBits?: number;
+    readonly serverNoContextTakeover?: boolean;
 }
