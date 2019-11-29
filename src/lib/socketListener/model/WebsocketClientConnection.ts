@@ -1,7 +1,7 @@
 import {Socket} from "net";
 import {EventDispatcher, EventListener, referenceToString} from "qft";
 import {composeWebsocketFrame, decomposeWebSocketFrame} from "../util/websocket-utils";
-import {WebsocketDataFrame} from "../data/WebsocketDataFrame";
+import {createDataFrame, WebsocketDataFrame} from "../data/WebsocketDataFrame";
 import {frameTypeToString, WebsocketDataFrameType} from "../data/WebsocketDataFrameType";
 import {isPromise} from "../util/is-promise";
 import {ClientConnection, ClientMessageEvent, ConnectionCloseEvent, ConnectionErrorEvent} from "../../socketServer";
@@ -52,7 +52,7 @@ export class WebsocketClientConnection extends EventDispatcher implements Client
             [TextFrame, Buffer.from(message)] :
             [BinaryFrame, message];
 
-        let dataFrame = createFrame({type, payload});
+        let dataFrame = createDataFrame(type, {payload});
 
         if (extensions && extensions.length > 0) {
             for (const extension of extensions.filter(({transformOutgoingData}) => !!transformOutgoingData)) {
@@ -84,17 +84,18 @@ export class WebsocketClientConnection extends EventDispatcher implements Client
                 }
             }
             console.log('>> payload', dataFrame.payload.toString("utf8"));
+            process.exit();
         } catch (e) {
             console.log('>> e@decomposeWebSocketFrame', e.message);
             process.exit();
             return;
         }
 
-        const {type, isFinal} = dataFrame;
+        const {type, isFinal, payload} = dataFrame;
         switch (type) {
             case WebsocketDataFrameType.Ping:
                 socket.write(composeWebsocketFrame(
-                    createFrame({type: WebsocketDataFrameType.Pong})
+                    createDataFrame(WebsocketDataFrameType.Pong, {payload})
                 ));
                 break;
             case WebsocketDataFrameType.ConnectionClose:
@@ -134,10 +135,6 @@ export class WebsocketClientConnection extends EventDispatcher implements Client
     }
 
 }
-
-const createFrame = ({type, payload, isFinal = true, rsv1 = false, rsv2 = false, rsv3 = false}: Partial<WebsocketDataFrame>): WebsocketDataFrame => ({
-    type, payload, isFinal, rsv1, rsv2, rsv3
-});
 
 const eventNameProxy = (event: string | Symbol): string | Symbol => {
     switch (event) {
