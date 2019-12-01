@@ -10,7 +10,7 @@ const httpServerPort = 8000;
 let contextInjector: Injector;
 
 const initHttpServer = async (port = httpServerPort) => {
-    const server = http.createServer((req, res) => {
+    const server = http.createServer(async (req, res) => {
         const {method, url} = req;
         console.log({method, url});
 
@@ -22,6 +22,14 @@ const initHttpServer = async (port = httpServerPort) => {
         }
 
         if (method == HttpMethod.POST && url === '/validate-socket') {
+            await new Promise<void>(resolve => {
+                const chunks: Buffer[] = [];
+                req.on("data", chunk => chunks.push(chunk));
+                req.on("end", () => {
+                    console.log({body: JSON.parse(Buffer.concat(chunks).toString("utf8"))});
+                    resolve();
+                });
+            });
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.write(JSON.stringify(true));
             res.end();

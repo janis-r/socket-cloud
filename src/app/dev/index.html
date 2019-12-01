@@ -21,15 +21,17 @@
     socket.onopen = event => {
         write("onopen", JSON.stringify(event, null, ' '));
         console.log({onopen: event});
-        const message = new Array(1).fill(null).map(x => "Hello server! This is client writing. How do you do?").join('\n');
+        const message = new Array(100000).fill(null).map(x => "Hello server! This is client writing. How do you do?").join('\n');
         write('len:' + message.length)
-        write('msg:' + message)
+        write('msg:' + message);
         socket.send(message);
     };
     socket.onmessage = event => {
         const {data} = event;
+
         write("onmessage", event);
         console.log({onmessage: data});
+        // socket.close();
     };
     socket.onerror = event => {
         write("onerror", JSON.stringify(event, null, ' '));

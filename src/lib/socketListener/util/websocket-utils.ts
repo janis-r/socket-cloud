@@ -54,8 +54,8 @@ export function decomposeWebSocketFrame(buffer: Buffer): Readonly<WebsocketDataF
         throw new Error(`Payload length mismatch ${[payload.length, payloadLength]} @decomposeWebSocketFrame`);
     }
 
-    if (maskInt32) {
-        const mask = Buffer.from([(maskInt32 >> 24) & 0xFF, (maskInt32 >> 16) & 0xFF, (maskInt32 >> 8) & 0xFF, maskInt32 & 0xFF]);
+    if (maskInt32 && payload.length > 0) {
+        const mask = [(maskInt32 >> 24) & 0xFF, (maskInt32 >> 16) & 0xFF, (maskInt32 >> 8) & 0xFF, maskInt32 & 0xFF];
         applyXorMask(payload, mask);
     }
 
@@ -103,7 +103,7 @@ export function composeWebsocketFrame(dataFrame: WebsocketDataFrame, masked: boo
     const payloadBytes = payload.length > 0 ? payload : null;
 
     if (payloadBytes && masked) {
-        applyXorMask(payloadBytes, maskingKeyBytes);
+        applyXorMask(payloadBytes, [...maskingKeyBytes]);
     }
 
     return Buffer.concat([headerBytes, extendedPayloadBytes, maskingKeyBytes, payloadBytes].filter(e => !!e));
@@ -128,7 +128,7 @@ const calculatePayloadProps = (length: number): { declaredPayloadValue: number, 
     };
 };
 
-function applyXorMask(buffer: Buffer, mask: Buffer): Buffer {
+function applyXorMask(buffer: Buffer, mask: number[]): Buffer {
     for (let i = 0; i < buffer.length; i++) {
         buffer[i] ^= mask[i % mask.length];
     }

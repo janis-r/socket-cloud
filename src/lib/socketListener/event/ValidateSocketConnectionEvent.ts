@@ -10,7 +10,7 @@ import {SocketDescriptor} from "../data/SocketDescriptor";
 export class ValidateSocketConnectionEvent extends AsyncValidationEvent<ValidationError> {
     static readonly TYPE = Symbol('validate-socket-connection-event');
 
-    constructor(readonly descriptor: SocketDescriptor, readonly context: ConfigurationContext) {
+    constructor(readonly descriptor: Readonly<SocketDescriptor>, readonly context: ConfigurationContext) {
         super(ValidateSocketConnectionEvent.TYPE);
     }
 }

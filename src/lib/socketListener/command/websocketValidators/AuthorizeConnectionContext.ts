@@ -22,9 +22,17 @@ export class AuthorizeConnectionContext implements Command<boolean> {
         const {
             event: {
                 request: {
-                    headers: {origin: originHeader, 'sec-websocket-origin': secWebsocketOriginHeader},
+                    headers: {
+                        origin: originHeader,
+                        host,
+                        'sec-websocket-key': secWebSocketKeyHeader,
+                        'sec-websocket-origin': secWebsocketOriginHeader,
+                        'x-forwarded-for': forwardedFor,
+                        'sec-websocket-version': websocketVersion
+                    },
                     connection: {remoteAddress},
-                    socket
+                    socket,
+                    url
                 },
                 requestInfo
             },
@@ -35,8 +43,13 @@ export class AuthorizeConnectionContext implements Command<boolean> {
 
         const socketDescriptor: SocketDescriptor = {
             type: SocketConnectionType.WebSocket,
+            connectionId: <string>secWebSocketKeyHeader,
+            host,
             origin: originHeader ?? secWebsocketOriginHeader,
-            remoteAddress
+            remoteAddress,
+            websocketVersion: parseInt(websocketVersion as string),
+            forwardedFor: forwardedFor && typeof forwardedFor === "string" ? forwardedFor : null,
+            url: url && url.replace(/\/|\//g, '').length > 0 ? url : null
         };
 
         const configuration = await getSocketConfigurationContext(socketDescriptor);

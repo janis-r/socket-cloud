@@ -9,6 +9,8 @@ export type WebsocketDataFrame = {
     payload: Buffer;
 }
 
-export const createDataFrame = (type: WebsocketDataFrameType, {payload = null, isFinal = true, rsv1 = false, rsv2 = false, rsv3 = false}: Partial<WebsocketDataFrame> = {}): WebsocketDataFrame => ({
+const emptyBuffer = Buffer.alloc(0);
+
+export const createDataFrame = (type: WebsocketDataFrameType, {payload = emptyBuffer, isFinal = true, rsv1 = false, rsv2 = false, rsv3 = false}: Partial<WebsocketDataFrame> = {}): WebsocketDataFrame => ({
     type, payload, isFinal, rsv1, rsv2, rsv3
 });
