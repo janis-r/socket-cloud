@@ -86,16 +86,17 @@ export class LoggerImpl extends Logger {
         if (!this.logDir) {
             return;
         }
+        const {getFilePath, logErrorHandler} = this;
 
-        const filePath = this.getFilePath(logFileName);
+        const filePath = getFilePath(logFileName);
         const formattedMessage = `${logTime ? getTimestamp() + ': ' : ''}${message}\n`;
-        const errorHandler = (err: ErrnoException | null) => err && console.warn(`Could not write to debug log file - message: ${message}, logFileName: ${logFileName}`)
-        fs.appendFile(filePath, formattedMessage, errorHandler);
+        fs.appendFile(filePath, formattedMessage, err => logErrorHandler(filePath, err));
     }
 
-    private getFilePath(type: string): string {
-        return this.logDir + createLogFileName(type);
-    }
+    private readonly getFilePath = (type: string) => this.logDir + createLogFileName(type);
+    private readonly logErrorHandler = (file: string, {message = null}: ErrnoException) => {
+        message && console.warn(`Could not write to log file: ${{file, message}}`);
+    };
 }
 
 

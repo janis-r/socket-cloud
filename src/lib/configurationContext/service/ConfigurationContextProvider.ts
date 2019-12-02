@@ -23,7 +23,8 @@ export class ConfigurationContextProvider {
         const config: ConfigurationContext = {
             id: 'test',
             maxConnectionCount: 100,
-            connectionValidationUrl: 'http://localhost:8000/validate-socket'
+            connectionValidationUrl: 'http://localhost:8000/validate-socket',
+            pingTimeout: 30000
         };
 
         return config;
