@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "serve": "ts-node server/exp/main.ts",
-    "test": "jest --colors --runInBand"
+    "test": "jest --colors --runInBand",
+    "dev": "ts-node src/app/dev/main.ts",
+    "echo-server": "ts-node src/app/echo-server/main.ts"
   },
   "author": "",
   "license": "none",
@@ -31,7 +33,6 @@
     "ugd10a": "^0.4.0"
   },
   "devDependencies": {
-    "@types/node": "^12.12.5",
-    "wstest": "^1.0.0"
+    "@types/node": "^12.12.5"
   }
 }

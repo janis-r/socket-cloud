@@ -90,7 +90,8 @@ export class LoggerImpl extends Logger {
 
         const filePath = getFilePath(logFileName);
         const formattedMessage = `${logTime ? getTimestamp() + ': ' : ''}${message}\n`;
-        fs.appendFile(filePath, formattedMessage, err => logErrorHandler(filePath, err));
+
+        fs.appendFile(filePath, formattedMessage, err => err && logErrorHandler(filePath, err));
     }
 
     private readonly getFilePath = (type: string) => this.logDir + createLogFileName(type);

@@ -63,6 +63,9 @@ export class ValidateNewConnection implements Command<void> {
             }
         } = this;
 
+        if (!connectionValidationUrl) {
+            return true;
+        }
 
         const request = await fetch(connectionValidationUrl, {
             method: "POST",

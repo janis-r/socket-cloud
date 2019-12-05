@@ -18,6 +18,7 @@ import {ConfigurationContext} from "../../configurationContext";
 import {WebsocketCloseCode} from "../data/WebsocketCloseCode";
 import {WebsocketDescriptor} from "../data/SocketDescriptor";
 import {ClientConnectionEventBase} from "./ClientConnectionEventBase";
+import PrintLabel = jest.PrintLabel;
 
 export class WebsocketClientConnection extends ClientConnectionEventBase implements ClientConnection {
 
@@ -64,7 +65,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     send(data: Buffer);
     send(data: string);
     async send(data: string | Buffer): Promise<void> {
-        console.log('>> send', data);
+        console.log('>> send', data.toString().substr(0, 50));
         const {
             outgoingMessageProcessingQueue: queue,
             extensions,
@@ -77,7 +78,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
             const [type, payload] = typeof data === "string" ? [TextFrame, Buffer.from(data)] : [BinaryFrame, data];
 
             let frames = fragmentWebsocketFrame(type, payload, fragmentSize);
-            console.log('>> frames', frames.map(({payload, ...rest}) => ({...rest, payload: payload.toString("utf8")})));
+            // console.log('>> frames', frames.map(({payload, ...rest}) => ({...rest, payload: payload.toString("utf8")})));
 
             if (!extensions || !extensions.length) {
                 resolve(frames);
@@ -98,14 +99,16 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         queue.delete(promiseOfFrames);
 
         dataFrames.forEach(frame => this.sendFrameData(frame));
+
+        // console.log(dataFrames)
+        // process.exit();
     }
 
     private sendFrameData(dataFrame: WebsocketDataFrame): void {
-        console.log('>> sendFrameData', dataFrame);
+        console.log('>> sendFrameData'/*, dataFrame*/);
 
         const {socket, writeBufferIsFull, outgoingMessageSendQueue} = this;
         const binaryData = composeWebsocketFrame(dataFrame);
-        console.log('\tvalid', JSON.stringify(decomposeWebSocketFrame(binaryData)), JSON.stringify(dataFrame));
 
         if (writeBufferIsFull) {
             outgoingMessageSendQueue.push(binaryData);
@@ -164,15 +167,6 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
             console.log({...rest, payload: payload.length});
 
             console.log(`>> [${id}] type`, {type: frameTypeToString(dataFrame.type), isFinal: dataFrame.isFinal});
-            console.log(`>> [${id}] extensions`, extensions ? extensions.map(e => referenceToString(e.constructor)) : null);
-            // Transformations, like deflating could be done only as final frame is received?
-            if (extensions && extensions.length > 0) {
-                for (const extension of extensions.filter(({transformIncomingData}) => !!transformIncomingData)) {
-                    const transformation = extension.transformIncomingData([dataFrame]);
-                    dataFrame = (isPromise(transformation) ? await transformation : transformation)[0];
-                }
-            }
-            console.log(`>> [${id}] payload len`, dataFrame.payload.toString("utf8").length);
             // process.exit();
         } catch (e) {
             console.log(`>> [${id}] e@decomposeWebSocketFrame`, id, e.message);
@@ -184,7 +178,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
             case WebsocketDataFrameType.ContinuationFrame:
             case WebsocketDataFrameType.TextFrame:
             case WebsocketDataFrameType.BinaryFrame:
-                this.processDataFrame(dataFrame);
+                await this.processDataFrame(dataFrame);
                 break;
             case WebsocketDataFrameType.ConnectionClose:
                 this.processConnectionCloseFrame(dataFrame);
@@ -202,17 +196,34 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         }
     }
 
-    private processDataFrame(dataFrame: WebsocketDataFrame): void {
-        const {dataFrames} = this;
+    private async processDataFrame(dataFrame: WebsocketDataFrame): Promise<void> {
+        /*if (dataFrame.type === WebsocketDataFrameType.TextFrame && (!dataFrame.payload || dataFrame.payload.length === 0)) {
+            this.setState(ConnectionState.CLOSING);
+            this.dispatchEvent(new ErrorEvent(this, `Text message with no payload received: ${JSON.stringify(dataFrame)}`));
+            this.socket.end();
+            return;
+        }*/
+
+        const {dataFrames, extensions} = this;
 
         dataFrames.add(dataFrame);
         if (!dataFrame.isFinal) {
             return;
         }
 
-        const messageBuffer = dataFrames.size === 1 ? [...dataFrames][0].payload : Buffer.concat([...dataFrames].map(({payload}) => payload));
-        const isTextData = [...dataFrames][0].type === WebsocketDataFrameType.TextFrame;
+        let frames = [...dataFrames];
         dataFrames.clear();
+
+        console.log(`>> extensions`, extensions ? extensions.map(e => referenceToString(e.constructor)) : null);
+        if (extensions && extensions.length > 0) {
+            for (const extension of extensions.filter(({transformIncomingData}) => !!transformIncomingData)) {
+                const transformation = extension.transformIncomingData(frames);
+                frames = isPromise(transformation) ? await transformation : transformation;
+            }
+        }
+
+        const messageBuffer = frames.length === 1 ? frames[0].payload : Buffer.concat(frames.map(({payload}) => payload));
+        const isTextData = frames[0].type === WebsocketDataFrameType.TextFrame;
 
         if (isTextData) {
             const message = messageBuffer.toString("utf8");
@@ -222,7 +233,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
             // TODO: Add support for binary data
             throw new Error('Binary data frames are not implemented')
         }
-        this.send(["a", "b"/*, "c"*/].map(char => new Array(10).fill(null).map((v, i) => char + i).join("")).join('-'));
+        // this.send(["a", "b"/*, "c"*/].map(char => new Array(10).fill(null).map((v, i) => char + i).join("")).join('-'));
     }
 
     private processConnectionCloseFrame({payload}: WebsocketDataFrame): void {

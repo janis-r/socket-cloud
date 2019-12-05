@@ -29,7 +29,7 @@ export function decomposeWebSocketFrame(buffer: Buffer): Readonly<WebsocketDataF
     let payloadOffset = 2;
 
     const secondByte = buffer.readUInt8(1);
-    let payloadLength: number | bigint = secondByte & 0x7F;
+    let payloadLength: number = secondByte & 0x7F;
 
     if (payloadLength > 125) {
         if (payloadLength === 126) {
@@ -37,8 +37,9 @@ export function decomposeWebSocketFrame(buffer: Buffer): Readonly<WebsocketDataF
             payloadOffset += 2;
         } else if (payloadLength === 127) {
             payloadOffset += 2;
-            payloadLength = buffer.readBigInt64BE(payloadOffset);
+            // payloadLength = buffer.readBigInt64BE(payloadOffset);
             payloadOffset += 8;
+            throw new Error('64 bit payload length is not supported')
         } else {
             throw new Error(`Wrong data format - payload length of ${payloadLength} should not be there`);
         }
@@ -52,8 +53,31 @@ export function decomposeWebSocketFrame(buffer: Buffer): Readonly<WebsocketDataF
     }
 
     const payload = buffer.slice(payloadOffset);
+    /*const payload = Buffer.alloc(payloadLength);
+    try {
+        for (let i = 0; i < payloadLength; i++) {
+            payload.writeUInt8(buffer.readUInt8(payloadOffset + i), i);
+        }
+    } catch (e) {
+        const tempBuf = buffer.slice(payloadOffset);
+        console.log(tempBuf.toString("utf8").slice(0, 20));
+        console.log(tempBuf);
+        console.log({
+            payloadLength,
+            'tempBuf.length': tempBuf.length,
+            'buffer.length': buffer.length,
+        });
+
+        throw e;
+    }*/
+
     if (payload.length !== payloadLength) {
-        throw new Error(`Payload length mismatch ${[payload.length, payloadLength]} @decomposeWebSocketFrame`);
+        console.warn(`Payload length mismatch ${JSON.stringify({
+            declaredLength: payloadLength,
+            acquiredLength: payload.length,
+            total: buffer.length,
+            check: payloadOffset + payloadLength
+        }, null, ' ')} @decomposeWebSocketFrame`);
     }
 
     if (maskInt32 && payload.length > 0) {

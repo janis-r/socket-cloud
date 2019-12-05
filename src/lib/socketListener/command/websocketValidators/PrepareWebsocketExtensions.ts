@@ -32,7 +32,7 @@ export class PrepareWebsocketExtensions implements Command<boolean> {
 
         if (!websocketExtensionRegistry) {
             // websocketExtensionRegistry and extensions are not present
-            return;
+            return true;
         }
 
         try {
