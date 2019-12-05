@@ -1,5 +1,5 @@
 import {EventListener} from "qft";
-import {MessageEvent, ErrorEvent} from "..";
+import {MessageEvent, ErrorEvent, DataEvent} from "..";
 import {ConnectionState} from "../data/ConnectionState";
 import {StateChangeEvent} from "../event/StateChangeEvent";
 import {ConfigurationContext} from "../../configurationContext";
@@ -15,10 +15,12 @@ export interface ClientConnection {
 
     addEventListener(event: "state-change", listener: EventListener<StateChangeEvent>, scope?: Object);
     addEventListener(event: "message", listener: EventListener<MessageEvent>, scope?: Object);
+    addEventListener(event: "data", listener: EventListener<DataEvent>, scope?: Object);
     addEventListener(event: "error", listener: EventListener<ErrorEvent>, scope?: Object);
 
     removeEventListener(event: "state-change", listener: EventListener<StateChangeEvent>, scope?: Object);
     removeEventListener(event: "message", listener: EventListener<MessageEvent>, scope?: Object);
+    removeEventListener(event: "data", listener: EventListener<DataEvent>, scope?: Object);
     removeEventListener(event: "error", listener: EventListener<ErrorEvent>, scope?: Object);
 
     removeAllEventListeners(scope?: Object): boolean;

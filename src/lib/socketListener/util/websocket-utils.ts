@@ -1,6 +1,7 @@
 import * as crypto from "crypto";
 import {createHash} from "crypto";
-import {WebsocketDataFrame} from "../data/WebsocketDataFrame";
+import {createDataFrame, WebsocketDataFrame} from "../data/WebsocketDataFrame";
+import {WebsocketDataFrameType} from "../data/WebsocketDataFrameType";
 
 /**
  * Generate Websocket connection handshake response
@@ -29,6 +30,7 @@ export function decomposeWebSocketFrame(buffer: Buffer): Readonly<WebsocketDataF
 
     const secondByte = buffer.readUInt8(1);
     let payloadLength: number | bigint = secondByte & 0x7F;
+
     if (payloadLength > 125) {
         if (payloadLength === 126) {
             payloadLength = buffer.readUInt16BE(payloadOffset);
@@ -107,6 +109,31 @@ export function composeWebsocketFrame(dataFrame: WebsocketDataFrame, masked: boo
     }
 
     return Buffer.concat([headerBytes, extendedPayloadBytes, maskingKeyBytes, payloadBytes].filter(e => !!e));
+}
+
+export function fragmentWebsocketFrame(type: WebsocketDataFrameType, payload: Buffer, fragmentSize: number): Array<WebsocketDataFrame> {
+    if (!fragmentSize || payload.length <= fragmentSize) {
+        return [
+            createDataFrame(type, {payload})
+        ];
+    }
+
+    const numFrames = Math.floor(payload.length / fragmentSize);
+    const frames = new Array<WebsocketDataFrame>();
+    for (let frameIndex = 0; frameIndex <= numFrames; frameIndex++) {
+        const start = fragmentSize * frameIndex;
+        const end = Math.min(start + fragmentSize, payload.length);
+        frames.push(
+            createDataFrame(
+                frameIndex === 0 ? type : WebsocketDataFrameType.ContinuationFrame,
+                {
+                    payload: payload.slice(start, end),
+                    isFinal: frameIndex == numFrames
+                }
+            )
+        );
+    }
+    return frames;
 }
 
 const calculatePayloadProps = (length: number): { declaredPayloadValue: number, extendedPayloadSize: number } => {

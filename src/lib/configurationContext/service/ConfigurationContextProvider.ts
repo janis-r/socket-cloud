@@ -15,7 +15,7 @@ export class ConfigurationContextProvider {
             return null;
         }
 
-        const {origin, remoteAddress} = descriptor;
+        const {origin} = descriptor;
         if (!origin) {
             return null;
         }
@@ -24,7 +24,9 @@ export class ConfigurationContextProvider {
             id: 'test',
             maxConnectionCount: 100,
             connectionValidationUrl: 'http://localhost:8000/validate-socket',
-            pingTimeout: 30000
+            pingTimeout: 30000,
+            outgoingMessageFragmentSize: 2 ** 14 // 16 kb
+            // outgoingMessageFragmentSize: 2 ** 3
         };
 
         return config;
