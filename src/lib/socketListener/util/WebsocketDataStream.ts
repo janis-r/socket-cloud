@@ -8,7 +8,7 @@ export class WebsocketDataStream {
     private resumeCall: () => void | null = null;
 
     constructor(private readonly dataCallback: (data: WebsocketDataFrame) => void) {
-        this.runIt();
+        this.processNextFrame();
     }
 
     write(chunk: Buffer): void {
@@ -63,7 +63,7 @@ export class WebsocketDataStream {
         return combinedOutput
     };
 
-    private async runIt(): Promise<void> {
+    private async processNextFrame(): Promise<void> {
         const {read} = this;
         const {type, isFinal, rsv1, rsv2, rsv3, masked, payloadLength} = decomposeHeader(await read(2));
         // console.log('>> header', header);
@@ -91,7 +91,9 @@ export class WebsocketDataStream {
             rsv2,
             rsv3,
             payload
-        })
+        });
+
+        this.processNextFrame();
     }
 }
 

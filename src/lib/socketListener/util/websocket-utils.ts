@@ -179,7 +179,7 @@ const calculatePayloadProps = (length: number): { declaredPayloadValue: number, 
     };
 };
 
-function applyXorMask(buffer: Buffer, mask: number[]): Buffer {
+export function applyXorMask(buffer: Buffer, mask: number[]): Buffer {
     for (let i = 0; i < buffer.length; i++) {
         buffer[i] ^= mask[i % mask.length];
     }

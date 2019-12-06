@@ -1,9 +1,9 @@
 import {Socket} from "net";
 import * as crypto from "crypto";
 import {referenceToString} from "qft";
-import {composeWebsocketFrame, decomposeWebSocketFrame, fragmentWebsocketFrame} from "../util/websocket-utils";
+import {composeWebsocketFrame, fragmentWebsocketFrame} from "../util/websocket-utils";
 import {createDataFrame, WebsocketDataFrame} from "../data/WebsocketDataFrame";
-import {frameTypeToString, WebsocketDataFrameType} from "../data/WebsocketDataFrameType";
+import {WebsocketDataFrameType} from "../data/WebsocketDataFrameType";
 import {isPromise} from "../util/is-promise";
 import {
     ClientConnection,
@@ -18,7 +18,7 @@ import {ConfigurationContext} from "../../configurationContext";
 import {WebsocketCloseCode} from "../data/WebsocketCloseCode";
 import {WebsocketDescriptor} from "../data/SocketDescriptor";
 import {ClientConnectionEventBase} from "./ClientConnectionEventBase";
-import PrintLabel = jest.PrintLabel;
+import {WebsocketDataStream} from "../util/WebsocketDataStream";
 
 export class WebsocketClientConnection extends ClientConnectionEventBase implements ClientConnection {
 
@@ -40,9 +40,15 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
                 private readonly socket: Socket,
                 private readonly extensions?: ReadonlyArray<WebsocketExtensionAgent>) {
         super();
+        console.log({descriptor, context});
 
         socket.once("ready", () => this.setState(ConnectionState.OPEN));
-        socket.on("data", this.incomingDataHandler);
+
+        // socket.on("data", this.incomingDataHandler);
+
+        const stream = new WebsocketDataStream(this.incomingDataHandler);
+        socket.on("data", data => stream.write(data));
+
         socket.on("error", err => {
             console.log(`WebsocketClientConnection socket err: ${JSON.stringify(err.message)}`);
             this.dispatchEvent(new ErrorEvent(this, err.message));
@@ -65,7 +71,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     send(data: Buffer);
     send(data: string);
     async send(data: string | Buffer): Promise<void> {
-        console.log('>> send', data.toString().substr(0, 50));
+        console.log('>> send', data.toString().substr(0, 20));
         const {
             outgoingMessageProcessingQueue: queue,
             extensions,
@@ -78,8 +84,6 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
             const [type, payload] = typeof data === "string" ? [TextFrame, Buffer.from(data)] : [BinaryFrame, data];
 
             let frames = fragmentWebsocketFrame(type, payload, fragmentSize);
-            // console.log('>> frames', frames.map(({payload, ...rest}) => ({...rest, payload: payload.toString("utf8")})));
-
             if (!extensions || !extensions.length) {
                 resolve(frames);
                 return;
@@ -90,7 +94,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
                 const transformation = extension.transformOutgoingData(frames);
                 frames = isPromise(transformation) ? await transformation : transformation;
             }
-            // console.log('>> frames 2', frames);
+
             resolve(frames);
         });
 
@@ -99,13 +103,10 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         queue.delete(promiseOfFrames);
 
         dataFrames.forEach(frame => this.sendFrameData(frame));
-
-        // console.log(dataFrames)
-        // process.exit();
     }
 
     private sendFrameData(dataFrame: WebsocketDataFrame): void {
-        console.log('>> sendFrameData'/*, dataFrame*/);
+        console.log('>> sendFrameData', {...dataFrame, payloadL: dataFrame.payload.length});
 
         const {socket, writeBufferIsFull, outgoingMessageSendQueue} = this;
         const binaryData = composeWebsocketFrame(dataFrame);
@@ -138,7 +139,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         this.writeBufferIsFull = false;
     };
 
-    private readonly incomingDataHandler = async (data: Buffer) => {
+    private readonly incomingDataHandler = async (data: WebsocketDataFrame) => {
         const {incomingMessageQueue: queue} = this;
         const process = new Promise<void>(async resolve => {
             if (queue.size > 0) {
@@ -153,27 +154,8 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         queue.delete(process);
     };
 
-    private async processIncomingDataFrame(data: Buffer): Promise<void> {
-        const {socket, extensions} = this;
-
-        const id = Math.floor(Math.random() * 0xFFFF).toString(16);
-        console.log(`\n>> [${id}] incomingDataHandler`, data.length, 'bytes,', data.toString("hex").substr(0, 50) + '...');
-
-        let dataFrame: WebsocketDataFrame;
-        try {
-            dataFrame = decomposeWebSocketFrame(data);
-            const {payload, ...rest} = dataFrame;
-
-            console.log({...rest, payload: payload.length});
-
-            console.log(`>> [${id}] type`, {type: frameTypeToString(dataFrame.type), isFinal: dataFrame.isFinal});
-            // process.exit();
-        } catch (e) {
-            console.log(`>> [${id}] e@decomposeWebSocketFrame`, id, e.message);
-            process.exit();
-            return;
-        }
-
+    private async processIncomingDataFrame(dataFrame: WebsocketDataFrame): Promise<void> {
+        const {socket} = this;
         switch (dataFrame.type) {
             case WebsocketDataFrameType.ContinuationFrame:
             case WebsocketDataFrameType.TextFrame:
@@ -197,13 +179,6 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     }
 
     private async processDataFrame(dataFrame: WebsocketDataFrame): Promise<void> {
-        /*if (dataFrame.type === WebsocketDataFrameType.TextFrame && (!dataFrame.payload || dataFrame.payload.length === 0)) {
-            this.setState(ConnectionState.CLOSING);
-            this.dispatchEvent(new ErrorEvent(this, `Text message with no payload received: ${JSON.stringify(dataFrame)}`));
-            this.socket.end();
-            return;
-        }*/
-
         const {dataFrames, extensions} = this;
 
         dataFrames.add(dataFrame);
@@ -214,7 +189,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         let frames = [...dataFrames];
         dataFrames.clear();
 
-        console.log(`>> extensions`, extensions ? extensions.map(e => referenceToString(e.constructor)) : null);
+        extensions && console.log(`>> extensions`, extensions.map(e => referenceToString(e.constructor)));
         if (extensions && extensions.length > 0) {
             for (const extension of extensions.filter(({transformIncomingData}) => !!transformIncomingData)) {
                 const transformation = extension.transformIncomingData(frames);
@@ -237,8 +212,17 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     }
 
     private processConnectionCloseFrame({payload}: WebsocketDataFrame): void {
+
+        const code = payload.readUInt16BE(0) || WebsocketCloseCode.NoStatusRcvd;
+        const reason = payload.length > 2 ? payload.slice(2).toString("utf8") : null;
+
         const closeCode = payload && payload.length > 0 ? parseInt(payload.toString("hex"), 16) : WebsocketCloseCode.NoStatusRcvd;
-        console.log({closeCode});
+        console.log({code, reason});
+
+        const responsePayload = Buffer.alloc(2);
+        responsePayload.writeUInt16BE(code, 0);
+        this.sendFrameData(createDataFrame(WebsocketDataFrameType.ConnectionClose, {payload: responsePayload}));
+
         this.setState(ConnectionState.CLOSING);
         this.socket.end();
     }
