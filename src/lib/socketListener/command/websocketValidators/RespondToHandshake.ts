@@ -40,7 +40,7 @@ export class RespondToHandshake implements Command<boolean> {
             responseHeaders.push('Sec-WebSocket-Extensions: ' + extensions.map(({configOfferResponse}) => configOfferResponse).join(", "))
         }
 
-        console.info('>> response headers', responseHeaders);
+        console.info('>> responseHeaders:', responseHeaders);
         socket.write(responseHeaders.join(delimiter) + delimiter + delimiter);
 
         return true;

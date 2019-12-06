@@ -59,7 +59,7 @@ export class ValidateNewWebsocket<T = boolean> extends MacroCommand<T> {
         const result = super.executeSubCommand(command);
 
         const value = isPromise(result) ? await result : result;
-        console.log('>> executeSubCommand', {command: referenceToString(command.type), value});
+        console.log('>> done -> executeSubCommand', {command: referenceToString(command.type), value});
 
         if (value as any === false) { // TODO "as any" should not be needed in here
             console.log('Halt ValidateNewWebsocket at', referenceToString(command.type));
