@@ -106,7 +106,11 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     }
 
     private sendFrameData(dataFrame: WebsocketDataFrame): void {
-        console.log('>> sendFrameData', {...dataFrame, payloadL: dataFrame.payload.length});
+        console.log('>> sendFrameData', {
+            ...dataFrame,
+            payloadLength: dataFrame.payload.length,
+            pAsStr: dataFrame.payload.toString("utf8").substr(0, 20)
+        });
 
         const {socket, writeBufferIsFull, outgoingMessageSendQueue} = this;
         const binaryData = composeWebsocketFrame(dataFrame);
@@ -221,10 +225,10 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
 
         const responsePayload = Buffer.alloc(2);
         responsePayload.writeUInt16BE(code, 0);
-        this.sendFrameData(createDataFrame(WebsocketDataFrameType.ConnectionClose, {payload: responsePayload}));
+        // this.sendFrameData(createDataFrame(WebsocketDataFrameType.ConnectionClose, {payload: responsePayload}));
 
         this.setState(ConnectionState.CLOSING);
-        this.socket.end();
+        this.socket.end(composeWebsocketFrame(createDataFrame(WebsocketDataFrameType.ConnectionClose, {payload: responsePayload})));
     }
 
     private processPingFrame({payload}: WebsocketDataFrame): void {
