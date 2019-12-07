@@ -1,90 +1,34 @@
 import * as crypto from "crypto";
-import {createHash} from "crypto";
-import {createDataFrame, WebsocketDataFrame} from "../data/WebsocketDataFrame";
+import {WebsocketDataFrame} from "../data/WebsocketDataFrame";
 import {WebsocketDataFrameType} from "../data/WebsocketDataFrameType";
-
-/**
- * Generate Websocket connection handshake response
- * @param key
- */
-export const generateWebsocketHandshakeResponse = (key: string) =>
-    createHash('sha1')
-        .update(`${key}258EAFA5-E914-47DA-95CA-C5AB0DC85B11`)
-        .digest('base64');
 
 /**
  * Decompose binary representation of websocket data frame into value object
  * @param buffer
  */
 export function decomposeWebSocketFrame(buffer: Buffer): Readonly<WebsocketDataFrame> {
-    const firstByte = buffer.readUInt8(0);
-    const [type, isFinal, rsv1, rsv2, rsv3] = [
-        firstByte & 0xF,
-        !!((firstByte >>> 7) & 0x1),
-        !!((firstByte >>> 6) & 0x1),
-        !!((firstByte >>> 5) & 0x1),
-        !!((firstByte >>> 4) & 0x1)
-    ];
-
-    let payloadOffset = 2;
-
-    const secondByte = buffer.readUInt8(1);
-    let payloadLength: number = secondByte & 0x7F;
-
-    if (payloadLength > 125) {
-        if (payloadLength === 126) {
-            payloadLength = buffer.readUInt16BE(payloadOffset);
-            payloadOffset += 2;
-        } else if (payloadLength === 127) {
-            payloadOffset += 2;
-            // payloadLength = buffer.readBigInt64BE(payloadOffset);
-            payloadOffset += 8;
-            throw new Error('64 bit payload length is not supported')
-        } else {
-            throw new Error(`Wrong data format - payload length of ${payloadLength} should not be there`);
+    let position: number = 0;
+    const read = (bytes: number): Buffer => {
+        if (buffer.length < position + bytes) {
+            throw new Error(`Missing data in decomposeWebSocketFrame - trying to read ${bytes} bytes, while there's only ${buffer.length - position} available`);
         }
+        const slice = buffer.slice(position, position + bytes);
+        position += bytes;
+        return slice;
+    };
+
+    const {type, isFinal, rsv1, rsv2, rsv3, payloadLength, masked} = decomposeHeader(read(2));
+
+    let extendedPayloadLength: number;
+    if (payloadLength === 126) {
+        extendedPayloadLength = read(2).readUInt16BE(0);
+    } else if (payloadLength === 127) {
+        extendedPayloadLength = read64BitPayloadLength(read(8));
     }
 
-    const isMasked = !!((secondByte >>> 7) & 0x1);
-    let maskInt32: number;
-    if (isMasked) {
-        maskInt32 = buffer.readUInt32BE(payloadOffset);
-        payloadOffset += 4;
-    }
-
-    const payload = buffer.slice(payloadOffset);
-    /*const payload = Buffer.alloc(payloadLength);
-    try {
-        for (let i = 0; i < payloadLength; i++) {
-            payload.writeUInt8(buffer.readUInt8(payloadOffset + i), i);
-        }
-    } catch (e) {
-        const tempBuf = buffer.slice(payloadOffset);
-        console.log(tempBuf.toString("utf8").slice(0, 20));
-        console.log(tempBuf);
-        console.log({
-            payloadLength,
-            'tempBuf.length': tempBuf.length,
-            'buffer.length': buffer.length,
-        });
-
-        throw e;
-    }*/
-
-    if (payload.length !== payloadLength) {
-        console.warn(`Payload length mismatch ${JSON.stringify({
-            declaredLength: payloadLength,
-            acquiredLength: payload.length,
-            total: buffer.length,
-            check: payloadOffset + payloadLength
-        }, null, ' ')} @decomposeWebSocketFrame`);
-    }
-
-    if (maskInt32 && payload.length > 0) {
-        const mask = [(maskInt32 >> 24) & 0xFF, (maskInt32 >> 16) & 0xFF, (maskInt32 >> 8) & 0xFF, maskInt32 & 0xFF];
-        applyXorMask(payload, mask);
-    }
-
+    const maskBytes = masked ? getMaskBytes(read(4)) : null;
+    const payload = read(extendedPayloadLength ?? payloadLength);
+    maskBytes && applyXorMask(payload, maskBytes);
     return {type, isFinal, rsv1, rsv2, rsv3, payload};
 }
 
@@ -137,9 +81,7 @@ export function composeWebsocketFrame(dataFrame: WebsocketDataFrame, masked: boo
 
 export function fragmentWebsocketFrame(type: WebsocketDataFrameType, payload: Buffer, fragmentSize: number): Array<WebsocketDataFrame> {
     if (!fragmentSize || payload.length <= fragmentSize) {
-        return [
-            createDataFrame(type, {payload})
-        ];
+        return [spawnFrameData(type, {payload})];
     }
 
     const numFrames = Math.floor(payload.length / fragmentSize);
@@ -148,7 +90,7 @@ export function fragmentWebsocketFrame(type: WebsocketDataFrameType, payload: Bu
         const start = fragmentSize * frameIndex;
         const end = Math.min(start + fragmentSize, payload.length);
         frames.push(
-            createDataFrame(
+            spawnFrameData(
                 frameIndex === 0 ? type : WebsocketDataFrameType.ContinuationFrame,
                 {
                     payload: payload.slice(start, end),
@@ -160,7 +102,7 @@ export function fragmentWebsocketFrame(type: WebsocketDataFrameType, payload: Bu
     return frames;
 }
 
-const calculatePayloadProps = (length: number): { declaredPayloadValue: number, extendedPayloadSize: number } => {
+function calculatePayloadProps(length: number): { declaredPayloadValue: number, extendedPayloadSize: number } {
     if (length >= 2 ** 16) {
         return {
             declaredPayloadValue: 127,
@@ -177,7 +119,7 @@ const calculatePayloadProps = (length: number): { declaredPayloadValue: number, 
         declaredPayloadValue: length,
         extendedPayloadSize: 0
     };
-};
+}
 
 export function applyXorMask(buffer: Buffer, mask: number[]): Buffer {
     for (let i = 0; i < buffer.length; i++) {
@@ -185,3 +127,47 @@ export function applyXorMask(buffer: Buffer, mask: number[]): Buffer {
     }
     return buffer;
 }
+
+const emptyBuffer = Buffer.alloc(0);
+
+export const spawnFrameData = (
+    type: WebsocketDataFrameType, {
+        payload = emptyBuffer,
+        isFinal = true,
+        rsv1 = false,
+        rsv2 = false,
+        rsv3 = false
+    }: Partial<Exclude<WebsocketDataFrame, "type">> = {}): WebsocketDataFrame & { render: () => Buffer } => {
+    const dataFrame = {type, payload, isFinal, rsv1, rsv2, rsv3};
+    return {...dataFrame, render: () => composeWebsocketFrame(dataFrame)};
+};
+
+export function decomposeHeader(data: Buffer): Pick<WebsocketDataFrame, "type" | "isFinal" | "rsv1" | "rsv2" | "rsv3"> & { payloadLength: number, masked: boolean } {
+    const firstByte = data.readUInt8(0);
+    const [type, isFinal, rsv1, rsv2, rsv3] = [
+        firstByte & 0xF,
+        !!((firstByte >>> 7) & 0x1),
+        !!((firstByte >>> 6) & 0x1),
+        !!((firstByte >>> 5) & 0x1),
+        !!((firstByte >>> 4) & 0x1)
+    ];
+    const secondByte = data.readUInt8(1);
+    const payloadLength = secondByte & 0x7F;
+    const masked = !!((secondByte >>> 7) & 0x1);
+    return {type, isFinal, rsv1, rsv2, rsv3, payloadLength, masked};
+}
+
+export function read64BitPayloadLength(data: Buffer): number {
+    const leftPart = data.readUInt32BE(0);
+    // Check if payload length is within bounds of Number in jS (bigint could actually help here?)
+    if (leftPart > (2 ** 21) - 1) {
+        throw new Error(`Payload length is too big`);
+    }
+    return leftPart * (2 ** 32) + data.readUInt32BE(4);
+}
+
+export function getMaskBytes(buffer: Buffer): Array<number> {
+    const maskInt32 = buffer.readUInt32BE(0);
+    return [(maskInt32 >> 24) & 0xFF, (maskInt32 >> 16) & 0xFF, (maskInt32 >> 8) & 0xFF, maskInt32 & 0xFF];
+}
+

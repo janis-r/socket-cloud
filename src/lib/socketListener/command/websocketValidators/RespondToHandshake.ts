@@ -1,7 +1,7 @@
 import {Command, Inject} from "qft";
 import {WebsocketConnectionValidationRequest} from "../../event/WebsocketConnectionValidationRequest";
 import {Logger} from "../../../logger";
-import {generateWebsocketHandshakeResponse} from "../../util/websocket-utils";
+import {websocketHandshakeResponse} from "../../util/websocketHandshakeResponse";
 
 export class RespondToHandshake implements Command<boolean> {
 
@@ -30,10 +30,10 @@ export class RespondToHandshake implements Command<boolean> {
 
         const delimiter = "\r\n";
         const responseHeaders = [
-            "HTTP/1.1 101 Web Socket Protocol Handshake",
-            "Upgrade: WebSocket",
-            "Connection: Upgrade",
-            `Sec-WebSocket-Accept: ${generateWebsocketHandshakeResponse(secWebSocketKeyHeader)}`
+            `HTTP/1.1 101 Web Socket Protocol Handshake`,
+            `Upgrade: WebSocket`,
+            `Connection: Upgrade`,
+            `Sec-WebSocket-Accept: ${websocketHandshakeResponse(secWebSocketKeyHeader)}`
         ];
 
         if (extensions && extensions.length > 0) {

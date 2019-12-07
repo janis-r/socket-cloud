@@ -1,4 +1,5 @@
 import {WebsocketDataFrameType} from "./WebsocketDataFrameType";
+import {composeWebsocketFrame} from "../util/websocket-utils";
 
 export type WebsocketDataFrame = {
     type: WebsocketDataFrameType;
@@ -9,15 +10,3 @@ export type WebsocketDataFrame = {
     payload: Buffer;
 }
 
-const emptyBuffer = Buffer.alloc(0);
-
-export const createDataFrame = (
-    type: WebsocketDataFrameType, {
-        payload = emptyBuffer,
-        isFinal = true,
-        rsv1 = false,
-        rsv2 = false,
-        rsv3 = false
-    }: Partial<Exclude<WebsocketDataFrame, "type">> = {}): WebsocketDataFrame => ({
-    type, payload, isFinal, rsv1, rsv2, rsv3
-});

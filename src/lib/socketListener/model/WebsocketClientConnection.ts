@@ -1,10 +1,10 @@
 import {Socket} from "net";
 import * as crypto from "crypto";
 import {referenceToString} from "qft";
-import {composeWebsocketFrame, fragmentWebsocketFrame} from "../util/websocket-utils";
-import {createDataFrame, WebsocketDataFrame} from "../data/WebsocketDataFrame";
+import {composeWebsocketFrame, spawnFrameData, fragmentWebsocketFrame} from "../util/websocket-utils";
+import {WebsocketDataFrame} from "../data/WebsocketDataFrame";
 import {WebsocketDataFrameType} from "../data/WebsocketDataFrameType";
-import {isPromise} from "../util/is-promise";
+import {isPromise} from "../../utils/is-promise";
 import {
     ClientConnection,
     ConnectionState,
@@ -18,11 +18,12 @@ import {ConfigurationContext} from "../../configurationContext";
 import {WebsocketCloseCode} from "../data/WebsocketCloseCode";
 import {WebsocketDescriptor} from "../data/SocketDescriptor";
 import {ClientConnectionEventBase} from "./ClientConnectionEventBase";
-import {WebsocketDataStream} from "../util/WebsocketDataStream";
+import {WebsocketDataStream} from "./WebsocketDataStream";
 
 export class WebsocketClientConnection extends ClientConnectionEventBase implements ClientConnection {
 
     private _state = ConnectionState.CONNECTING;
+    private readonly dataStream = new WebsocketDataStream();
     private readonly dataFrames = new Set<WebsocketDataFrame>();
     private readonly incomingMessageQueue = new Set<Promise<void>>();
     private readonly outgoingMessageProcessingQueue = new Set<Promise<any>>();
@@ -40,27 +41,28 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
                 private readonly socket: Socket,
                 private readonly extensions?: ReadonlyArray<WebsocketExtensionAgent>) {
         super();
+
+        const {dataStream, incomingDataHandler, resetPingTimeout} = this;
+
         console.log({descriptor, context});
 
-        socket.once("ready", () => this.setState(ConnectionState.OPEN));
-
-        // socket.on("data", this.incomingDataHandler);
-
-        const stream = new WebsocketDataStream(this.incomingDataHandler);
-        socket.on("data", data => stream.write(data));
-
-        socket.on("error", err => {
+        dataStream.addEventListener("data", ({data}) => incomingDataHandler(data));
+        socket.once("ready", () => {
+            console.log('>>>>>>>>>>>> ready')
+            this.setState(ConnectionState.OPEN)
+        });
+        socket.on("data", data => dataStream.write(data));
+        socket.once("error", err => {
             console.log(`WebsocketClientConnection socket err: ${JSON.stringify(err.message)}`);
             this.dispatchEvent(new ErrorEvent(this, err.message));
-            this.setState(ConnectionState.CLOSING);
-            this.socket.end();
+            this.close(WebsocketCloseCode.AbnormalClosure);
         });
         socket.on("close", () => this.setState(ConnectionState.CLOSED));
 
         if (context.pingTimeout) {
             this.pingTimeout = context.pingTimeout;
             this.startPingTimeout();
-            socket.on("data", this.resetPingTimeout);
+            socket.on("data", resetPingTimeout);
         }
     }
 
@@ -101,8 +103,19 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         queue.add(promiseOfFrames);
         const dataFrames = await promiseOfFrames;
         queue.delete(promiseOfFrames);
-
         dataFrames.forEach(frame => this.sendFrameData(frame));
+    }
+
+    private close(code: WebsocketCloseCode = WebsocketCloseCode.NormalClosure): boolean {
+        if (this._state >= ConnectionState.CLOSING) {
+            return false;
+        }
+
+        const payload = Buffer.alloc(2);
+        payload.writeUInt16BE(code, 0);
+
+        this.setState(ConnectionState.CLOSING);
+        this.socket.end(spawnFrameData(WebsocketDataFrameType.ConnectionClose, {payload}).render());
     }
 
     private sendFrameData(dataFrame: WebsocketDataFrame): void {
@@ -122,18 +135,31 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
 
         // If there is backpressure, write returns false and the you should wait for drain
         // to be emitted before writing additional data.
-        const success = socket.write(binaryData, err => err && console.log('socket.write err', err));
-        if (!success) {
+
+        socket.cork();
+        const success = socket.write(binaryData, err => {
+            console.debug('>> socket wrote', binaryData.length, 'bytes');
+            err && console.log('socket.write err', err)
+        });
+        console.log({success, readable: socket.readable, writable: socket.writable});
+
+        socket.uncork();
+        /*if (!success) {
             outgoingMessageSendQueue.push(binaryData);
             this.writeBufferIsFull = true;
             socket.once("drain", this.resendData);
-        }
+        }*/
     }
 
     private readonly resendData = () => {
         const {socket, outgoingMessageSendQueue} = this;
         while (outgoingMessageSendQueue.length > 0) {
-            const success = socket.write(outgoingMessageSendQueue[0], err => err && console.log('socket.write err II', err));
+            const success = socket.write(outgoingMessageSendQueue[0], err => {
+                err && console.log('socket.write err II', err);
+                console.debug('>> socket wrote 2', outgoingMessageSendQueue[0].length, 'bytes');
+            });
+            console.log({success, readable: socket.readable, writable: socket.writable});
+
             if (!success) {
                 socket.once("drain", this.resendData);
                 return;
@@ -219,21 +245,17 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
 
         const code = payload.readUInt16BE(0) || WebsocketCloseCode.NoStatusRcvd;
         const reason = payload.length > 2 ? payload.slice(2).toString("utf8") : null;
-
-        const closeCode = payload && payload.length > 0 ? parseInt(payload.toString("hex"), 16) : WebsocketCloseCode.NoStatusRcvd;
-        console.log({code, reason});
+        // TODO: Log close code and reason?
 
         const responsePayload = Buffer.alloc(2);
-        responsePayload.writeUInt16BE(code, 0);
-        // this.sendFrameData(createDataFrame(WebsocketDataFrameType.ConnectionClose, {payload: responsePayload}));
+        responsePayload.writeUInt16BE(code !== WebsocketCloseCode.NoStatusRcvd ? WebsocketCloseCode.NormalClosure : code, 0);
 
-        this.setState(ConnectionState.CLOSING);
-        this.socket.end(composeWebsocketFrame(createDataFrame(WebsocketDataFrameType.ConnectionClose, {payload: responsePayload})));
+        this.close(code !== WebsocketCloseCode.NoStatusRcvd ? WebsocketCloseCode.NormalClosure : code);
     }
 
     private processPingFrame({payload}: WebsocketDataFrame): void {
         // Send pong back with same payload
-        this.sendFrameData(createDataFrame(WebsocketDataFrameType.Pong, {payload}));
+        this.sendFrameData(spawnFrameData(WebsocketDataFrameType.Pong, {payload}));
     }
 
     private processPongFrame({payload}: WebsocketDataFrame): void {
@@ -263,7 +285,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
 
         console.log('>> ping', {pingsInProgress});
         this.connectivityErrorTimoutId = setTimeout(handleLostConnection, pingTimeout);
-        this.sendFrameData(createDataFrame(WebsocketDataFrameType.Ping, {payload}));
+        this.sendFrameData(spawnFrameData(WebsocketDataFrameType.Ping, {payload}));
     };
 
     private startPingTimeout(): void {
@@ -283,7 +305,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     private readonly handleLostConnection = () => {
         this.setState(ConnectionState.CLOSING);
         this.dispatchEvent(new ErrorEvent(this, `Socket connection is lost`));
-        this.socket.end();
+        this.close(WebsocketCloseCode.AbnormalClosure);
     };
 
     private setState(newState: ConnectionState): void {

@@ -6,7 +6,7 @@ import {ValidateConnectionHeaders} from "./websocketValidators/ValidateConnectio
 import {NewSocketConnectionEvent} from "../event/NewSocketConnectionEvent";
 import {WebsocketClientConnection} from "../model/WebsocketClientConnection";
 import {PrepareWebsocketExtensions} from "./websocketValidators/PrepareWebsocketExtensions";
-import {isPromise} from "../util/is-promise";
+import {isPromise} from "../../utils/is-promise";
 import {RespondToHandshake} from "./websocketValidators/RespondToHandshake";
 import {WebsocketDescriptor} from "../data/SocketDescriptor";
 

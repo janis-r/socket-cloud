@@ -1,16 +1,8 @@
-import {composeWebsocketFrame, decomposeWebSocketFrame, generateWebsocketHandshakeResponse} from "./websocket-utils";
+import {composeWebsocketFrame, decomposeWebSocketFrame} from "./websocket-utils";
 import {WebsocketDataFrame} from "../data/WebsocketDataFrame";
 import {WebsocketDataFrameType} from "../data/WebsocketDataFrameType";
 
 describe("websocket-utils", () => {
-
-    it("Can generate websocket handshake", () => {
-        expect(
-            generateWebsocketHandshakeResponse("dGhlIHNhbXBsZSBub25jZQ==")
-        ).toBe(
-            "s3pPLMBiTxaQ9kYGzzhZRbK+xOo="
-        );
-    });
 
     it("Can compose and decompose websocket frame", () => {
         const dataFrame: WebsocketDataFrame = {

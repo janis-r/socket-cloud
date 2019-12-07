@@ -1,10 +1,10 @@
 import * as http from "http";
-import {Context, Injector, ModuleConfig, WebApplicationBundle, InjectionConfig} from "qft";
+import {Context, InjectionConfig, Injector, ModuleConfig, WebApplicationBundle} from "qft";
 import * as fs from "fs";
 import {WebSocketListenerConfig, WebsocketListenerModule} from "../../lib/socketListener";
 import {Logger} from "../../lib/logger";
 import {HttpMethod} from "../../lib/types/HttpMethod";
-import {ConfigurationContext, ConfigurationContextProvider} from "../../lib/configurationContext";
+import {ConfigurationContextProvider} from "../../lib/configurationContext";
 import {SocketDescriptor} from "../../lib/socketListener/data/SocketDescriptor";
 
 const httpServerPort = 8000;
@@ -66,7 +66,8 @@ const initSocket = async () => {
                         map: ConfigurationContextProvider,
                         useValue: {
                             getSocketConfigurationContext: (descriptor: SocketDescriptor) => ({
-                                id: 'echo-server'
+                                id: 'echo-server',
+                                // outgoingMessageFragmentSize: 2 ** 14
                             })
                         }
                     }
