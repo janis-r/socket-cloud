@@ -1,4 +1,4 @@
-import {EventDispatcher, Inject, MacroCommand, SubCommand, referenceToString} from "qft";
+import {EventDispatcher, Inject, MacroCommand, referenceToString, SubCommand} from "qft";
 import {WebsocketConnectionValidationRequest} from "../event/WebsocketConnectionValidationRequest";
 import {Logger} from "../../logger";
 import {AuthorizeConnectionContext} from "./websocketValidators/AuthorizeConnectionContext";
@@ -47,10 +47,9 @@ export class ValidateNewWebsocket<T = boolean> extends MacroCommand<T> {
             extensions
         );
 
-        // TODO: Remvoe this at some point
-        connection.addEventListener("message", ({message}) => {
-            connection.send(message);
-        });
+        // TODO: Remove this at some point
+        connection.addEventListener("message", ({message}) => connection.send(message));
+        connection.addEventListener("data", ({data}) => connection.send(data));
 
         eventDispatcher.dispatchEvent(new NewSocketConnectionEvent(connection));
     }

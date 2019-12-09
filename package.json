@@ -33,6 +33,7 @@
     "ugd10a": "^0.4.0"
   },
   "devDependencies": {
-    "@types/node": "^12.12.5"
+    "@types/node": "^12.12.5",
+    "utf-8-validate": "^5.0.2"
   }
 }

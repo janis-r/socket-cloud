@@ -1,6 +1,8 @@
 /**
  * Endpoints MAY use the following pre-defined status codes when sending a Close frame.
  */
+import {valueBelongsToEnum} from "ugd10a";
+
 export enum WebsocketCloseCode {
 
     /**
@@ -83,3 +85,7 @@ export enum WebsocketCloseCode {
      */
     TLSHandshake = 1015
 }
+
+export const isValidWebsocketCloseCode = (value: number) =>
+    valueBelongsToEnum(WebsocketCloseCode, value) || value >= 3000 && value < 5000;
+

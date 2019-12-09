@@ -1,6 +1,5 @@
 import {Socket} from "net";
 import * as crypto from "crypto";
-import {referenceToString} from "qft";
 import {composeWebsocketFrame, fragmentWebsocketFrame, spawnFrameData} from "../util/websocket-utils";
 import {WebsocketDataFrame} from "../data/WebsocketDataFrame";
 import {WebsocketDataFrameType} from "../data/WebsocketDataFrameType";
@@ -9,17 +8,21 @@ import {
     ClientConnection,
     ConnectionState,
     connectionStateToString,
+    DataEvent,
     ErrorEvent,
     MessageEvent,
     StateChangeEvent
 } from "../../socketServer";
 import {WebsocketExtensionAgent} from "../../websocketExtension";
 import {ConfigurationContext} from "../../configurationContext";
-import {WebsocketCloseCode} from "../data/WebsocketCloseCode";
+import {isValidWebsocketCloseCode, WebsocketCloseCode} from "../data/WebsocketCloseCode";
 import {WebsocketDescriptor} from "../data/SocketDescriptor";
 import {ClientConnectionEventBase} from "./ClientConnectionEventBase";
 import {WebsocketIncomingDataBuffer} from "../util/WebsocketIncomingDataBuffer";
 import {WebsocketOutgoingDataBuffer} from "../util/WebsocketOutgoingDataBuffer";
+import {valueBelongsToEnum} from "ugd10a";
+
+const isValidUTF8: (data: Buffer) => boolean = require('utf-8-validate');
 
 export class WebsocketClientConnection extends ClientConnectionEventBase implements ClientConnection {
 
@@ -28,13 +31,16 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     private readonly outgoingDataBuffer: WebsocketOutgoingDataBuffer;
 
     private readonly dataFrames = new Set<WebsocketDataFrame>();
-    private readonly incomingMessageQueue = new Set<Promise<void>>();
+    private readonly incomingMessageQueue = new Set<Promise<any>>();
     private readonly outgoingMessageProcessingQueue = new Set<Promise<any>>();
 
     private readonly pingTimeout: number;
     private readonly pingsInProgress = new Map<string, number>();
     private nextPingTimeoutId: ReturnType<typeof setTimeout> | null = null;
     private connectivityErrorTimoutId: ReturnType<typeof setTimeout> | null = null;
+
+    private readonly incomingDataExtensions: Array<WebsocketExtensionAgent>;
+    private readonly outgoingDataExtensions: Array<WebsocketExtensionAgent>;
 
     constructor(readonly descriptor: WebsocketDescriptor,
                 readonly context: ConfigurationContext,
@@ -61,6 +67,17 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
             this.close(WebsocketCloseCode.AbnormalClosure);
         });
         socket.on("close", () => this.setState(ConnectionState.CLOSED));
+
+        if (extensions && extensions.length > 0) {
+            const incoming = extensions.filter(({transformIncomingData}) => !!transformIncomingData);
+            const outgoing = extensions.filter(({transformOutgoingData}) => !!transformOutgoingData);
+            if (incoming) {
+                this.incomingDataExtensions = incoming;
+            }
+            if (outgoing) {
+                this.outgoingDataExtensions = outgoing;
+            }
+        }
 
         if (context.pingTimeout) {
             this.pingTimeout = context.pingTimeout;
@@ -108,6 +125,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     }
 
     close(code: WebsocketCloseCode = WebsocketCloseCode.NormalClosure): boolean {
+        console.log('>> close', code);
         const {state, setState, socket} = this;
         if (state >= ConnectionState.CLOSING) {
             return false;
@@ -121,21 +139,67 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     }
 
     private readonly incomingDataHandler = async (data: WebsocketDataFrame) => {
+        console.log('>> incomingDataHandler', data);
         const {incomingMessageQueue: queue} = this;
-        const process = new Promise<void>(async resolve => {
+        const process = new Promise<boolean>(async resolve => {
             if (queue.size > 0) {
                 await Promise.all([...queue]);
             }
-            await this.processIncomingDataFrame(data);
-            resolve();
+
+            if (!data.isFinal) {
+                const cantBeFragmented = [
+                    WebsocketDataFrameType.TextFrame,
+                    WebsocketDataFrameType.BinaryFrame,
+                    WebsocketDataFrameType.ContinuationFrame
+                ].includes(data.type);
+
+                if (!cantBeFragmented) {
+                    const event = new ErrorEvent(this, `Received fragmented message that should never be fragmented ${JSON.stringify(data)}`);
+                    console.log(event.message);
+                    this.dispatchEvent(event);
+                    this.close(WebsocketCloseCode.ProtocolError);
+                    resolve(false);
+                    return;
+                }
+            }
+
+            // This would apply all the extension updates to incoming data frame
+            const [extendedData] = (await this.extendIncomingData([data]));
+            // And here all rsv fields must be already set to 0 as extensions have been applied
+            if (extendedData.rsv1 || extendedData.rsv2 || extendedData.rsv3) {
+                console.log('Some RSV fields have not being reset by extensions - protocol error @incomingDataHandler');
+                this.close(WebsocketCloseCode.ProtocolError);
+                resolve(false);
+                return;
+            }
+
+            await this.processIncomingDataFrame(extendedData);
+            resolve(true);
         });
 
         queue.add(process);
-        await process;
+        if (await process === false) {
+            return;
+        }
         queue.delete(process);
     };
 
+    private async extendIncomingData(data: WebsocketDataFrame[]): Promise<WebsocketDataFrame[]> {
+        const {incomingDataExtensions} = this;
+        if (!incomingDataExtensions) {
+            return data;
+        }
+
+        for (const extension of incomingDataExtensions) {
+            const transformation = extension.transformIncomingData(data);
+            data = isPromise(transformation) ? await transformation : transformation;
+        }
+
+        return data;
+    }
+
     private async processIncomingDataFrame(dataFrame: WebsocketDataFrame): Promise<void> {
+        console.log('>> processIncomingDataFrame', dataFrame);
         const {socket} = this;
         switch (dataFrame.type) {
             case WebsocketDataFrameType.ContinuationFrame:
@@ -147,7 +211,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
                 this.processConnectionCloseFrame(dataFrame);
                 break;
             case WebsocketDataFrameType.Ping:
-                this.processPingFrame(dataFrame);
+                await this.processPingFrame(dataFrame);
                 break;
             case WebsocketDataFrameType.Pong:
                 this.processPongFrame(dataFrame);
@@ -160,7 +224,19 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     }
 
     private async processDataFrame(dataFrame: WebsocketDataFrame): Promise<void> {
-        const {dataFrames, extensions} = this;
+        const {dataFrames} = this;
+
+        if (dataFrame.type === WebsocketDataFrameType.ContinuationFrame && dataFrames.size === 0) {
+            this.dispatchEvent(new ErrorEvent(this, `Received continuation frame with not preceding opening frame: ${JSON.stringify(dataFrame)}`));
+            this.close(WebsocketCloseCode.ProtocolError);
+            return;
+        }
+        if (dataFrame.type !== WebsocketDataFrameType.ContinuationFrame && dataFrames.size > 0) {
+            this.dispatchEvent(new ErrorEvent(this, `Received double opening frames: ${JSON.stringify(dataFrame)}`));
+            this.close(WebsocketCloseCode.ProtocolError);
+            return;
+        }
+
 
         dataFrames.add(dataFrame);
         if (!dataFrame.isFinal) {
@@ -170,41 +246,72 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         let frames = [...dataFrames];
         dataFrames.clear();
 
-        extensions && console.log(`>> extensions`, extensions.map(e => referenceToString(e.constructor)));
-        if (extensions && extensions.length > 0) {
-            for (const extension of extensions.filter(({transformIncomingData}) => !!transformIncomingData)) {
-                const transformation = extension.transformIncomingData(frames);
-                frames = isPromise(transformation) ? await transformation : transformation;
-            }
-        }
-
-        const messageBuffer = frames.length === 1 ? frames[0].payload : Buffer.concat(frames.map(({payload}) => payload));
+        const message = frames.length === 1 ? frames[0].payload : Buffer.concat(frames.map(({payload}) => payload));
         const isTextData = frames[0].type === WebsocketDataFrameType.TextFrame;
         if (isTextData) {
-            const message = messageBuffer.toString("utf8");
-            console.log(message.substr(0, 100));
-            this.dispatchEvent(new MessageEvent(this, message));
+            if (!isValidUTF8(message)) {
+                this.dispatchEvent(new ErrorEvent(this, `Received invalid UTF8 content: ${JSON.stringify(message)}`));
+                this.close(WebsocketCloseCode.ProtocolError);
+                return;
+            }
+
+            const event = new MessageEvent(this, message.toString("utf8"));
+            console.log('>> text message', event.message.substr(0, 100));
+            this.dispatchEvent(event);
         } else {
-            // TODO: Add support for binary data
-            throw new Error('Binary data frames are not implemented')
+            console.log('>> binary message', message);
+            this.dispatchEvent(new DataEvent(this, message));
         }
         // this.send(["a", "b"/*, "c"*/].map(char => new Array(10).fill(null).map((v, i) => char + i).join("")).join('-'));
     }
 
     private processConnectionCloseFrame({payload}: WebsocketDataFrame): void {
-        const code = payload.readUInt16BE(0) || WebsocketCloseCode.NoStatusRcvd;
+        const {ProtocolError, AbnormalClosure, NormalClosure, NoStatusRcvd} = WebsocketCloseCode;
+
+        if (payload.length === 1) {
+            this.dispatchEvent(new ErrorEvent(this, `Close connection frame with length 1 byte received`));
+            this.close(ProtocolError);
+            return;
+        }
+
+        if (payload.length > 125) {
+            this.dispatchEvent(new ErrorEvent(this, `Close frame payload too long: ${payload.length}`));
+            this.close(ProtocolError);
+            return;
+        }
+
+        if (payload.length > 2 && !isValidUTF8(payload.slice(2))) {
+            this.dispatchEvent(new ErrorEvent(this, `Close frame payload contain invalid UTF too long: ${payload.length}`));
+            this.close(ProtocolError);
+            return;
+        }
+
+        const code = payload.length >= 2 ? payload.readUInt16BE(0) : null;
         const reason = payload.length > 2 ? payload.slice(2).toString("utf8") : null;
+
+        console.log({code, reason})
+
+        // NoStatusRcvd & AbnormalClosure are not allowed to appear in data requests
+        if (code !== null && ([NoStatusRcvd, AbnormalClosure].includes(code) || !isValidWebsocketCloseCode(code))) {
+            this.dispatchEvent(new ErrorEvent(this, `Invalid close code received: ${{code}}`));
+            this.close(ProtocolError);
+            return;
+        }
+
+        console.log('>> processConnectionCloseFrame', {payload, code, reason});
+
         // TODO: Log close code and reason?
 
-        const responsePayload = Buffer.alloc(2);
-        responsePayload.writeUInt16BE(code !== WebsocketCloseCode.NoStatusRcvd ? WebsocketCloseCode.NormalClosure : code, 0);
-
-        this.close(code !== WebsocketCloseCode.NoStatusRcvd ? WebsocketCloseCode.NormalClosure : code);
+        this.close(code ?? NormalClosure);
     }
 
-    private processPingFrame({payload}: WebsocketDataFrame): void {
-        // Send pong back with same payload
-        this.outgoingDataBuffer.write(spawnFrameData(WebsocketDataFrameType.Pong, {payload}).render());
+    private async processPingFrame({payload}: WebsocketDataFrame): Promise<void> {
+        const {outgoingDataBuffer} = this;
+        if (payload.length > 125) {
+            this.close(WebsocketCloseCode.ProtocolError);
+            return;
+        }
+        await outgoingDataBuffer.write(spawnFrameData(WebsocketDataFrameType.Pong, {payload}).render());
     }
 
     private processPongFrame({payload}: WebsocketDataFrame): void {
