@@ -10,7 +10,7 @@ export abstract class ClientConnectionEventBase extends EventDispatcher implemen
     addEventListener(event: "data", listener: EventListener<DataEvent>, scope?: Object);
     addEventListener(event: "error", listener: EventListener<ErrorEvent>, scope?: Object);
     addEventListener(event: string | Symbol, listener: EventListener<any>, scope?: Object) {
-        return super.addEventListener(eventNameProxy(event), listener, scope);
+        return super.addEventListener(event, listener, scope);
     }
 
     removeEventListener(event: "state-change", listener: EventListener<StateChangeEvent>, scope?: Object);
@@ -18,14 +18,6 @@ export abstract class ClientConnectionEventBase extends EventDispatcher implemen
     removeEventListener(event: "data", listener: EventListener<DataEvent>, scope?: Object);
     removeEventListener(event: "error", listener: EventListener<ErrorEvent>, scope?: Object);
     removeEventListener(event: string | Symbol, listener: EventListener<any>, scope?: Object): boolean {
-        return super.removeEventListener(eventNameProxy(event), listener, scope);
+        return super.removeEventListener(event, listener, scope);
     }
 }
-
-const eventMap = new Map<string, Symbol>([
-    ["state-change", StateChangeEvent.TYPE],
-    ["message", MessageEvent.TYPE],
-    ["data", DataEvent.TYPE],
-    ["error", ErrorEvent.TYPE]
-]);
-const eventNameProxy = (event: string | Symbol) => typeof event === "string" && eventMap.has(event) ? eventMap.get(event) : event;

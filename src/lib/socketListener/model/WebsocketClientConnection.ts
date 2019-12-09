@@ -1,7 +1,7 @@
 import {Socket} from "net";
 import * as crypto from "crypto";
 import {referenceToString} from "qft";
-import {composeWebsocketFrame, spawnFrameData, fragmentWebsocketFrame} from "../util/websocket-utils";
+import {composeWebsocketFrame, fragmentWebsocketFrame, spawnFrameData} from "../util/websocket-utils";
 import {WebsocketDataFrame} from "../data/WebsocketDataFrame";
 import {WebsocketDataFrameType} from "../data/WebsocketDataFrameType";
 import {isPromise} from "../../utils/is-promise";
@@ -18,18 +18,18 @@ import {ConfigurationContext} from "../../configurationContext";
 import {WebsocketCloseCode} from "../data/WebsocketCloseCode";
 import {WebsocketDescriptor} from "../data/SocketDescriptor";
 import {ClientConnectionEventBase} from "./ClientConnectionEventBase";
-import {WebsocketDataStream} from "./WebsocketDataStream";
+import {WebsocketIncomingDataBuffer} from "../util/WebsocketIncomingDataBuffer";
+import {WebsocketOutgoingDataBuffer} from "../util/WebsocketOutgoingDataBuffer";
 
 export class WebsocketClientConnection extends ClientConnectionEventBase implements ClientConnection {
 
     private _state = ConnectionState.CONNECTING;
-    private readonly dataStream = new WebsocketDataStream();
+    private readonly incomingDataBuffer = new WebsocketIncomingDataBuffer();
+    private readonly outgoingDataBuffer: WebsocketOutgoingDataBuffer;
+
     private readonly dataFrames = new Set<WebsocketDataFrame>();
     private readonly incomingMessageQueue = new Set<Promise<void>>();
     private readonly outgoingMessageProcessingQueue = new Set<Promise<any>>();
-    private readonly outgoingMessageSendQueue = new Array<Buffer>();
-
-    private writeBufferIsFull = false;
 
     private readonly pingTimeout: number;
     private readonly pingsInProgress = new Map<string, number>();
@@ -42,16 +42,19 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
                 private readonly extensions?: ReadonlyArray<WebsocketExtensionAgent>) {
         super();
 
-        const {dataStream, incomingDataHandler, resetPingTimeout} = this;
+        this.outgoingDataBuffer = new WebsocketOutgoingDataBuffer(socket);
+
+        const {incomingDataBuffer, incomingDataHandler, resetPingTimeout} = this;
 
         console.log({descriptor, context});
 
-        dataStream.addEventListener("data", ({data}) => incomingDataHandler(data));
         socket.once("ready", () => {
-            console.log('>>>>>>>>>>>> ready')
-            this.setState(ConnectionState.OPEN)
+            this.setState(ConnectionState.OPEN);
+            throw new Error("READY");
         });
-        socket.on("data", data => dataStream.write(data));
+
+        incomingDataBuffer.addEventListener("data", ({data}) => incomingDataHandler(data));
+        socket.on("data", data => incomingDataBuffer.write(data));
         socket.once("error", err => {
             console.log(`WebsocketClientConnection socket err: ${JSON.stringify(err.message)}`);
             this.dispatchEvent(new ErrorEvent(this, err.message));
@@ -77,97 +80,45 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         const {
             outgoingMessageProcessingQueue: queue,
             extensions,
-            context: {outgoingMessageFragmentSize: fragmentSize}
+            context: {outgoingMessageFragmentSize: fragmentSize},
+            outgoingDataBuffer
         } = this;
         const {TextFrame, BinaryFrame} = WebsocketDataFrameType;
 
-        const promiseOfFrames = new Promise<Array<WebsocketDataFrame>>(async resolve => {
+        const process = new Promise<void>(async resolve => {
             await Promise.all([...queue]);
             const [type, payload] = typeof data === "string" ? [TextFrame, Buffer.from(data)] : [BinaryFrame, data];
 
             let frames = fragmentWebsocketFrame(type, payload, fragmentSize);
-            if (!extensions || !extensions.length) {
-                resolve(frames);
-                return;
+            if (extensions && extensions.length) {
+                const validExtensions = extensions.filter(({transformOutgoingData}) => !!transformOutgoingData);
+                for (const extension of validExtensions) {
+                    const transformation = extension.transformOutgoingData(frames);
+                    frames = isPromise(transformation) ? await transformation : transformation;
+                }
             }
 
-            const validExtensions = extensions.filter(({transformOutgoingData}) => !!transformOutgoingData);
-            for (const extension of validExtensions) {
-                const transformation = extension.transformOutgoingData(frames);
-                frames = isPromise(transformation) ? await transformation : transformation;
-            }
-
-            resolve(frames);
+            await outgoingDataBuffer.write(frames.map(frame => composeWebsocketFrame(frame)));
+            resolve();
         });
 
-        queue.add(promiseOfFrames);
-        const dataFrames = await promiseOfFrames;
-        queue.delete(promiseOfFrames);
-        dataFrames.forEach(frame => this.sendFrameData(frame));
+        queue.add(process);
+        await process;
+        queue.delete(process);
     }
 
-    private close(code: WebsocketCloseCode = WebsocketCloseCode.NormalClosure): boolean {
-        if (this._state >= ConnectionState.CLOSING) {
+    close(code: WebsocketCloseCode = WebsocketCloseCode.NormalClosure): boolean {
+        const {state, setState, socket} = this;
+        if (state >= ConnectionState.CLOSING) {
             return false;
         }
 
         const payload = Buffer.alloc(2);
         payload.writeUInt16BE(code, 0);
 
-        this.setState(ConnectionState.CLOSING);
-        this.socket.end(spawnFrameData(WebsocketDataFrameType.ConnectionClose, {payload}).render());
+        setState(ConnectionState.CLOSING);
+        socket.end(spawnFrameData(WebsocketDataFrameType.ConnectionClose, {payload}).render());
     }
-
-    private sendFrameData(dataFrame: WebsocketDataFrame): void {
-        console.log('>> sendFrameData', {
-            ...dataFrame,
-            payloadLength: dataFrame.payload.length,
-            pAsStr: dataFrame.payload.toString("utf8").substr(0, 20)
-        });
-
-        const {socket, writeBufferIsFull, outgoingMessageSendQueue} = this;
-        const binaryData = composeWebsocketFrame(dataFrame);
-
-        if (writeBufferIsFull) {
-            outgoingMessageSendQueue.push(binaryData);
-            return;
-        }
-
-        // If there is backpressure, write returns false and the you should wait for drain
-        // to be emitted before writing additional data.
-
-        socket.cork();
-        const success = socket.write(binaryData, err => {
-            console.debug('>> socket wrote', binaryData.length, 'bytes');
-            err && console.log('socket.write err', err)
-        });
-        console.log({success, readable: socket.readable, writable: socket.writable});
-
-        socket.uncork();
-        /*if (!success) {
-            outgoingMessageSendQueue.push(binaryData);
-            this.writeBufferIsFull = true;
-            socket.once("drain", this.resendData);
-        }*/
-    }
-
-    private readonly resendData = () => {
-        const {socket, outgoingMessageSendQueue} = this;
-        while (outgoingMessageSendQueue.length > 0) {
-            const success = socket.write(outgoingMessageSendQueue[0], err => {
-                err && console.log('socket.write err II', err);
-                console.debug('>> socket wrote 2', outgoingMessageSendQueue[0].length, 'bytes');
-            });
-            console.log({success, readable: socket.readable, writable: socket.writable});
-
-            if (!success) {
-                socket.once("drain", this.resendData);
-                return;
-            }
-            outgoingMessageSendQueue.shift();
-        }
-        this.writeBufferIsFull = false;
-    };
 
     private readonly incomingDataHandler = async (data: WebsocketDataFrame) => {
         const {incomingMessageQueue: queue} = this;
@@ -229,7 +180,6 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
 
         const messageBuffer = frames.length === 1 ? frames[0].payload : Buffer.concat(frames.map(({payload}) => payload));
         const isTextData = frames[0].type === WebsocketDataFrameType.TextFrame;
-
         if (isTextData) {
             const message = messageBuffer.toString("utf8");
             console.log(message.substr(0, 100));
@@ -242,7 +192,6 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     }
 
     private processConnectionCloseFrame({payload}: WebsocketDataFrame): void {
-
         const code = payload.readUInt16BE(0) || WebsocketCloseCode.NoStatusRcvd;
         const reason = payload.length > 2 ? payload.slice(2).toString("utf8") : null;
         // TODO: Log close code and reason?
@@ -255,7 +204,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
 
     private processPingFrame({payload}: WebsocketDataFrame): void {
         // Send pong back with same payload
-        this.sendFrameData(spawnFrameData(WebsocketDataFrameType.Pong, {payload}));
+        this.outgoingDataBuffer.write(spawnFrameData(WebsocketDataFrameType.Pong, {payload}).render());
     }
 
     private processPongFrame({payload}: WebsocketDataFrame): void {
@@ -278,14 +227,15 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     }
 
     private readonly ping = (): void => {
-        const {pingTimeout, pingsInProgress, handleLostConnection} = this;
+        const {pingTimeout, pingsInProgress, handleLostConnection, outgoingDataBuffer} = this;
 
         const payload = crypto.randomBytes(4);
         pingsInProgress.set(payload.toString("hex"), Date.now());
 
         console.log('>> ping', {pingsInProgress});
         this.connectivityErrorTimoutId = setTimeout(handleLostConnection, pingTimeout);
-        this.sendFrameData(spawnFrameData(WebsocketDataFrameType.Ping, {payload}));
+
+        outgoingDataBuffer.write(spawnFrameData(WebsocketDataFrameType.Ping, {payload}).render())
     };
 
     private startPingTimeout(): void {
@@ -308,7 +258,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         this.close(WebsocketCloseCode.AbnormalClosure);
     };
 
-    private setState(newState: ConnectionState): void {
+    private readonly setState = (newState: ConnectionState) => {
         console.log('>> setState', {
             currentState: connectionStateToString(this._state),
             newState: connectionStateToString(newState)
@@ -325,6 +275,5 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
             clearTimeout(this.nextPingTimeoutId);
             this.nextPingTimeoutId = null;
         }
-    }
-
+    };
 }

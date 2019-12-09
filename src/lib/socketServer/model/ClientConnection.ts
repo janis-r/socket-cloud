@@ -1,17 +1,15 @@
-import {EventListener} from "qft";
-import {MessageEvent, ErrorEvent, DataEvent} from "..";
+import {Event, EventListener} from "qft";
 import {ConnectionState} from "../data/ConnectionState";
-import {StateChangeEvent} from "../event/StateChangeEvent";
 import {ConfigurationContext} from "../../configurationContext";
-import {WebsocketDescriptor} from "../../socketListener/data/SocketDescriptor";
+import {DataEvent, ErrorEvent, MessageEvent, StateChangeEvent} from "..";
 
 export interface ClientConnection {
 
-    readonly descriptor: WebsocketDescriptor;
     readonly context: ConfigurationContext;
     readonly state: ConnectionState;
 
     send(message: string);
+    send(message: Buffer);
 
     addEventListener(event: "state-change", listener: EventListener<StateChangeEvent>, scope?: Object);
     addEventListener(event: "message", listener: EventListener<MessageEvent>, scope?: Object);
@@ -24,5 +22,4 @@ export interface ClientConnection {
     removeEventListener(event: "error", listener: EventListener<ErrorEvent>, scope?: Object);
 
     removeAllEventListeners(scope?: Object): boolean;
-
 }

@@ -48,8 +48,8 @@ export class ValidateNewWebsocket<T = boolean> extends MacroCommand<T> {
         );
 
         // TODO: Remvoe this at some point
-        connection.addEventListener("message", event => {
-            connection.send(event.message);
+        connection.addEventListener("message", ({message}) => {
+            connection.send(message);
         });
 
         eventDispatcher.dispatchEvent(new NewSocketConnectionEvent(connection));

@@ -1,13 +1,13 @@
 import {Event} from "qft";
 import {ClientConnection} from "../model/ClientConnection";
 
-export class ErrorEvent extends Event {
-    static readonly TYPE = Symbol('client-connection-error');
+export class ErrorEvent extends Event<{ message: string, code?: any }> {
+    static readonly TYPE = "error";
 
     constructor(readonly connection: ClientConnection,
                 readonly message: string,
                 readonly code?: any
     ) {
-        super(ErrorEvent.TYPE);
+        super(ErrorEvent.TYPE, {message, code});
     }
 }

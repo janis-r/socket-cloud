@@ -137,9 +137,12 @@ export const spawnFrameData = (
         rsv1 = false,
         rsv2 = false,
         rsv3 = false
-    }: Partial<Exclude<WebsocketDataFrame, "type">> = {}): WebsocketDataFrame & { render: () => Buffer } => {
+    }: Partial<Exclude<WebsocketDataFrame, "type">> = {}): WebsocketDataFrame & { render: (masked?: boolean) => Buffer } => {
     const dataFrame = {type, payload, isFinal, rsv1, rsv2, rsv3};
-    return {...dataFrame, render: () => composeWebsocketFrame(dataFrame)};
+    return {
+        ...dataFrame,
+        render: (masked?: boolean) => composeWebsocketFrame(dataFrame, masked)
+    };
 };
 
 export function decomposeHeader(data: Buffer): Pick<WebsocketDataFrame, "type" | "isFinal" | "rsv1" | "rsv2" | "rsv3"> & { payloadLength: number, masked: boolean } {

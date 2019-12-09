@@ -1,11 +1,12 @@
 import {Event, EventDispatcher, EventListener} from "qft";
 import {WebsocketDataFrame} from "../data/WebsocketDataFrame";
-import {applyXorMask, decomposeHeader, getMaskBytes, read64BitPayloadLength} from "../util/websocket-utils";
+import {applyXorMask, decomposeHeader, getMaskBytes, read64BitPayloadLength} from "./websocket-utils";
 
-export class WebsocketDataStream extends EventDispatcher {
+export class WebsocketIncomingDataBuffer extends EventDispatcher {
 
     private chunks = new Array<Buffer>();
-    private resumeCall: () => void | null = null;
+    private process: () => void | null = null;
+    private _destroyed = false;
 
     constructor() {
         super();
@@ -14,14 +15,18 @@ export class WebsocketDataStream extends EventDispatcher {
 
     write(chunk: Buffer): void {
         if (!chunk || !(chunk instanceof Buffer)) {
-            throw new Error(`This: (${chunk}) is not a Buffer! @WebsocketDataStream:write`);
+            throw new Error(`This: (${chunk}) is not a Buffer! @WebsocketIncomingDataBuffer:write`);
+        }
+
+        if (this._destroyed) {
+            throw new Error(`Writing: (${chunk}) is not allowed on destroyed instance! @WebsocketIncomingDataBuffer:write`);
         }
 
         console.log('>> write', chunk.length, 'bytes');
 
         this.chunks.push(chunk);
-        if (this.resumeCall) {
-            this.resumeCall();
+        if (this.process) {
+            this.process();
         }
     }
 
@@ -30,7 +35,24 @@ export class WebsocketDataStream extends EventDispatcher {
         return super.addEventListener(event, listener, scope);
     }
 
+    destroy(): void {
+        if (this._destroyed) {
+            return;
+        }
+
+        this._destroyed = true
+        this.process && this.process();
+    }
+
+    get destroyed(): boolean {
+        return this._destroyed;
+    }
+
     private readonly read = async (bytes: number): Promise<Buffer> => {
+        if (this._destroyed) {
+            // Return empty buffer of required length if this instance is destroyed
+            return Buffer.alloc(bytes);
+        }
         // console.log('>> read', bytes, this.chunks.map(c => c.length + ' bytes'));
         const {chunks} = this;
 
@@ -59,9 +81,9 @@ export class WebsocketDataStream extends EventDispatcher {
 
         await new Promise<void>(resolve => {
             // console.log('>> wait for', bytes - bytesWritten, 'bytes');
-            this.resumeCall = () => {
+            this.process = () => {
                 // console.log('>> resume');
-                this.resumeCall = null;
+                this.process = null;
                 resolve();
             }
         });
@@ -91,6 +113,10 @@ export class WebsocketDataStream extends EventDispatcher {
         // console.log('>> payload', payload.length, 'bytes');
 
         maskBytes && applyXorMask(payload, maskBytes);
+
+        if (this._destroyed) {
+            return;
+        }
 
         this.dispatchEvent("data", {
             type,
