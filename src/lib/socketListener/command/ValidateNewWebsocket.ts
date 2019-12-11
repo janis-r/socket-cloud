@@ -41,15 +41,16 @@ export class ValidateNewWebsocket<T = boolean> extends MacroCommand<T> {
         }
 
         const connection = new WebsocketClientConnection(
+            socket,
             socketDescriptor as WebsocketDescriptor,
             configurationContext,
-            socket,
             extensions
         );
 
         // TODO: Remove this at some point
         connection.addEventListener("message", ({message}) => connection.send(message));
         connection.addEventListener("data", ({data}) => connection.send(data));
+        connection.addEventListener("error", ({data: {message}}) => console.error(">> error", message));
 
         eventDispatcher.dispatchEvent(new NewSocketConnectionEvent(connection));
     }

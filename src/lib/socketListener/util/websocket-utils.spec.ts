@@ -11,7 +11,8 @@ describe("websocket-utils", () => {
             rsv1: false,
             rsv2: true,
             rsv3: false,
-            payload: Buffer.from("message")
+            payload: Buffer.from("message"),
+            masked: false
         };
 
         let encoded: Buffer;
@@ -26,14 +27,16 @@ describe("websocket-utils", () => {
             rsv1: false,
             rsv2: true,
             rsv3: false,
-            payload: Buffer.from("message")
+            payload: Buffer.from("message"),
+            masked: true
         };
 
         let encoded: Buffer;
         expect(
-            () => encoded = composeWebsocketFrame({...dataFrame, payload: Buffer.from(dataFrame.payload)},
-                true
-            )
+            () => encoded = composeWebsocketFrame({
+                ...dataFrame,
+                payload: Buffer.from(dataFrame.payload) // This line is de-referencing payload before Buffer operations
+            })
         ).not.toThrowError();
 
         let decodedFrame: WebsocketDataFrame;

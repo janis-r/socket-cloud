@@ -1,7 +1,16 @@
 import {Event, EventDispatcher, EventListener} from "qft";
-import {WebsocketDataFrame} from "../data/WebsocketDataFrame";
-import {applyXorMask, decomposeHeader, getMaskBytes, read64BitPayloadLength} from "./websocket-utils";
+import {WebsocketDataFrame} from "../../data/WebsocketDataFrame";
+import {
+    applyXorMask,
+    decomposeHeader,
+    decomposeWebSocketFrame,
+    getMaskBytes,
+    read64BitPayloadLength
+} from "../../util/websocket-utils";
 
+/**
+ * Utility class to buffer up incoming websocket data until they make up full data frame.
+ */
 export class WebsocketIncomingDataBuffer extends EventDispatcher {
 
     private chunks = new Array<Buffer>();
@@ -19,7 +28,7 @@ export class WebsocketIncomingDataBuffer extends EventDispatcher {
         }
 
         if (this._destroyed) {
-            throw new Error(`Writing: (${chunk}) is not allowed on destroyed instance! @WebsocketIncomingDataBuffer:write`);
+            throw new Error(`Writing: (${decomposeWebSocketFrame(chunk)}) is not allowed on destroyed instance! @WebsocketIncomingDataBuffer:write`);
         }
 
         console.log('>> write', chunk.length, 'bytes');
@@ -31,7 +40,7 @@ export class WebsocketIncomingDataBuffer extends EventDispatcher {
     }
 
     addEventListener(event: "data", listener: EventListener<Event<WebsocketDataFrame>>, scope?: Object);
-    addEventListener(event: Event['type'], listener: EventListener, scope?: Object) {
+    addEventListener(event: Event['type'], listener: EventListener<any>, scope?: Object) {
         return super.addEventListener(event, listener, scope);
     }
 
@@ -40,7 +49,7 @@ export class WebsocketIncomingDataBuffer extends EventDispatcher {
             return;
         }
 
-        this._destroyed = true
+        this._destroyed = true;
         this.process && this.process();
     }
 
@@ -53,7 +62,6 @@ export class WebsocketIncomingDataBuffer extends EventDispatcher {
             // Return empty buffer of required length if this instance is destroyed
             return Buffer.alloc(bytes);
         }
-        // console.log('>> read', bytes, this.chunks.map(c => c.length + ' bytes'));
         const {chunks} = this;
 
         const output = Buffer.alloc(bytes);
@@ -63,7 +71,6 @@ export class WebsocketIncomingDataBuffer extends EventDispatcher {
             const bytesToConsume = Math.min(chunk.length, bytes - bytesWritten);
             chunk.copy(output, bytesWritten, 0, bytesToConsume);
             chunks[i] = chunk.slice(bytesToConsume);
-            // console.log({bytesToConsume, 'chunk.length': chunk.length});
             bytesWritten += bytesToConsume;
             if (bytesWritten === bytes) {
                 break;
@@ -75,28 +82,22 @@ export class WebsocketIncomingDataBuffer extends EventDispatcher {
         }
 
         if (bytesWritten === bytes) {
-            // console.log('>> return 1', output.length, 'bytes');
             return output;
         }
 
         await new Promise<void>(resolve => {
-            // console.log('>> wait for', bytes - bytesWritten, 'bytes');
             this.process = () => {
-                // console.log('>> resume');
                 this.process = null;
                 resolve();
-            }
+            };
         });
 
-        const combinedOutput = Buffer.concat([output.slice(0, bytesWritten), await this.read(bytes - bytesWritten)]);
-        // console.log('>> return 2', combinedOutput.length, 'bytes');
-        return combinedOutput
+        return Buffer.concat([output.slice(0, bytesWritten), await this.read(bytes - bytesWritten)])
     };
 
     private async processNextFrame(): Promise<void> {
         const {read} = this;
         const {type, isFinal, rsv1, rsv2, rsv3, masked, payloadLength} = decomposeHeader(await read(2));
-        // console.log('>> header', header);
 
         let extendedPayloadLength: number;
         if (payloadLength === 126) {
@@ -104,16 +105,10 @@ export class WebsocketIncomingDataBuffer extends EventDispatcher {
         } else if (payloadLength === 127) {
             extendedPayloadLength = read64BitPayloadLength(await read(8));
         }
-        // console.log('>> extendedPayloadLength', extendedPayloadLength);
 
         const maskBytes = masked ? getMaskBytes(await read(4)) : null;
-        // console.log('>> maskBytes', maskBytes);
-
         const payload = await read(extendedPayloadLength ?? payloadLength);
-        // console.log('>> payload', payload.length, 'bytes');
-
         maskBytes && applyXorMask(payload, maskBytes);
-
         if (this._destroyed) {
             return;
         }
@@ -126,7 +121,6 @@ export class WebsocketIncomingDataBuffer extends EventDispatcher {
             rsv3,
             payload
         });
-
         this.processNextFrame();
     }
 }

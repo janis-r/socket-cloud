@@ -1,8 +1,8 @@
 export enum ConnectionState {
-    CONNECTING,
-    OPEN,
-    CLOSING,
-    CLOSED
+    Connecting,
+    Open,
+    Closing,
+    Closed
 }
 
 export const connectionStateToString = (state: ConnectionState) => [
@@ -11,3 +11,4 @@ export const connectionStateToString = (state: ConnectionState) => [
     'closing',
     'closed'
 ][state];
+

@@ -29,16 +29,15 @@ export function decomposeWebSocketFrame(buffer: Buffer): Readonly<WebsocketDataF
     const maskBytes = masked ? getMaskBytes(read(4)) : null;
     const payload = read(extendedPayloadLength ?? payloadLength);
     maskBytes && applyXorMask(payload, maskBytes);
-    return {type, isFinal, rsv1, rsv2, rsv3, payload};
+    return {type, isFinal, rsv1, rsv2, rsv3, payload, masked};
 }
 
 /**
  * Create binary representation of websocket data frame
  * @param dataFrame
- * @param masked
  */
-export function composeWebsocketFrame(dataFrame: WebsocketDataFrame, masked: boolean = false): Buffer {
-    const {type, payload, isFinal, rsv1, rsv2, rsv3} = dataFrame;
+export function composeWebsocketFrame(dataFrame: WebsocketDataFrame): Buffer {
+    const {type, payload, isFinal, rsv1, rsv2, rsv3, masked} = dataFrame;
 
     const headerBytes = Buffer.alloc(2);
     // First byte consists of FIN and RSV(1-3) bits
@@ -136,12 +135,13 @@ export const spawnFrameData = (
         isFinal = true,
         rsv1 = false,
         rsv2 = false,
-        rsv3 = false
-    }: Partial<Exclude<WebsocketDataFrame, "type">> = {}): WebsocketDataFrame & { render: (masked?: boolean) => Buffer } => {
-    const dataFrame = {type, payload, isFinal, rsv1, rsv2, rsv3};
+        rsv3 = false,
+        masked = false
+    }: Partial<Exclude<WebsocketDataFrame, "type">> = {}): WebsocketDataFrame & { render: () => Buffer } => {
+    const dataFrame = {type, payload, isFinal, rsv1, rsv2, rsv3, masked};
     return {
         ...dataFrame,
-        render: (masked?: boolean) => composeWebsocketFrame(dataFrame, masked)
+        render: () => composeWebsocketFrame(dataFrame)
     };
 };
 

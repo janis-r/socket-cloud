@@ -5,7 +5,7 @@
   "outdir": "./../reports/servers",
   "servers": [
     {
-      "agent": "web-socket-playground",
+      "agent": "Single core Echo",
       "url": "ws://127.0.0.1:9001",
       "options": {
         "version": 18
@@ -13,7 +13,7 @@
     }
   ],
   "cases": [
-    "7.*"
+    "6.3.2"
   ],
   "exclude-cases": [],
   "exclude-agent-cases": {}
