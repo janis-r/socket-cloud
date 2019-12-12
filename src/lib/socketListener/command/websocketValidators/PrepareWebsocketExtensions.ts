@@ -35,16 +35,16 @@ export class PrepareWebsocketExtensions implements Command<boolean> {
             return true;
         }
 
-        try {
+        // try {
             event.extensions = websocketExtensionRegistry.getExtensionAgentsForConfiguration(secWebsocketExtensions);
-        } catch ({error, stack}) {
-            logError(`PrepareWebsocketExtensions err while validating configuration offer ${JSON.stringify({
-                error,
-                stack
-            }, null, ' ')}`);
-            socket.end("HTTP/1.1 400 Bad Request");
-            return false;
-        }
+        // } catch ({error, stack}) {
+        //     logError(`PrepareWebsocketExtensions err while validating configuration offer ${JSON.stringify({
+        //         error,
+        //         stack
+        //     }, null, ' ')}`);
+        //     socket.end("HTTP/1.1 400 Bad Request");
+        //     return false;
+        // }
 
         return true;
     }

@@ -79,6 +79,7 @@ const validateConfiguration = (config: WebsocketExtensionConfig): PermessageDefl
         return null;
     }
 
+    console.log(config);
     for (const key of Object.keys(config.values)) {
         const value = config.values[key];
         if (!valueBelongsToEnum(PermessageDeflateParam, key)) {

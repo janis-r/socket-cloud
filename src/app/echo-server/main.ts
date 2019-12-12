@@ -6,6 +6,7 @@ import {Logger} from "../../lib/logger";
 import {HttpMethod} from "../../lib/types/HttpMethod";
 import {ConfigurationContextProvider} from "../../lib/configurationContext";
 import {SocketDescriptor} from "../../lib/socketListener/data/SocketDescriptor";
+import {PermessageDeflateConfig, PermessageDeflateExtensionModule} from "../../lib/permessageDeflateExtension";
 
 const httpServerPort = 8000;
 let contextInjector: Injector;
@@ -49,13 +50,7 @@ const initSocket = async () => {
         .install(...WebApplicationBundle)
         .configure(
             WebsocketListenerModule,
-            /*PermessageDeflateExtensionModule,
-            <ModuleConfig> {
-                mappings: [
-                    // { map: PermessageDeflateConfig, useValue: {}}
-                    PermessageDeflateConfig
-                ]
-            }*/
+            PermessageDeflateExtensionModule,
             <ModuleConfig>{
                 mappings: [
                     {
@@ -67,10 +62,11 @@ const initSocket = async () => {
                         useValue: {
                             getSocketConfigurationContext: (descriptor: SocketDescriptor) => ({
                                 id: 'echo-server',
-                                // outgoingMessageFragmentSize: 2 ** 14
+                                outgoingMessageFragmentSize: 2 ** 14
                             })
                         }
-                    }
+                    },
+                    PermessageDeflateConfig
                 ]
             },
         )
