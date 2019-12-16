@@ -1,12 +1,11 @@
 import {Injectable} from "qft";
 import * as fs from "fs";
-import chalk from "chalk";
+import chalk, {Chalk} from "chalk";
 import {LogLevel} from "../data/LogLevel";
 import {Logger} from "../service/Logger";
 import {LoggerConfig} from "../data/LoggerConfig";
 import {LoggerEntity} from "../data/LoggerEntity";
 import {createLogFileName} from "../util/createLogFileName";
-// import {currentDateToObject} from "ugd10a";
 import ErrnoException = NodeJS.ErrnoException;
 
 /**
@@ -32,7 +31,7 @@ export class LoggerImpl extends Logger {
         }
     }
 
-    spawnEntity(name: LogLevel | string, logTime: boolean = true): LoggerEntity {
+    spawnEntity(name: LogLevel | string, logTime: boolean = true, format?: Chalk): LoggerEntity {
         if (!(name in this.entities)) {
             this.entities[name] = {
                 name,
@@ -42,7 +41,7 @@ export class LoggerImpl extends Logger {
                         this.writeMessage(message.join(' '), name, logTime);
                     }
                     if (name === LogLevel.Error || this.logToConsole) { // Always log to console LogLevel.Error messages
-                        console.log(formatter(`[${name}] ${message}`));
+                        console.log(formatter(`[${name}] ${format ? format(...message) : message}`));
                     }
                 }
             }

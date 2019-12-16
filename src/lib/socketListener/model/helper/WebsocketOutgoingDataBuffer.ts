@@ -29,10 +29,9 @@ export class WebsocketOutgoingDataBuffer {
                 continue;
             }
 
-            console.log('>> sendData', frame);
+            console.log('>> sendData', frame.payload.length, 'bytes', frame);
             const renderedFrame = composeWebsocketFrame(frame);
             const flushed = socket.write(renderedFrame, err => {
-                console.debug('>> socket wrote', renderedFrame.length, 'bytes');
                 err && console.log('socket.write err', err)
             });
             if (!flushed) {

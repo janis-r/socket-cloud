@@ -3,6 +3,8 @@ import {WebsocketDataFrame} from "../../socketListener/data/WebsocketDataFrame";
 import {getDeflator, getInflator} from "../util/indeflate-utils";
 import {WebsocketDataFrameType} from "../../socketListener/data/WebsocketDataFrameType";
 
+const {ContinuationFrame, TextFrame, BinaryFrame} = WebsocketDataFrameType;
+
 export class PermessageDeflateAgent implements WebsocketExtensionAgent {
 
     private _inflate: ReturnType<typeof getInflator>;
@@ -14,24 +16,36 @@ export class PermessageDeflateAgent implements WebsocketExtensionAgent {
     }
 
     async transformIncomingData(dataFrames: Array<WebsocketDataFrame>) {
-        if (!dataFrames[0].rsv1) {
+        console.log('>> transformIncomingData', dataFrames);
+        if (![ContinuationFrame, TextFrame, BinaryFrame].includes(dataFrames[0].type) || !dataFrames[0].rsv1) {
             return dataFrames;
         }
 
         const transformedFrames = new Array<WebsocketDataFrame>();
         for (const {payload, ...ignoredParams} of dataFrames) {
-            transformedFrames.push({...ignoredParams, rsv1: false, payload: await this.inflate(payload)});
+            // try {
+                transformedFrames.push({...ignoredParams, rsv1: false, payload: await this.inflate(payload)});
+            // } catch (e) {
+            //     console.log('err', e);
+            //     console.log('config', this.config);
+            //     process.exit();
+            // }
         }
         return transformedFrames;
     }
 
     async transformOutgoingData(dataFrames: Array<WebsocketDataFrame>) {
+        console.log('>> transformOutgoingData', dataFrames);
+        if (![ContinuationFrame, TextFrame, BinaryFrame].includes(dataFrames[0].type)) {
+            return dataFrames;
+        }
         if (dataFrames[0].rsv1) {
             throw new Error(`Data frame collection is already deflated!`);
         }
 
         const transformedFrames = new Array<WebsocketDataFrame>();
         for (const {payload, ...ignoredParams} of dataFrames) {
+            console.log('>> payload', payload.toString("utf8"));
             transformedFrames.push({
                 ...ignoredParams,
                 rsv1: ignoredParams.type !== WebsocketDataFrameType.ContinuationFrame, // Only first, definitive frame has other type than ContinuationFrame

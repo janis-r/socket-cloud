@@ -20,8 +20,8 @@ export function parseWebsocketExtensionOffers(headerString: string): Map<string,
             });
 
             const config: WebsocketExtensionConfig = {
-                // origin: [extensionName, ...params].join(';'),
-                origin: extensionName,
+                name: extensionName,
+                origin: [extensionName, ...params].join(';'),
                 values
             };
 

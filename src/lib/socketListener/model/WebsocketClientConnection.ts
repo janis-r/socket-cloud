@@ -22,6 +22,7 @@ import {WebsocketIncomingDataBuffer} from "./helper/WebsocketIncomingDataBuffer"
 import {WebsocketOutgoingDataBuffer} from "./helper/WebsocketOutgoingDataBuffer";
 import {KeepAliveManager} from "./clientExtensions/KeepAliveManager";
 import {IncomingDataManager} from "./clientExtensions/IncomingDataManager";
+import chalk from "chalk";
 
 const isValidUTF8: (data: Buffer) => boolean = require('utf-8-validate');
 
@@ -103,8 +104,9 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     send(data: Buffer);
     send(data: string);
     async send(data: string | Buffer): Promise<void> {
-        console.log('>> send', typeof data === "string" ? data.substr(0, 100) : data);
+        console.log(chalk.red('>> send', data.length.toString(), 'bytes'), typeof data === "string" ? data.substr(0, 100) : data);
         await this.sendDataFrame(this.prepareDataFrame(data));
+        // process.exit();
     }
 
     async sendDataFrame(data: WebsocketDataFrame | WebsocketDataFrame[] | Promise<WebsocketDataFrame | WebsocketDataFrame[]>): Promise<void> {
@@ -130,7 +132,9 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         const process = new Promise<WebsocketDataFrame>(async resolve => {
             await Promise.all([...queue]);
             // This would apply all the extension updates to incoming data frame
+            console.log(chalk.red('>> raw incoming data', data.payload.length.toString(), 'bytes'), data);
             const [extendedData] = await this.extendIncomingData([data]);
+            console.log(chalk.red('>> extendedData', extendedData.payload.length.toString(), 'bytes'), extendedData);
             resolve(extendedData);
         });
 
@@ -250,13 +254,18 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
             return data;
         }
         for (const extension of incomingDataExtensions) {
-            const transformation = extension.transformIncomingData(data);
-            data = isPromise(transformation) ? await transformation : transformation;
+            try {
+                const transformation = extension.transformIncomingData(data);
+                data = isPromise(transformation) ? await transformation : transformation;
+            } catch (e) {
+                this.close(WebsocketCloseCode.ProtocolError, e.message);
+            }
         }
         return data;
     }
 
     private async extendOutgoingData(data: WebsocketDataFrame[]): Promise<WebsocketDataFrame[]> {
+        console.log('>> extendOutgoingData', data)
         const {outgoingDataExtensions} = this;
         if (!outgoingDataExtensions) {
             return data;
@@ -265,6 +274,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
             const transformation = extension.transformOutgoingData(data);
             data = isPromise(transformation) ? await transformation : transformation;
         }
+        console.log('>> extended', data)
         return data;
     }
 }

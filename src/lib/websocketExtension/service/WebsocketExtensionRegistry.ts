@@ -30,8 +30,6 @@ export class WebsocketExtensionRegistry {
     getExtensionAgentsForConfiguration(configOffers: string): WebsocketExtensionAgent[] {
         const {knownExtensions} = this;
         const configurationOffers = parseWebsocketExtensionOffers(configOffers);
-
-        console.log({configurationOffers});
         const agents: WebsocketExtensionAgent[] = [];
         if (configurationOffers.size === 0) {
             return agents;

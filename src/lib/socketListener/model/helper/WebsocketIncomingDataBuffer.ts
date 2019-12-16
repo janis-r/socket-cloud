@@ -7,6 +7,7 @@ import {
     getMaskBytes,
     read64BitPayloadLength
 } from "../../util/websocket-utils";
+import chalk from "chalk";
 
 /**
  * Utility class to buffer up incoming websocket data until they make up full data frame.
@@ -31,7 +32,7 @@ export class WebsocketIncomingDataBuffer extends EventDispatcher {
             throw new Error(`Writing: (${decomposeWebSocketFrame(chunk)}) is not allowed on destroyed instance! @WebsocketIncomingDataBuffer:write`);
         }
 
-        console.log('>> write', chunk.length, 'bytes');
+        console.log(chalk.blue('>> write to incoming buffer', chunk.length.toString(), 'bytes'));
 
         this.chunks.push(chunk);
         if (this.process) {

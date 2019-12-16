@@ -5,6 +5,7 @@ import {WebsocketExtension, WebsocketExtensionAgent, WebsocketExtensionConfig} f
 import {PermessageDeflateParam} from "../data/PermessageDeflateParam";
 import {PermessageDeflateAgent} from "./PermessageDeflateAgent";
 import {PermessageDeflateExtensionConfig} from "../data/PermessageDeflateExtensionConfig";
+import * as zlib from "zlib";
 
 export class PermessageDeflateExtension implements WebsocketExtension {
 
@@ -17,6 +18,8 @@ export class PermessageDeflateExtension implements WebsocketExtension {
         if (!configs || configs.length === 0) {
             throw new Error(`Empty configs provided to permessage-deflate extension`);
         }
+
+        const {constants: {Z_DEFAULT_WINDOWBITS}} = zlib;
 
         const {configuration} = this;
         const permessageDeflateExtensionConfigs = configs.map(config => {
@@ -38,15 +41,11 @@ export class PermessageDeflateExtension implements WebsocketExtension {
         // Missing client_max_window_bits key indicate that client is not supporting this property, so it will be left
         // out from response
         if (PermessageDeflateParam.ClientMaxWindowBits in clientConfigOffer) {
-            const value = clientConfigOffer.client_max_window_bits ?? configuration.clientMaxWindowBits;
-            if (value) {
-                configOfferResponseValues.client_max_window_bits = value;
-            }
+            configOfferResponseValues.client_max_window_bits = clientConfigOffer.client_max_window_bits ?? configuration.clientMaxWindowBits ?? Z_DEFAULT_WINDOWBITS;
         }
 
-        const serverMaxWindowBits = clientConfigOffer.server_max_window_bits ?? configuration.serverMaxWindowBits;
-        if (serverMaxWindowBits) {
-            configOfferResponseValues.server_max_window_bits = serverMaxWindowBits;
+        if (PermessageDeflateParam.ServerMaxWindowBits in clientConfigOffer) {
+            configOfferResponseValues.server_max_window_bits = clientConfigOffer.server_max_window_bits ?? configuration.serverMaxWindowBits ?? Z_DEFAULT_WINDOWBITS;
         }
 
         const clientNoContextTakeover = clientConfigOffer.client_no_context_takeover ?? configuration.clientNoContextTakeover;
@@ -60,8 +59,17 @@ export class PermessageDeflateExtension implements WebsocketExtension {
         }
 
         const response = [this.id];
-        Object.keys(configOfferResponseValues).forEach(key => response.push(`${key}=${configOfferResponseValues[key]}`));
-
+        Object.keys(configOfferResponseValues).forEach(key => {
+            const value = configOfferResponseValues[key];
+            if (typeof value === "number") {
+                response.push(`${key}=${value}`);
+            } else {
+                // Boolean properties like \w+_no_context_takeover are enabled by just listing propety so true values
+                // can be omitted in here, which leaves us with only number value to be included
+                response.push(`${key}`);
+            }
+        });
+        // console.log({configuration, clientConfigOffer, configOfferResponseValues})
         return new PermessageDeflateAgent({
             peerWindowBits: configOfferResponseValues.client_max_window_bits,
             ownWindowBits: configOfferResponseValues.server_max_window_bits,
@@ -72,6 +80,8 @@ export class PermessageDeflateExtension implements WebsocketExtension {
 }
 
 const validateConfiguration = (config: WebsocketExtensionConfig): PermessageDeflateExtensionConfig | null => {
+    console.log('>> validateConfiguration', config);
+    // permessage-deflate;client_no_context_takeover;client_max_window_bits=15
     if (!config.origin || typeof config.origin !== "string") {
         return null;
     }
@@ -79,14 +89,44 @@ const validateConfiguration = (config: WebsocketExtensionConfig): PermessageDefl
         return null;
     }
 
+    const keys = Object.keys(config.values);
+    const keyIsSet = key => keys.includes(key);
+    const getValue = key => config.values[key];
+    const {ClientMaxWindowBits, ServerMaxWindowBits, ClientNoContextTakeover, ServerNoContextTakeover} = PermessageDeflateParam;
     console.log(config);
-    for (const key of Object.keys(config.values)) {
-        const value = config.values[key];
+
+    // permessage-deflate;client_no_context_takeover;client_max_window_bits=15
+    /*const configValues: PermessageDeflateExtensionConfig['values'] = {
+        client_no_context_takeover: true,
+        client_max_window_bits:15
+    };*/
+    const configValues: PermessageDeflateExtensionConfig['values'] = {};
+    if (keyIsSet(ClientMaxWindowBits)) {
+        const value = getValue(ClientMaxWindowBits);
+        if (typeof value !== "string") {
+            configValues.client_max_window_bits = value;
+        }
+    }
+    if (keyIsSet(ServerMaxWindowBits)) {
+        const value = getValue(ServerMaxWindowBits);
+        if (typeof value !== "string") {
+            configValues.server_max_window_bits = value;
+        }
+    }
+    if (keyIsSet(ClientNoContextTakeover)) {
+        configValues.client_no_context_takeover = true;
+    }
+    if (keyIsSet(ServerNoContextTakeover)) {
+        configValues.server_no_context_takeover = true;
+    }
+
+    for (const key of Object.keys(configValues)) {
+        const value = configValues[key];
         if (!valueBelongsToEnum(PermessageDeflateParam, key)) {
             console.warn(`${key} is not known param of permessage-deflate extension`);
             return null;
         }
-        if (key === PermessageDeflateParam.ClientMaxWindowBits && value === undefined) {
+        if (key === ClientMaxWindowBits && value === undefined) {
             // This is allowed setting
             continue;
         }
@@ -99,5 +139,10 @@ const validateConfiguration = (config: WebsocketExtensionConfig): PermessageDefl
             return null;
         }
     }
-    return config as PermessageDeflateExtensionConfig;
+    // console.log({configValues});
+    // process.exit();
+    return {
+        ...config,
+        values: configValues
+    };
 };
