@@ -2,6 +2,7 @@ import {WebsocketExtensionAgent} from "../../websocketExtension";
 import {WebsocketDataFrame} from "../../socketListener/data/WebsocketDataFrame";
 import {getDeflator, getInflator} from "../util/indeflate-utils";
 import {WebsocketDataFrameType} from "../../socketListener/data/WebsocketDataFrameType";
+import {debug} from "../../socketListener/model/WebsocketClientConnection";
 
 const {ContinuationFrame, TextFrame, BinaryFrame} = WebsocketDataFrameType;
 
@@ -13,29 +14,25 @@ export class PermessageDeflateAgent implements WebsocketExtensionAgent {
     constructor(readonly config: AgentConfig,
                 readonly configOfferResponse: string
     ) {
+        // console.log(config);
+        // process.exit()
     }
 
     async transformIncomingData(dataFrames: Array<WebsocketDataFrame>) {
-        console.log('>> transformIncomingData', dataFrames);
+        debug && console.log('>> transformIncomingData', dataFrames);
         if (![ContinuationFrame, TextFrame, BinaryFrame].includes(dataFrames[0].type) || !dataFrames[0].rsv1) {
             return dataFrames;
         }
 
         const transformedFrames = new Array<WebsocketDataFrame>();
         for (const {payload, ...ignoredParams} of dataFrames) {
-            // try {
-                transformedFrames.push({...ignoredParams, rsv1: false, payload: await this.inflate(payload)});
-            // } catch (e) {
-            //     console.log('err', e);
-            //     console.log('config', this.config);
-            //     process.exit();
-            // }
+            transformedFrames.push({...ignoredParams, rsv1: false, payload: await this.inflate(payload)});
         }
         return transformedFrames;
     }
 
     async transformOutgoingData(dataFrames: Array<WebsocketDataFrame>) {
-        console.log('>> transformOutgoingData', dataFrames);
+        debug && console.log('>> transformOutgoingData', dataFrames);
         if (![ContinuationFrame, TextFrame, BinaryFrame].includes(dataFrames[0].type)) {
             return dataFrames;
         }
@@ -45,7 +42,7 @@ export class PermessageDeflateAgent implements WebsocketExtensionAgent {
 
         const transformedFrames = new Array<WebsocketDataFrame>();
         for (const {payload, ...ignoredParams} of dataFrames) {
-            console.log('>> payload', payload.toString("utf8"));
+            debug && console.log('>> payload', payload.toString("utf8"));
             transformedFrames.push({
                 ...ignoredParams,
                 rsv1: ignoredParams.type !== WebsocketDataFrameType.ContinuationFrame, // Only first, definitive frame has other type than ContinuationFrame
@@ -73,7 +70,7 @@ export class PermessageDeflateAgent implements WebsocketExtensionAgent {
             return this._deflate;
         }
 
-        const {allowOwnContextTakeover: allowTakeover, peerWindowBits: windowBits} = this.config;
+        const {allowOwnContextTakeover: allowTakeover, ownWindowBits: windowBits} = this.config;
         const executor = getDeflator({windowBits});
 
         if (allowTakeover) {

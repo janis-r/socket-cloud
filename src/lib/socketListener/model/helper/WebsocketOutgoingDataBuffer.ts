@@ -2,6 +2,7 @@ import {Socket} from "net";
 import {composeWebsocketFrame} from "../../util/websocket-utils";
 import {isPromise} from "../../../utils/is-promise";
 import {WebsocketDataFrame} from "../../data/WebsocketDataFrame";
+import {debug} from "../WebsocketClientConnection";
 
 export class WebsocketOutgoingDataBuffer {
 
@@ -29,7 +30,7 @@ export class WebsocketOutgoingDataBuffer {
                 continue;
             }
 
-            console.log('>> sendData', frame.payload.length, 'bytes', frame);
+            debug && console.log('>> sendData', frame.payload.length, 'bytes', frame);
             const renderedFrame = composeWebsocketFrame(frame);
             const flushed = socket.write(renderedFrame, err => {
                 err && console.log('socket.write err', err)

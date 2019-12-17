@@ -73,8 +73,8 @@ export class PermessageDeflateExtension implements WebsocketExtension {
         return new PermessageDeflateAgent({
             peerWindowBits: configOfferResponseValues.client_max_window_bits,
             ownWindowBits: configOfferResponseValues.server_max_window_bits,
-            allowPeerContextTakeover: !!configOfferResponseValues.client_no_context_takeover,
-            allowOwnContextTakeover: !!configOfferResponseValues.server_no_context_takeover,
+            allowPeerContextTakeover: !configOfferResponseValues.client_no_context_takeover,
+            allowOwnContextTakeover: !configOfferResponseValues.server_no_context_takeover,
         }, response.join(';'));
     }
 }
@@ -95,11 +95,6 @@ const validateConfiguration = (config: WebsocketExtensionConfig): PermessageDefl
     const {ClientMaxWindowBits, ServerMaxWindowBits, ClientNoContextTakeover, ServerNoContextTakeover} = PermessageDeflateParam;
     console.log(config);
 
-    // permessage-deflate;client_no_context_takeover;client_max_window_bits=15
-    /*const configValues: PermessageDeflateExtensionConfig['values'] = {
-        client_no_context_takeover: true,
-        client_max_window_bits:15
-    };*/
     const configValues: PermessageDeflateExtensionConfig['values'] = {};
     if (keyIsSet(ClientMaxWindowBits)) {
         const value = getValue(ClientMaxWindowBits);

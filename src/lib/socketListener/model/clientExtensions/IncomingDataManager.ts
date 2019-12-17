@@ -19,8 +19,7 @@ export class IncomingDataManager extends EventDispatcher {
         ).once();
     }
 
-    addEventListener(event: "data", listener: EventListener<Event<WebsocketDataFrame>>, scope?: Object);
-    addEventListener(event: string | Symbol, listener: EventListener<any>, scope?: Object) {
+    addEventListener(event: "data", listener: EventListener<Event<WebsocketDataFrame>>, scope?: Object) {
         return super.addEventListener(event, listener, scope);
     }
 
@@ -30,20 +29,19 @@ export class IncomingDataManager extends EventDispatcher {
 
     private readonly validateDataFrame = (dataFrame: WebsocketDataFrame) => {
         const {connection, queue} = this;
-        const {ProtocolError, InvalidFramePayloadData} = WebsocketCloseCode;
-        const {ContinuationFrame, TextFrame} = WebsocketDataFrameType;
+        const {ProtocolError} = WebsocketCloseCode;
+        const {ContinuationFrame} = WebsocketDataFrameType;
 
-        const {type, isFinal, rsv1, rsv2, rsv3, payload} = dataFrame;
+        const {type, isFinal, rsv1, rsv2, rsv3} = dataFrame;
 
         const controlFrame = isControlFrame(type);
-
         if (!isFinal && controlFrame) {
             connection.close(ProtocolError, `Received fragmented message that should never be fragmented ${JSON.stringify(dataFrame)}`);
             return;
         }
 
-        if ([rsv1, rsv2, rsv3].includes(true)) {
-            connection.close(ProtocolError, `Some RSV fields have not being reset by extensions ${JSON.stringify(dataFrame)}`);
+        if ([rsv1, rsv2, rsv3].includes(true) && controlFrame) {
+            connection.close(ProtocolError, `Enabled RSV fields on control frames seem to be an error: ${JSON.stringify(dataFrame)}`);
             return;
         }
 
@@ -65,14 +63,13 @@ export class IncomingDataManager extends EventDispatcher {
         const frameType = queue.length > 0 ? queue[0].type : dataFrame.type;
 
         // TODO: cebae1bdb9cf83cebcceb5f4 is not reported as valid UTF8, while it should be - remove this hack
-        // && dataFrame.payload.toString("hex") !== 'cebae1bdb9cf83cebcceb5f4'
-        if (isFinal && frameType === TextFrame && isValidUTF8(payload) === false) {
+        /*if (isFinal && frameType === TextFrame && isValidUTF8(payload) === false) {
             connection.close(InvalidFramePayloadData, `Received invalid UTF8 content 1: ${JSON.stringify({
                 ...dataFrame,
-                payload: dataFrame.payload.toString("hex")
+                payload: dataFrame.payload.toString("utf8")
             })}`);
             return;
-        }
+        }*/
 
         if (isFinal && queue.length === 0) {
             this.dispatchEvent("data", dataFrame);
@@ -84,18 +81,21 @@ export class IncomingDataManager extends EventDispatcher {
             return;
         }
 
-        const messageBuffer = Buffer.concat(queue.map(({payload}) => payload));
-        if (frameType === TextFrame && !isValidUTF8(payload)) {
+        const aggregatedFrameData = {
+            ...queue[0],
+            isFinal: true,
+            payload: Buffer.concat(queue.map(({payload}) => payload))
+        };
+
+        queue.length = 0;
+        /*if (frameType === TextFrame && !isValidUTF8(payload)) {
             connection.close(InvalidFramePayloadData, `Received invalid UTF8 content 2: ${JSON.stringify({
                 dataFrame: {...dataFrame, payload: dataFrame.payload.toString("hex")},
                 messageBuffer: messageBuffer.toString("hex")
             })}`);
             return;
-        }
-
-        if (isFinal) {
-            this.dispatchEvent("data", {...queue[0], payload: messageBuffer});
-        }
+        }*/
+        this.dispatchEvent("data", aggregatedFrameData);
     }
 }
 
