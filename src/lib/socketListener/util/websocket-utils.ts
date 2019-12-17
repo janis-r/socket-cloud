@@ -78,22 +78,28 @@ export function composeWebsocketFrame(dataFrame: WebsocketDataFrame): Buffer {
     return Buffer.concat([headerBytes, extendedPayloadBytes, maskingKeyBytes, payloadBytes].filter(e => !!e));
 }
 
-export function fragmentWebsocketFrame(type: WebsocketDataFrameType, payload: Buffer, fragmentSize: number): Array<WebsocketDataFrame> {
+export function fragmentWebsocketFrame(data: WebsocketDataFrame, fragmentSize: number): Array<WebsocketDataFrame> {
+    const {type, rsv1, rsv2, rsv3, payload} = data;
+
     if (!fragmentSize || payload.length <= fragmentSize) {
-        return [spawnFrameData(type, {payload})];
+        return [data];
     }
 
-    const numFrames = Math.floor(payload.length / fragmentSize);
+    const numFrames = Math.ceil(payload.length / fragmentSize);
     const frames = new Array<WebsocketDataFrame>();
-    for (let frameIndex = 0; frameIndex <= numFrames; frameIndex++) {
+    for (let frameIndex = 0; frameIndex < numFrames; frameIndex++) {
         const start = fragmentSize * frameIndex;
         const end = Math.min(start + fragmentSize, payload.length);
+        const [isFirstFrame, isFinal] = [frameIndex === 0, frameIndex == numFrames - 1];
         frames.push(
             spawnFrameData(
-                frameIndex === 0 ? type : WebsocketDataFrameType.ContinuationFrame,
+                isFirstFrame ? type : WebsocketDataFrameType.ContinuationFrame,
                 {
                     payload: payload.slice(start, end),
-                    isFinal: frameIndex == numFrames
+                    rsv1: isFirstFrame ? rsv1 : false,
+                    rsv2: isFirstFrame ? rsv2 : false,
+                    rsv3: isFirstFrame ? rsv3 : false,
+                    isFinal
                 }
             )
         );
@@ -137,7 +143,15 @@ export const spawnFrameData = (
         rsv2 = false,
         rsv3 = false,
         masked = false
-    }: Partial<Exclude<WebsocketDataFrame, "type">> = {}): WebsocketDataFrame => ({type, payload, isFinal, rsv1, rsv2, rsv3, masked});
+    }: Partial<Exclude<WebsocketDataFrame, "type">> = {}): WebsocketDataFrame => ({
+    type,
+    payload,
+    isFinal,
+    rsv1,
+    rsv2,
+    rsv3,
+    masked
+});
 
 export function decomposeHeader(data: Buffer): Pick<WebsocketDataFrame, "type" | "isFinal" | "rsv1" | "rsv2" | "rsv3"> & { payloadLength: number, masked: boolean } {
     const firstByte = data.readUInt8(0);

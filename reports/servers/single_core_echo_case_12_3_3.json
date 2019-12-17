@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send 1000 compressed messages each of payload size 256, auto-fragment to 0 octets. Use default permessage-deflate offer.",
    "droppedByMe": false,
-   "duration": 1392,
+   "duration": 813,
    "expectation": "Receive echo'ed messages (with payload as sent). Timeout case after 120 secs.",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: t0fGTHEUXD+YidZxMp1dmg==\r\nSec-WebSocket-Extensions: permessage-deflate; client_no_context_takeover; client_max_window_bits\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: sGHZ/L4VoOlkAm8DjKBCVZNDXPk=\r\nSec-WebSocket-Extensions: permessage-deflate;client_max_window_bits=15;client_no_context_takeover\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: 0kBkct2/0rCIe8t/UbCZIA==\r\nSec-WebSocket-Extensions: permessage-deflate; client_no_context_takeover; client_max_window_bits\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 3GeN0+KEs0MgsQXL56EF9XOUtaE=\r\nSec-WebSocket-Extensions: permessage-deflate;client_max_window_bits=15;client_no_context_takeover\r\n\r\n",
    "id": "12.3.3",
    "isServer": false,
    "localCloseCode": 1000,
@@ -97,7 +97,7 @@
       "215": 2,
       "238": 1
    },
-   "started": "2019-12-17T09:15:30.868Z",
+   "started": "2019-12-17T14:07:53.199Z",
    "trafficStats": {
       "incomingCompressionRatio": 0.72540234375,
       "incomingOctetsAppLevel": 256000,
@@ -223,7 +223,7 @@
          8,
          true,
          0,
-         "f44fa875",
+         "d9b5329b",
          null,
          null,
          false
@@ -232,7 +232,7 @@
          "TO",
          [
             8,
-            "8882f44fa875f7a7"
+            "8882d9b5329bda5d"
          ],
          false
       ],

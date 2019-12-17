@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send 1000 compressed messages each of payload size 8192, auto-fragment to 256 octets. Use default permessage-deflate offer.",
    "droppedByMe": false,
-   "duration": 5163,
+   "duration": 2400,
    "expectation": "Receive echo'ed messages (with payload as sent). Timeout case after 480 secs.",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: pJVvRNsyz9fdxZOkJyekjQ==\r\nSec-WebSocket-Extensions: permessage-deflate; client_no_context_takeover; client_max_window_bits\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 4ffHOwiKHsVUa1nwaHYB2AvgGE0=\r\nSec-WebSocket-Extensions: permessage-deflate;client_max_window_bits=15;client_no_context_takeover\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: 9SLXwkF+B8iK7NGuIn47Cg==\r\nSec-WebSocket-Extensions: permessage-deflate; client_no_context_takeover; client_max_window_bits\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 4Cydu5riaVyvAObIxWbJtlMskkY=\r\nSec-WebSocket-Extensions: permessage-deflate;client_max_window_bits=15;client_no_context_takeover\r\n\r\n",
    "id": "12.2.11",
    "isServer": false,
    "localCloseCode": 1000,
@@ -506,7 +506,7 @@
       "7488": 1,
       "7490": 1
    },
-   "started": "2019-12-17T09:11:11.251Z",
+   "started": "2019-12-17T14:03:37.992Z",
    "trafficStats": {
       "incomingCompressionRatio": 0.87269775390625,
       "incomingOctetsAppLevel": 8192000,
@@ -826,7 +826,7 @@
          8,
          true,
          0,
-         "12ee1fa8",
+         "36ea95b3",
          null,
          null,
          false
@@ -835,7 +835,7 @@
          "TO",
          [
             8,
-            "888212ee1fa81106"
+            "888236ea95b33502"
          ],
          false
       ],

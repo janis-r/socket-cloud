@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send text message message with payload of length 1 * 2**20 (1M). Sent out data in chops of 64 octets.",
    "droppedByMe": false,
-   "duration": 5188,
+   "duration": 3507,
    "expectation": "Receive echo'ed text message (with payload as sent).",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: vtCoXLPO8RCPGzIJRy7GcA==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: gFP/ByH8pdDDAjwv/fxots85xAM=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: a8Mabc4Kn8ZBziUgbTnygA==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: EOvH9aTQDn23dvsKiQIyHjFoxbU=\r\n\r\n",
    "id": "9.5.1",
    "isServer": false,
    "localCloseCode": 1000,
@@ -33,16 +33,19 @@
    "result": "Received text message of length 1048576.",
    "resultClose": "Connection was properly closed",
    "rxFrameStats": {
+      "0": 63,
       "1": 1,
       "8": 1
    },
    "rxOctetStats": {
       "4": 1,
-      "10": 1,
       "139": 1,
-      "65536": 16
+      "240": 1,
+      "16388": 1,
+      "49164": 1,
+      "65536": 15
    },
-   "started": "2019-12-17T09:07:29.929Z",
+   "started": "2019-12-17T14:00:33.780Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 1,
@@ -88,7 +91,7 @@
          8,
          true,
          0,
-         "566750bf",
+         "afc2167c",
          null,
          null,
          false
@@ -97,7 +100,7 @@
          "TO",
          [
             8,
-            "8882566750bf558f"
+            "8882afc2167cac2a"
          ],
          false
       ],

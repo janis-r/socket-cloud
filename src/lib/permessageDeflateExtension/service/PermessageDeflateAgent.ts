@@ -20,7 +20,7 @@ export class PermessageDeflateAgent implements WebsocketExtensionAgent {
 
     async transformIncomingData(dataFrames: Array<WebsocketDataFrame>) {
         debug && console.log('>> transformIncomingData', dataFrames);
-        if (![ContinuationFrame, TextFrame, BinaryFrame].includes(dataFrames[0].type) || !dataFrames[0].rsv1) {
+        if (![TextFrame, BinaryFrame].includes(dataFrames[0].type) || !dataFrames[0].rsv1) {
             return dataFrames;
         }
 
@@ -33,7 +33,7 @@ export class PermessageDeflateAgent implements WebsocketExtensionAgent {
 
     async transformOutgoingData(dataFrames: Array<WebsocketDataFrame>) {
         debug && console.log('>> transformOutgoingData', dataFrames);
-        if (![ContinuationFrame, TextFrame, BinaryFrame].includes(dataFrames[0].type)) {
+        if (![TextFrame, BinaryFrame].includes(dataFrames[0].type)) {
             return dataFrames;
         }
         if (dataFrames[0].rsv1) {
