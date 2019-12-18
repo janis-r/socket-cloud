@@ -1,4 +1,4 @@
-import {WebsocketDataFrame} from "../../socketListener/data/WebsocketDataFrame";
+import {DataFrame} from "../../websocketListener/data/DataFrame";
 
 export interface WebsocketExtensionAgent {
     /**
@@ -8,17 +8,15 @@ export interface WebsocketExtensionAgent {
 
     /**
      * Transformation action to be applied on incoming data frame
-     * @param dataFrames Incoming data frame - a single frame or collection of frames with data frame
+     * @param dataFrame Incoming data frame
      * followed by continuation frames.
      */
-    transformIncomingData?(dataFrames: WebsocketDataFrame[]): WebsocketDataFrame[] | Promise<WebsocketDataFrame[]>;
+    transformIncomingData?(dataFrame: DataFrame): DataFrame | Promise<DataFrame>;
 
     /**
      * Transformation action to be applied on outgoing data frame
-     * @param dataFrames Outgoing data frame - a single frame or collection of frames with data frame
+     * @param dataFrame Outgoing data frame
      * followed by continuation frames.
      */
-    transformOutgoingData?(dataFrames: WebsocketDataFrame[]): WebsocketDataFrame[] | Promise<WebsocketDataFrame[]>;
+    transformOutgoingData?(dataFrame: DataFrame): DataFrame | Promise<DataFrame>;
 }
-
-// type DataFrameOrCollectionOfFrames = WebsocketDataFrame | WebsocketDataFrame[];

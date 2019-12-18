@@ -1,7 +1,7 @@
 import * as http from "http";
 import {Context, Injector, ModuleConfig, WebApplicationBundle} from "qft";
 import * as fs from "fs";
-import {WebSocketListenerConfig, WebsocketListenerModule} from "../../lib/socketListener";
+import {WebSocketListenerConfig, WebsocketListenerModule} from "../../lib/websocketListener";
 import {Logger} from "../../lib/logger";
 import {HttpMethod} from "../../lib/types/HttpMethod";
 import {PermessageDeflateConfig, PermessageDeflateExtensionModule} from "../../lib/permessageDeflateExtension";

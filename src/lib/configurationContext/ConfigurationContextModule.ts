@@ -1,7 +1,7 @@
 import {ModuleConfig} from "qft";
 import {LoggerModule} from "../logger";
 import {ConfigurationContextProvider} from "./service/ConfigurationContextProvider";
-import {ValidateSocketConnectionEvent} from "../socketListener";
+import {ValidateSocketConnectionEvent} from "../websocketListener";
 import {ValidateNewConnection} from "./command/ValidateNewConnection";
 
 export const ConfigurationContextModule: ModuleConfig = {

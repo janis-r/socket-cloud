@@ -1,7 +1,6 @@
 // describe("Data inflate/deflate utils", async () => {
 //
 import {getDeflator, getInflator} from "./indeflate-utils";
-import {ZlibOptions} from "zlib";
 
 describe('Data inflate/deflate', () => {
 
@@ -43,17 +42,4 @@ describe('Data inflate/deflate', () => {
         expect(rawData).toMatchObject(Buffer.concat(inflated));
         doneCallback();
     });
-    it("Can inflate and then deflate binary data", async (doneCallback) => {
-        const options: ZlibOptions = {windowBits: 10};
-        const rawData = Buffer.from([
-            0x02, 0x02, 0x26, 0x08, 0x66, 0x64, 0xe0, 0x00, 0x32, 0x00, 0x00
-        ]);
-
-        const inflated = await getInflator(options)(rawData);
-        const deflated = await getDeflator(options)(inflated);
-        console.log({rawData, inflated, deflated});
-        expect(rawData).toMatchObject(deflated);
-        doneCallback();
-    });
-
 });

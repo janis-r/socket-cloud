@@ -3,7 +3,7 @@ import {Logger} from "../../logger";
 import fetch from "node-fetch";
 import {HttpStatusCode} from "../../types/HttpStatusCodes";
 import {Json} from "../../types/Json";
-import {ValidateSocketConnectionEvent, ValidationError} from "../../socketListener";
+import {ValidateSocketConnectionEvent, ValidationError} from "../../websocketListener";
 import {ConnectionValidationError} from "../data/ConnectionValidationError";
 
 export class ValidateNewConnection implements Command<void> {

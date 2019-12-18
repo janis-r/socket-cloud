@@ -1,0 +1,17 @@
+{
+  "options": {
+    "failByDrop": false
+  },
+  "outdir": "./../reports/servers",
+  "servers": [
+    {
+      "agent": "Single core Echo",
+      "url": "ws://127.0.0.1:9001"
+    }
+  ],
+  "cases": [
+    "12.1.*"
+  ],
+  "exclude-cases": [],
+  "exclude-agent-cases": {}
+}

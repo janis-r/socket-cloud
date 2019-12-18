@@ -1,7 +1,7 @@
 import {Inject} from "qft";
 import {Logger} from "../../logger";
 import {ConfigurationContext} from "../data/ConfigurationContext";
-import {SocketDescriptor} from "../../socketListener/data/SocketDescriptor";
+import {SocketDescriptor} from "../../websocketListener/data/SocketDescriptor";
 import {SocketConnectionType} from "../../types/SocketConnectionType";
 
 export class ConfigurationContextProvider {

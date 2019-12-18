@@ -1,2 +1,2 @@
 #!/bin/bash
-wstest -s config/fuzzingclient.json -m fuzzingclient
+wstest -s fuzzingclient.json -m fuzzingclient

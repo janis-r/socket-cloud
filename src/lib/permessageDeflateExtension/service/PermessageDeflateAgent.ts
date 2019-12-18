@@ -1,10 +1,10 @@
 import {WebsocketExtensionAgent} from "../../websocketExtension";
-import {WebsocketDataFrame} from "../../socketListener/data/WebsocketDataFrame";
+import {DataFrame} from "../../websocketListener/data/DataFrame";
 import {getDeflator, getInflator} from "../util/indeflate-utils";
-import {WebsocketDataFrameType} from "../../socketListener/data/WebsocketDataFrameType";
-import {debug} from "../../socketListener/model/WebsocketClientConnection";
+import {DataFrameType} from "../../websocketListener/data/DataFrameType";
+import {debug} from "../../websocketListener/model/WebsocketClientConnection";
 
-const {ContinuationFrame, TextFrame, BinaryFrame} = WebsocketDataFrameType;
+const {TextFrame, BinaryFrame} = DataFrameType;
 
 export class PermessageDeflateAgent implements WebsocketExtensionAgent {
 
@@ -14,42 +14,37 @@ export class PermessageDeflateAgent implements WebsocketExtensionAgent {
     constructor(readonly config: AgentConfig,
                 readonly configOfferResponse: string
     ) {
-        // console.log(config);
-        // process.exit()
     }
 
-    async transformIncomingData(dataFrames: Array<WebsocketDataFrame>) {
-        debug && console.log('>> transformIncomingData', dataFrames);
-        if (![TextFrame, BinaryFrame].includes(dataFrames[0].type) || !dataFrames[0].rsv1) {
-            return dataFrames;
+    async transformIncomingData(dataFrame: DataFrame) {
+        debug && console.log('>> transformIncomingData', dataFrame);
+        const {type, rsv1, payload} = dataFrame;
+        if (![TextFrame, BinaryFrame].includes(type) || !rsv1) {
+            return dataFrame;
         }
 
-        const transformedFrames = new Array<WebsocketDataFrame>();
-        for (const {payload, ...ignoredParams} of dataFrames) {
-            transformedFrames.push({...ignoredParams, rsv1: false, payload: await this.inflate(payload)});
+        return {
+            ...dataFrame,
+            rsv1: false,
+            payload: await this.inflate(payload)
         }
-        return transformedFrames;
     }
 
-    async transformOutgoingData(dataFrames: Array<WebsocketDataFrame>) {
-        debug && console.log('>> transformOutgoingData', dataFrames);
-        if (![TextFrame, BinaryFrame].includes(dataFrames[0].type)) {
-            return dataFrames;
+    async transformOutgoingData(dataFrame: DataFrame) {
+        debug && console.log('>> transformOutgoingData', dataFrame);
+        const {type, rsv1, payload} = dataFrame;
+        if (![TextFrame, BinaryFrame].includes(type)) {
+            return dataFrame;
         }
-        if (dataFrames[0].rsv1) {
+        if (rsv1) {
             throw new Error(`Data frame collection is already deflated!`);
         }
 
-        const transformedFrames = new Array<WebsocketDataFrame>();
-        for (const {payload, ...ignoredParams} of dataFrames) {
-            debug && console.log('>> payload', payload.toString("utf8"));
-            transformedFrames.push({
-                ...ignoredParams,
-                rsv1: ignoredParams.type !== WebsocketDataFrameType.ContinuationFrame, // Only first, definitive frame has other type than ContinuationFrame
-                payload: await this.deflate(payload)
-            });
-        }
-        return transformedFrames;
+        return {
+            ...dataFrame,
+            rsv1: true,
+            payload: await this.deflate(payload)
+        };
     }
 
     private get inflate() {
