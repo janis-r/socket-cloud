@@ -1,18 +1,10 @@
 import {Socket} from "net";
-import {Event} from "qft";
 import {fragmentWebsocketFrame, spawnFrameData} from "../util/websocket-utils";
 import {DataFrame} from "../data/DataFrame";
-import {DataFrameType, frameTypeToString} from "../data/DataFrameType";
+import {DataFrameType} from "../data/DataFrameType";
 import {isPromise} from "../../utils/is-promise";
-import {
-    ClientConnection,
-    ConnectionState,
-    connectionStateToString,
-    DataEvent,
-    ErrorEvent,
-    MessageEvent,
-    StateChangeEvent
-} from "../../socketServer";
+import {ClientConnection, ConnectionState, connectionStateToString} from "../../clientConnectionPool";
+import {ErrorEvent, MessageEvent, StateChangeEvent} from "../../clientConnectionPool/connectionEvent";
 import {WebsocketExtensionAgent} from "../../websocketExtension";
 import {ConfigurationContext} from "../../configurationContext";
 import {CloseCode, isValidWebsocketCloseCode} from "../data/CloseCode";
@@ -108,8 +100,8 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         return true;
     }
 
-    send(data: Buffer);
-    send(data: string);
+    send(data: Buffer): Promise<void>;
+    send(data: string): Promise<void>;
     async send(data: string | Buffer): Promise<void> {
         const {outgoingMessagePreparationQueue: {enqueue}} = this;
         await enqueue(() => this.sendDataFrame(this.prepareDataFrame(data)));
@@ -166,17 +158,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
             return;
         }
 
-        let event: Event;
-        if (type === TextFrame) {
-            event = new MessageEvent(this, payload.toString("utf8"));
-        } else {
-            event = new DataEvent(this, payload);
-        }
-
-        debug && console.log(`>> ${frameTypeToString(type)} message`, type, payload.length, 'bytes');
-        debug && type == TextFrame && console.log(`>> ${frameTypeToString(type)} message`, payload.toString("utf8").substr(0, 20));
-
-        this.dispatchEvent(event);
+        this.dispatchEvent(new MessageEvent(this, type === TextFrame ? payload.toString("utf8") : payload));
     };
 
     private processConnectionCloseFrame({payload}: DataFrame): void {

@@ -2,7 +2,6 @@ import {WebsocketExtensionAgent} from "../../websocketExtension";
 import {DataFrame} from "../../websocketListener/data/DataFrame";
 import {getDeflator, getInflator} from "../util/indeflate-utils";
 import {DataFrameType} from "../../websocketListener/data/DataFrameType";
-import {debug} from "../../websocketListener/model/WebsocketClientConnection";
 
 const {TextFrame, BinaryFrame} = DataFrameType;
 
@@ -13,11 +12,9 @@ export class PermessageDeflateAgent implements WebsocketExtensionAgent {
 
     constructor(readonly config: AgentConfig,
                 readonly configOfferResponse: string
-    ) {
-    }
+    ) {}
 
     async transformIncomingData(dataFrame: DataFrame) {
-        debug && console.log('>> transformIncomingData', dataFrame);
         const {type, rsv1, payload} = dataFrame;
         if (![TextFrame, BinaryFrame].includes(type) || !rsv1) {
             return dataFrame;
@@ -31,7 +28,6 @@ export class PermessageDeflateAgent implements WebsocketExtensionAgent {
     }
 
     async transformOutgoingData(dataFrame: DataFrame) {
-        debug && console.log('>> transformOutgoingData', dataFrame);
         const {type, rsv1, payload} = dataFrame;
         if (![TextFrame, BinaryFrame].includes(type)) {
             return dataFrame;

@@ -7,6 +7,8 @@ import {HttpMethod} from "../../lib/types/HttpMethod";
 import {ConfigurationContextProvider} from "../../lib/configurationContext";
 import {SocketDescriptor} from "../../lib/websocketListener/data/SocketDescriptor";
 import {PermessageDeflateConfig, PermessageDeflateExtensionModule} from "../../lib/permessageDeflateExtension";
+import {ClientMessageEvent} from "../../lib/clientConnectionPool";
+import {EchoMessage} from "./command/EchoMessage";
 
 const httpServerPort = 8000;
 let contextInjector: Injector;
@@ -67,6 +69,9 @@ const initSocket = async () => {
                         }
                     },
                     PermessageDeflateConfig
+                ],
+                commands: [
+                    {event: ClientMessageEvent.TYPE, command: EchoMessage}
                 ]
             },
         )

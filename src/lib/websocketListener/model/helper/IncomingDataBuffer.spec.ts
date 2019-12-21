@@ -2,10 +2,7 @@ import {IncomingDataBuffer} from "./IncomingDataBuffer";
 import {DataFrame} from "../../data/DataFrame";
 
 describe("websocket incoming data buffer", () => {
-
-    let dataBuffer: IncomingDataBuffer;
-    beforeEach(() => dataBuffer = new IncomingDataBuffer());
-
+    
     it("Can read fragmented messages", async () => {
         const messageBytes = [0x01, 0x89, 0x50, 0x99, 0xa0, 0xc8, 0x36, 0xeb, 0xc1, 0xaf, 0x3d, 0xfc, 0xce, 0xbc, 0x61, 0x80, 0x89, 0x72, 0x09, 0x10, 0xea, 0x14, 0x7b, 0x71, 0x8d, 0x1f, 0x6c, 0x7e, 0x9e, 0x40];
         const encodedFrame = {
@@ -18,9 +15,7 @@ describe("websocket incoming data buffer", () => {
         };
 
         const parsedMessages = new Array<DataFrame>();
-        dataBuffer.addEventListener("data", ({data}) => {
-            parsedMessages.push(data);
-        });
+        const dataBuffer = new IncomingDataBuffer(dataFrame => parsedMessages.push(dataFrame));
         dataBuffer.write(Buffer.from(messageBytes));
 
         await new Promise<void>(resolve => setTimeout(resolve, 10));

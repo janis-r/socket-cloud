@@ -1,10 +1,11 @@
 import * as crypto from "crypto";
 import {WebsocketClientConnection} from "../WebsocketClientConnection";
-import {ConnectionState, StateChangeEvent} from "../../../socketServer";
+import {ConnectionState} from "../../../clientConnectionPool";
 import {CloseCode} from "../../data/CloseCode";
 import {spawnFrameData} from "../../util/websocket-utils";
 import {DataFrameType} from "../../data/DataFrameType";
 import {DataFrame} from "../../data/DataFrame";
+import {StateChangeEvent} from "../../../clientConnectionPool/connectionEvent";
 
 export class KeepAliveManager {
 

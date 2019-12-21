@@ -13,7 +13,7 @@ describe('ExecutionQueue', () => {
                     await new Promise<number>(resolve => setTimeout(resolve, 1 + Math.floor(Math.random() * 10)));
                     return entry;
                 }
-            ).then(v => output.push(v))
+            ).then(response => output.push(response));
         }
 
         queue.enqueue(

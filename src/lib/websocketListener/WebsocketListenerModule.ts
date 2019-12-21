@@ -5,11 +5,13 @@ import {WebsocketConnectionValidationRequest} from "./event/WebsocketConnectionV
 import {ValidateNewWebsocket} from "./command/ValidateNewWebsocket";
 import {LoggerModule} from "../logger";
 import {ConfigurationContextModule} from "../configurationContext";
+import {ClientConnectionModule} from "../clientConnectionPool";
 
 export const WebsocketListenerModule: ModuleConfig = {
     requires: [
         LoggerModule,
-        ConfigurationContextModule
+        ConfigurationContextModule,
+        ClientConnectionModule
     ],
     mappings: [
         WebSocketListenerConfig,

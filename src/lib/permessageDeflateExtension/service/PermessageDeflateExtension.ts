@@ -64,7 +64,7 @@ export class PermessageDeflateExtension implements WebsocketExtension {
             if (typeof value === "number") {
                 response.push(`${key}=${value}`);
             } else {
-                // Boolean properties like \w+_no_context_takeover are enabled by just listing propety so true values
+                // Boolean properties like \w+_no_context_takeover are enabled by just listing property so true values
                 // can be omitted in here, which leaves us with only number value to be included
                 response.push(`${key}`);
             }
@@ -134,10 +134,6 @@ const validateConfiguration = (config: WebsocketExtensionConfig): PermessageDefl
             return null;
         }
     }
-    // console.log({configValues});
-    // process.exit();
-    return {
-        ...config,
-        values: configValues
-    };
+
+    return {...config, values: configValues};
 };

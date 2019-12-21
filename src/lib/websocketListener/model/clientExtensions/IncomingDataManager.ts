@@ -2,10 +2,9 @@ import {Event, EventDispatcher, EventListener} from "qft";
 import {DataFrame} from "../../data/DataFrame";
 import {WebsocketClientConnection} from "../WebsocketClientConnection";
 import {DataFrameType} from "../../data/DataFrameType";
-import {ConnectionState, StateChangeEvent} from "../../../socketServer";
+import {ConnectionState} from "../../../clientConnectionPool";
 import {CloseCode} from "../../data/CloseCode";
-
-const isValidUTF8: (data: Buffer) => boolean = require('utf-8-validate');
+import {StateChangeEvent} from "../../../clientConnectionPool/connectionEvent";
 
 export class IncomingDataManager extends EventDispatcher {
 
@@ -60,17 +59,6 @@ export class IncomingDataManager extends EventDispatcher {
             return;
         }
 
-        const frameType = queue.length > 0 ? queue[0].type : dataFrame.type;
-
-        // TODO: cebae1bdb9cf83cebcceb5f4 is not reported as valid UTF8, while it should be - remove this hack
-        /*if (isFinal && frameType === TextFrame && isValidUTF8(payload) === false) {
-            connection.close(InvalidFramePayloadData, `Received invalid UTF8 content 1: ${JSON.stringify({
-                ...dataFrame,
-                payload: dataFrame.payload.toString("utf8")
-            })}`);
-            return;
-        }*/
-
         if (isFinal && queue.length === 0) {
             this.dispatchEvent("data", dataFrame);
             return;
@@ -88,13 +76,6 @@ export class IncomingDataManager extends EventDispatcher {
         };
 
         queue.length = 0;
-        /*if (frameType === TextFrame && !isValidUTF8(payload)) {
-            connection.close(InvalidFramePayloadData, `Received invalid UTF8 content 2: ${JSON.stringify({
-                dataFrame: {...dataFrame, payload: dataFrame.payload.toString("hex")},
-                messageBuffer: messageBuffer.toString("hex")
-            })}`);
-            return;
-        }*/
         this.dispatchEvent("data", aggregatedFrameData);
     }
 }

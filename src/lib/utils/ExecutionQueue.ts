@@ -1,8 +1,8 @@
 export class ExecutionQueue {
 
-    private readonly queue = new Array<EnqueuedAction>();
+    private readonly queue = new Array<EnqueuedAction<any>>();
 
-    readonly enqueue = async (action: Action) => new Promise<ReturnType<Action>>((resolve, reject) => {
+    readonly enqueue = async <T>(action: Action<T>) => new Promise<ReturnType<Action<T>>>((resolve, reject) => {
         const {queue} = this;
         queue.push(
             async () => {
@@ -21,7 +21,6 @@ export class ExecutionQueue {
         }
     });
 
-
     private async executeNext() {
         const {queue} = this;
         if (queue.length === 0) {
@@ -35,5 +34,5 @@ export class ExecutionQueue {
 
 }
 
-type Action = () => any | Promise<any>;
-type EnqueuedAction = () => Promise<ReturnType<Action>>
+type Action<T> = () => T | Promise<T>;
+type EnqueuedAction<T> = () => Promise<ReturnType<Action<T>>>;

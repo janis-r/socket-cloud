@@ -9,7 +9,8 @@ import {LoggerConfig} from "./data/LoggerConfig";
             map: LoggerConfig,
             useValue: {
                 logDir: __dirname + "/../../../log/", // TODO: This should be gone when active dev is over
-                logToConsole: true
+                logToConsole: true,
+                logFileMode: "single-file"
             }
         } as InjectionConfig<LoggerConfig>,
         {map: Logger, useType: LoggerImpl},
