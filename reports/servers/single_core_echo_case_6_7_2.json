@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send a text message with payload which is valid UTF-8 in one fragment.<br><br>Payload: 0xc280",
    "droppedByMe": false,
-   "duration": 11,
+   "duration": 8,
    "expectation": "The message is echo'ed back to us.",
    "expected": {
       "OK": [
@@ -27,8 +27,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: V1Cjo9kAxz4wjrU6RBeClg==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: mIN6ZYUTKirAsytwHMYnuSdohSM=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: awGL5Yylmd8ZanPzrT9zwA==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: h34IlyMIzAVntFy6J9+v9qSPZPk=\r\n\r\n",
    "id": "6.7.2",
    "isServer": false,
    "localCloseCode": 1000,
@@ -54,7 +54,7 @@
       "4": 2,
       "139": 1
    },
-   "started": "2019-12-17T14:00:16.671Z",
+   "started": "2019-12-28T17:27:55.233Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 1,
@@ -94,7 +94,7 @@
          1,
          true,
          0,
-         "10a4ab1f",
+         "01a6545d",
          null,
          null,
          false
@@ -103,7 +103,7 @@
          "TO",
          [
             8,
-            "818210a4ab1fd224"
+            "818201a6545dc326"
          ],
          false
       ],
@@ -139,7 +139,7 @@
          8,
          true,
          0,
-         "3cbb46c8",
+         "65311b90",
          null,
          null,
          false
@@ -148,7 +148,7 @@
          "TO",
          [
             8,
-            "88823cbb46c83f53"
+            "888265311b9066d9"
          ],
          false
       ],

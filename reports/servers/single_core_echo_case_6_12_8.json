@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send a text message with payload which is not valid UTF-8 in one fragment.<br><br>Payload: 0x808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbe",
    "droppedByMe": false,
-   "duration": 10,
+   "duration": 15,
    "expectation": "The connection is failed immediately, since the payload is not valid UTF-8.",
    "expected": {
       "OK": []
@@ -22,15 +22,15 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: fUFPhZFVMJpXj8xP+mOPlQ==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: HJTCNX4Ja2f2xAMdZBZiwlyTDlA=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: nvkpUJbVDzvwcPszsVBU3g==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: EEiDQm7tlPObnNaLszGr+gGaCMo=\r\n\r\n",
    "id": "6.12.8",
    "isServer": false,
    "localCloseCode": 1000,
    "localCloseReason": null,
    "received": [],
    "remoteCloseCode": 1007,
-   "remoteCloseReason": null,
+   "remoteCloseReason": "Received invalid UTF8 content",
    "reportCompressionRatio": false,
    "reportTime": false,
    "result": "Actual events match at least one expected.",
@@ -39,10 +39,10 @@
       "8": 1
    },
    "rxOctetStats": {
-      "4": 1,
+      "33": 1,
       "139": 1
    },
-   "started": "2019-12-17T14:00:17.465Z",
+   "started": "2019-12-28T17:27:56.030Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 1,
@@ -83,7 +83,7 @@
          1,
          true,
          0,
-         "95f6a1c9",
+         "f36efbbf",
          null,
          null,
          false
@@ -92,7 +92,7 @@
          "TO",
          [
             69,
-            "81bf95f6a1c91577234a1173274e1d7f2b42197b2f460567335a0163375e0d6f3b52096b3f563557036a3153076e3d5f0b62395b0f662547137a2143177e2d4f ..."
+            "81bff36efbbf73ef793c77eb7d387be771347fe3753063ff692c67fb6d286bf761246ff3652053cf591c57cb5d185bc751145fc3551043df490c47db4d084bd7 ..."
          ],
          false
       ],
@@ -103,15 +103,15 @@
       [
          "RO",
          [
-            4,
-            "880203ef"
+            33,
+            "881f03ef526563656976656420696e76616c6964205554463820636f6e74656e74"
          ]
       ],
       [
          "RF",
          [
-            2,
-            "0x03ef"
+            31,
+            "0x03ef526563656976656420696e76616c6964205554463820636f6e74656e74"
          ],
          8,
          true,
@@ -128,7 +128,7 @@
          8,
          true,
          0,
-         "ce0f0534",
+         "ffd08c9d",
          null,
          null,
          false
@@ -137,7 +137,7 @@
          "TO",
          [
             8,
-            "8882ce0f0534cde7"
+            "8882ffd08c9dfc38"
          ],
          false
       ]

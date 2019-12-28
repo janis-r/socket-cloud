@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send a close frame with close code and close reason of maximum length (123)",
    "droppedByMe": false,
-   "duration": 10,
+   "duration": 8,
    "expectation": "Clean close with normal code.",
    "expected": {
       "OK": []
@@ -21,8 +21,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: LFajcIPLJZyi6e6++DNfiw==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 8hZEOwCB0NpPhc7MFLfXzf8g8uY=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: CDPZALzWdEhzhYKmwniToA==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: nC+t+uW5XwOBrI6+rtKv7rjxqVY=\r\n\r\n",
    "id": "7.3.5",
    "isServer": false,
    "localCloseCode": 1000,
@@ -41,7 +41,7 @@
       "4": 1,
       "139": 1
    },
-   "started": "2019-12-17T14:00:20.735Z",
+   "started": "2019-12-28T17:27:59.436Z",
    "trafficStats": null,
    "txFrameStats": {
       "8": 1
@@ -80,7 +80,7 @@
          8,
          true,
          0,
-         "ab7f844f",
+         "c07233a9",
          null,
          null,
          false
@@ -89,7 +89,7 @@
          "TO",
          [
             131,
-            "88fdab7f844fa897ae658155ae658155ae658155ae658155ae658155ae658155ae658155ae658155ae658155ae658155ae658155ae658155ae658155ae658155 ..."
+            "88fdc07233a9c39a1983ea581983ea581983ea581983ea581983ea581983ea581983ea581983ea581983ea581983ea581983ea581983ea581983ea581983ea58 ..."
          ],
          false
       ],

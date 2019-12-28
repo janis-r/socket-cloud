@@ -21,41 +21,36 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: zUS4uFWvVBmlL5R3fKbAcw==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: RlPoywbX1Gqb8j7QaouPCjVw0sA=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: TGwK94O76orHBgfAVbuU4Q==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: kcVKtuHjsiSsWKbZ5S8PB/xLmv0=\r\n\r\n",
    "id": "5.16",
    "isServer": false,
-   "localCloseCode": 1000,
+   "localCloseCode": null,
    "localCloseReason": null,
    "received": [],
-   "remoteCloseCode": 1002,
+   "remoteCloseCode": null,
    "remoteCloseReason": null,
    "reportCompressionRatio": false,
    "reportTime": false,
    "result": "Actual events match at least one expected.",
    "resultClose": "Connection was properly closed",
-   "rxFrameStats": {
-      "8": 1
-   },
+   "rxFrameStats": {},
    "rxOctetStats": {
-      "4": 1,
       "139": 1
    },
-   "started": "2019-12-17T14:00:05.432Z",
+   "started": "2019-12-28T17:27:43.988Z",
    "trafficStats": null,
    "txFrameStats": {
       "0": 4,
-      "1": 2,
-      "8": 1
+      "1": 2
    },
    "txOctetStats": {
-      "8": 1,
       "15": 6,
       "240": 1
    },
-   "wasClean": true,
+   "wasClean": false,
    "wasCloseHandshakeTimeout": false,
-   "wasNotCleanReason": null,
+   "wasNotCleanReason": "peer dropped the TCP connection without previous WebSocket closing handshake",
    "wasOpenHandshakeTimeout": false,
    "wasServerConnectionDropTimeout": false,
    "wirelog": [
@@ -83,7 +78,7 @@
          0,
          false,
          0,
-         "417062c7",
+         "b18a6afa",
          null,
          null,
          false
@@ -92,7 +87,7 @@
          "TO",
          [
             15,
-            "0089417062c7270203a02c150cb370"
+            "0089b18a6afad7f80b9ddcef048e80"
          ],
          false
       ],
@@ -105,7 +100,7 @@
          1,
          false,
          0,
-         "08f40554",
+         "8c419663",
          null,
          null,
          false
@@ -114,7 +109,7 @@
          "TO",
          [
             15,
-            "018908f405546e86643365916b203a"
+            "01898c419663ea33f704e124f817be"
          ],
          false
       ],
@@ -127,7 +122,7 @@
          0,
          true,
          0,
-         "02396409",
+         "a436d8d1",
          null,
          null,
          false
@@ -136,7 +131,7 @@
          "TO",
          [
             15,
-            "808902396409644b056e6f5c0a7d31"
+            "8089a436d8d1c244b9b6c953b6a597"
          ],
          false
       ],
@@ -149,7 +144,7 @@
          0,
          false,
          0,
-         "86af4a59",
+         "f139dd31",
          null,
          null,
          false
@@ -158,7 +153,7 @@
          "TO",
          [
             15,
-            "008986af4a59e0dd2b3eebca242db7"
+            "0089f139dd31974bbc569c5cb345c0"
          ],
          false
       ],
@@ -171,7 +166,7 @@
          1,
          false,
          0,
-         "4fb53d7f",
+         "fb88b301",
          null,
          null,
          false
@@ -180,7 +175,7 @@
          "TO",
          [
             15,
-            "01894fb53d7f29c75c1822d0530b7d"
+            "0189fb88b3019dfad26696eddd75c9"
          ],
          false
       ],
@@ -193,7 +188,7 @@
          0,
          true,
          0,
-         "f23a2e7b",
+         "af2afa34",
          null,
          null,
          false
@@ -202,54 +197,13 @@
          "TO",
          [
             15,
-            "8089f23a2e7b94484f1c9f5f400fc1"
+            "8089af2afa34c9589b53c24f94409c"
          ],
          false
       ],
       [
          "KL",
          1
-      ],
-      [
-         "RO",
-         [
-            4,
-            "880203ea"
-         ]
-      ],
-      [
-         "RF",
-         [
-            2,
-            "0x03ea"
-         ],
-         8,
-         true,
-         0,
-         false,
-         null
-      ],
-      [
-         "TF",
-         [
-            2,
-            "0x03e8"
-         ],
-         8,
-         true,
-         0,
-         "e74dd176",
-         null,
-         null,
-         false
-      ],
-      [
-         "TO",
-         [
-            8,
-            "8882e74dd176e4a5"
-         ],
-         false
       ]
    ]
 }

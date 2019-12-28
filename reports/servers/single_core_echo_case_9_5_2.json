@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send text message message with payload of length 1 * 2**20 (1M). Sent out data in chops of 128 octets.",
    "droppedByMe": false,
-   "duration": 1513,
+   "duration": 1473,
    "expectation": "Receive echo'ed text message (with payload as sent).",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: 9OF3q0z103AWUTl5v60Uxw==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: QMDEkpzaacjLK/kiQ94VUfx9Pnc=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: 27Rsmu5qLILY2xI4IPSGLw==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: cB2DRXVReHZxVZt3+HupNiTuiFw=\r\n\r\n",
    "id": "9.5.2",
    "isServer": false,
    "localCloseCode": 1000,
@@ -40,10 +40,13 @@
    "rxOctetStats": {
       "4": 1,
       "139": 1,
-      "256": 1,
-      "65536": 16
+      "16388": 6,
+      "32776": 3,
+      "49164": 3,
+      "49324": 1,
+      "65536": 10
    },
-   "started": "2019-12-17T14:00:37.303Z",
+   "started": "2019-12-28T17:28:16.036Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 1,
@@ -89,7 +92,7 @@
          8,
          true,
          0,
-         "45b608c5",
+         "fca8494b",
          null,
          null,
          false
@@ -98,7 +101,7 @@
          "TO",
          [
             8,
-            "888245b608c5465e"
+            "8882fca8494bff40"
          ],
          false
       ],

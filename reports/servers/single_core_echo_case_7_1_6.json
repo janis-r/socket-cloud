@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send 256K message followed by close then a ping",
    "droppedByMe": false,
-   "duration": 20,
+   "duration": 29,
    "expectation": "Case outcome depends on implementation defined close behavior. Message and close frame are sent back to back. If the close frame is processed before the text message write is complete (as can happen in asynchronous processing models) the close frame is processed first and the text message may not be received or may only be partially recieved.",
    "expected": {
       "NON-STRICT": [],
@@ -28,8 +28,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: XAoTe1acddirMGM3FKCeBA==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 0nYKAFkej7sDZgIMrroGPqBW9AM=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: dMfM9GcEp/BLUwl3pEk9Xw==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: CiOY4JmDAwMeyGR1C92iIHEGzaU=\r\n\r\n",
    "id": "7.1.6",
    "isServer": false,
    "localCloseCode": 1000,
@@ -38,11 +38,6 @@
       [
          "message",
          "BAsd7&jh23BAsd7&jh23BAsd7&jh23BAsd7&jh23BAsd7&jh23BAsd7&jh23BAsd ...",
-         false
-      ],
-      [
-         "message",
-         "Hello World!",
          false
       ]
    ],
@@ -54,17 +49,17 @@
    "resultClose": "Connection was properly closed",
    "rxFrameStats": {
       "0": 15,
-      "1": 2,
+      "1": 1,
       "8": 1
    },
    "rxOctetStats": {
       "139": 1,
       "16388": 1,
-      "16454": 1,
+      "16440": 1,
       "32776": 1,
       "65536": 3
    },
-   "started": "2019-12-17T14:00:20.562Z",
+   "started": "2019-12-28T17:27:59.255Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 2,
@@ -108,7 +103,7 @@
          1,
          true,
          0,
-         "cea13b87",
+         "eb2607ed",
          262144,
          null,
          false
@@ -117,7 +112,7 @@
          "TO",
          [
             262158,
-            "81ff0000000000040000cea13b878ce048e3f98751effc9279c6bdc50ca1a4c909b48ce048e3f98751effc9279c6bdc50ca1a4c909b48ce048e3f98751effc92 ..."
+            "81ff0000000000040000eb2607eda9677489dc006d85d91545ac984230cb814e35dea9677489dc006d85d91545ac984230cb814e35dea9677489dc006d85d915 ..."
          ],
          false
       ],
@@ -130,7 +125,7 @@
          1,
          true,
          0,
-         "bf09fdac",
+         "202607d4",
          null,
          null,
          false
@@ -139,7 +134,7 @@
          "TO",
          [
             18,
-            "818cbf09fdacf76c91c0d029aac3cd65998d"
+            "818c202607d468436bb84f0650bb524a63f5"
          ],
          false
       ],
@@ -152,7 +147,7 @@
          8,
          true,
          0,
-         "235e30fd",
+         "89fc9157",
          null,
          null,
          false
@@ -161,7 +156,7 @@
          "TO",
          [
             8,
-            "8882235e30fd20b6"
+            "888289fc91578a14"
          ],
          false
       ],
@@ -174,7 +169,7 @@
          9,
          true,
          0,
-         "3419799b",
+         "ff7172d0",
          null,
          null,
          false
@@ -183,7 +178,7 @@
          "TO",
          [
             6,
-            "89803419799b"
+            "8980ff7172d0"
          ],
          false
       ],
@@ -397,7 +392,7 @@
       [
          "RO",
          [
-            16454,
+            16440,
             "736437266a6832334241736437266a6832334241736437266a6832334241736437266a6832334241736437266a683233807e40004241736437266a6832334241 ..."
          ]
       ],
@@ -420,18 +415,6 @@
             "BAsd7&jh23BAsd7&jh23BAsd7&jh23BAsd7&jh23BAsd7&jh23BAsd7&jh23BAsd ..."
          ],
          0,
-         true,
-         0,
-         false,
-         null
-      ],
-      [
-         "RF",
-         [
-            12,
-            "Hello World!"
-         ],
-         1,
          true,
          0,
          false,

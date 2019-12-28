@@ -15,7 +15,8 @@ describe("websocket incoming data buffer", () => {
         };
 
         const parsedMessages = new Array<DataFrame>();
-        const dataBuffer = new IncomingDataBuffer(dataFrame => parsedMessages.push(dataFrame));
+        const dataBuffer = new IncomingDataBuffer();
+        dataBuffer.onData(dataFrame => parsedMessages.push(dataFrame));
         dataBuffer.write(Buffer.from(messageBytes));
 
         await new Promise<void>(resolve => setTimeout(resolve, 10));

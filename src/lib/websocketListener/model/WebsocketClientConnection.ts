@@ -10,11 +10,11 @@ import {ConfigurationContext} from "../../configurationContext";
 import {CloseCode, isValidWebsocketCloseCode} from "../data/CloseCode";
 import {WebsocketDescriptor} from "../data/SocketDescriptor";
 import {ClientConnectionEventBase} from "./ClientConnectionEventBase";
-import {IncomingDataBuffer} from "./helper/IncomingDataBuffer";
-import {OutgoingDataBuffer} from "./helper/OutgoingDataBuffer";
+import {OutgoingMessageBuffer} from "./helper/OutgoingMessageBuffer";
 import {KeepAliveManager} from "./clientExtensions/KeepAliveManager";
-import {IncomingDataManager} from "./clientExtensions/IncomingDataManager";
-import {ExecutionQueue} from "../../utils/ExecutionQueue";
+import {IncomingMessageManager} from "./helper/IncomingMessageManager";
+import {ExecutionQueue} from "ugd10a";
+import chalk from "chalk";
 
 const isValidUTF8: (data: Buffer) => boolean = require('utf-8-validate');
 
@@ -24,8 +24,8 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
 
     private _state = ConnectionState.Connecting;
 
-    private readonly incomingDataBuffer: IncomingDataBuffer;
-    private readonly outgoingDataBuffer: OutgoingDataBuffer;
+    private readonly incomingMessageManager: IncomingMessageManager;
+    private readonly outgoingDataBuffer: OutgoingMessageBuffer;
 
     private readonly outgoingMessagePreparationQueue = new ExecutionQueue();
     private readonly incomingMessageExtendingQueue = new ExecutionQueue();
@@ -34,7 +34,6 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     private readonly outgoingDataExtensions: Array<WebsocketExtensionAgent>;
 
     private readonly keepAliveManager: KeepAliveManager;
-    private readonly incomingDataManager: IncomingDataManager;
 
     constructor(private readonly socket: Socket,
                 readonly descriptor: WebsocketDescriptor,
@@ -44,26 +43,34 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         debug && console.log({descriptor, context});
 
         this.keepAliveManager = new KeepAliveManager(this);
-        this.outgoingDataBuffer = new OutgoingDataBuffer(socket);
+        this.incomingMessageManager = new IncomingMessageManager();
+        this.outgoingDataBuffer = new OutgoingMessageBuffer(socket);
 
-        this.incomingDataBuffer = new IncomingDataBuffer(this.rawDataHandler);
-        socket.on("data", data => this.incomingDataBuffer.write(data));
+        const {incomingMessageManager, parsedDataHandler} = this;
 
-        this.incomingDataManager = new IncomingDataManager(this);
-        this.incomingDataManager.addEventListener("data",
-            ({data}) => this.parsedDataHandler(data)
-        );
-
-        socket.once("error", err => {
-            console.log(`WebsocketClientConnection socket err: ${JSON.stringify(err.message)}`);
-            this.dispatchEvent(new ErrorEvent(this, err.message));
-            this.close(CloseCode.AbnormalClosure, err.message);
+        incomingMessageManager.onData(parsedDataHandler);
+        incomingMessageManager.onError(error => {
+            // this.close(CloseCode.ProtocolError, error);
+            this.setState(ConnectionState.Closing);
+            this.socket.end();
         });
-        socket.on("close", () => this.setState(ConnectionState.Closed));
+
+        socket.on("data", incomingMessageManager.write);
+        socket.once("error", this.socketErrorHandler);
+        socket.on("close", this.socketCloseHandler);
 
         if (extensions && extensions.length > 0) {
-            const incoming = extensions.filter(({transformIncomingData}) => !!transformIncomingData);
-            const outgoing = extensions.filter(({transformOutgoingData}) => !!transformOutgoingData);
+            const incoming = [];
+            const outgoing = [];
+            extensions.forEach(extension => {
+                if (extension.transformIncomingData) {
+                    incoming.push(extension);
+                }
+                if (extension.transformOutgoingData) {
+                    outgoing.push(extension);
+                }
+            });
+
             if (incoming) {
                 this.incomingDataExtensions = incoming;
             }
@@ -93,9 +100,10 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
             payload = Buffer.concat([payload, Buffer.from(reason)]);
         }
 
+        const closeMessageSent = this.sendDataFrame(spawnFrameData(DataFrameType.ConnectionClose, {payload}));
         this.setState(ConnectionState.Closing);
 
-        await this.sendDataFrame(spawnFrameData(DataFrameType.ConnectionClose, {payload}));
+        await closeMessageSent;
         socket.end();
         return true;
     }
@@ -108,6 +116,9 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     }
 
     async sendDataFrame(data: DataFrame | DataFrame[] | Promise<DataFrame | DataFrame[]>): Promise<void> {
+        if (this._state >= ConnectionState.Closing) {
+            return;
+        }
         await this.outgoingDataBuffer.write(data);
     }
 
@@ -120,33 +131,19 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         return fragmentWebsocketFrame(extendedFrame, fragmentSize);
     }
 
-    private readonly rawDataHandler = async (dataFrame: DataFrame) => {
-        const {ContinuationFrame, TextFrame, BinaryFrame, ConnectionClose, Ping, Pong} = DataFrameType;
-        if (![ContinuationFrame, TextFrame, BinaryFrame, ConnectionClose, Ping, Pong].includes(dataFrame.type)) {
-            this.close(CloseCode.ProtocolError, `Unknown frame type ${dataFrame.type} received`);
-            return;
-        }
-
-        this.dispatchEvent("data-frame", dataFrame);
-        // Control frames can be executed sooner than data frames due to this construction.
-        // Could it turn out to be a problem at some point?
-        switch (dataFrame.type) {
-            case ConnectionClose:
-                this.processConnectionCloseFrame(dataFrame);
-                break;
-            case Ping:
-                await this.processPingFrame(dataFrame);
-                break;
-        }
-    };
-
     private readonly parsedDataHandler = async (data: DataFrame) => {
         const {ProtocolError, InvalidFramePayloadData} = CloseCode;
-        const {TextFrame} = DataFrameType;
+        const {TextFrame, ConnectionClose, Ping, Pong, BinaryFrame} = DataFrameType;
         const {incomingMessageExtendingQueue: {enqueue}} = this;
+        debug && console.log('>> parsedDataHandler', chalk.red(connectionStateToString(this._state)), data);
 
         const dataFrame = await enqueue(() => this.extendIncomingData(data));
         const {type, payload, rsv1, rsv2, rsv3} = dataFrame;
+
+        if (this._state >= ConnectionState.Closing && type !== ConnectionClose) {
+            debug && console.log('>> parsedDataHandler', chalk.red('stop'));
+            return;
+        }
 
         if ([rsv1, rsv2, rsv3].includes(true)) {
             this.close(ProtocolError, `Some RSV fields have not being reset by extensions`, dataFrame);
@@ -158,7 +155,24 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
             return;
         }
 
-        this.dispatchEvent(new MessageEvent(this, type === TextFrame ? payload.toString("utf8") : payload));
+        this.dispatchEvent("data-frame", dataFrame);
+        switch (dataFrame.type) {
+            case ConnectionClose:
+                this.processConnectionCloseFrame(dataFrame);
+                break;
+            case Ping:
+                await this.processPingFrame(dataFrame);
+                break;
+            case Pong:
+                break;
+            case TextFrame:
+            case BinaryFrame:
+                this.dispatchEvent(new MessageEvent(this, type === TextFrame ? payload.toString("utf8") : payload));
+                break;
+            default:
+                console.log('wtf?', dataFrame);
+        }
+
     };
 
     private processConnectionCloseFrame({payload}: DataFrame): void {
@@ -190,7 +204,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         const code = payload.length >= 2 ? payload.readUInt16BE(0) : null;
         const reason = payload.length > 2 ? payload.slice(2).toString("utf8") : null;
 
-        console.log({code, reason});
+        console.log('>> processConnectionCloseFrame', {code, reason});
 
         // NoStatusRcvd & AbnormalClosure are not allowed to appear in data requests
         if (code !== null && ([NoStatusRcvd, AbnormalClosure].includes(code) || !isValidWebsocketCloseCode(code))) {
@@ -227,10 +241,6 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
 
         this._state = newState;
         this.dispatchEvent(new StateChangeEvent(this, currentState));
-
-        if (newState === ConnectionState.Closed) {
-            this.incomingDataBuffer.destroy();
-        }
     }
 
     private async extendIncomingData(data: DataFrame): Promise<DataFrame> {
@@ -260,5 +270,15 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
             data = isPromise(transformation) ? await transformation : transformation;
         }
         return data;
+    }
+
+    private readonly socketErrorHandler = (err: Error) => {
+        console.log(`WebsocketClientConnection socket err: ${JSON.stringify(err.message)}`);
+        this.dispatchEvent(new ErrorEvent(this, err.message));
+        this.close(CloseCode.AbnormalClosure, err.message);
+    };
+
+    private readonly socketCloseHandler = () => {
+        this.setState(ConnectionState.Closed);
     }
 }

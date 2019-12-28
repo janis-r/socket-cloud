@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send ping with binary payload of 126 octets.",
    "droppedByMe": false,
-   "duration": 14,
+   "duration": 10,
    "expectation": "Connection is failed immediately (1002/Protocol Error), since control frames are only allowed to have payload up to and including 125 octets..",
    "expected": {
       "OK": []
@@ -21,15 +21,15 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: wZnd2efx6E01tZgoJFf2jw==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: Wbs0Jhw9PvfxNzVc6NHrKClXuWs=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: h86OfEHZ/f9s2dNsXxT6Eg==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: qdQ2Lnno+aSkw4TE4muM6bMjims=\r\n\r\n",
    "id": "2.5",
    "isServer": false,
    "localCloseCode": 1000,
    "localCloseReason": null,
    "received": [],
    "remoteCloseCode": 1002,
-   "remoteCloseReason": null,
+   "remoteCloseReason": "Ping payload exceed 125 byte limit",
    "reportCompressionRatio": false,
    "reportTime": false,
    "result": "Actual events match at least one expected.",
@@ -38,10 +38,10 @@
       "8": 1
    },
    "rxOctetStats": {
-      "4": 1,
+      "38": 1,
       "139": 1
    },
-   "started": "2019-12-17T14:00:03.854Z",
+   "started": "2019-12-28T17:27:42.531Z",
    "trafficStats": null,
    "txFrameStats": {
       "8": 1,
@@ -82,7 +82,7 @@
          9,
          true,
          0,
-         "25feeb5c",
+         "28aaacab",
          null,
          null,
          false
@@ -91,7 +91,7 @@
          "TO",
          [
             134,
-            "89fe007e25feeb5cdb0015a2db0015a2db0015a2db0015a2db0015a2db0015a2db0015a2db0015a2db0015a2db0015a2db0015a2db0015a2db0015a2db0015a2 ..."
+            "89fe007e28aaacabd6545255d6545255d6545255d6545255d6545255d6545255d6545255d6545255d6545255d6545255d6545255d6545255d6545255d6545255 ..."
          ],
          false
       ],
@@ -102,15 +102,15 @@
       [
          "RO",
          [
-            4,
-            "880203ea"
+            38,
+            "882403ea50696e67207061796c6f616420657863656564203132352062797465206c696d6974"
          ]
       ],
       [
          "RF",
          [
-            2,
-            "0x03ea"
+            36,
+            "0x03ea50696e67207061796c6f616420657863656564203132352062797465206c696d6974"
          ],
          8,
          true,
@@ -127,7 +127,7 @@
          8,
          true,
          0,
-         "eb016dd8",
+         "f0279573",
          null,
          null,
          false
@@ -136,7 +136,7 @@
          "TO",
          [
             8,
-            "8882eb016dd8e8e9"
+            "8882f0279573f3cf"
          ],
          false
       ]

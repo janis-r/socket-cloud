@@ -1,4 +1,4 @@
-import {OutgoingDataBuffer} from "./OutgoingDataBuffer";
+import {OutgoingMessageBuffer} from "./OutgoingMessageBuffer";
 import {Socket} from "net";
 import {decomposeWebSocketFrame, spawnFrameData} from "../../util/websocket-utils";
 import {DataFrameType} from "../../data/DataFrameType";
@@ -6,12 +6,12 @@ import {DataFrame} from "../../data/DataFrame";
 
 describe("websocket outgoing data buffer", () => {
 
-    let dataBuffer: OutgoingDataBuffer;
+    let dataBuffer: OutgoingMessageBuffer;
     let socket: FakeSocket;
 
     beforeEach(() => {
         socket = new FakeSocket();
-        dataBuffer = new OutgoingDataBuffer(socket);
+        dataBuffer = new OutgoingMessageBuffer(socket);
     });
 
     it("Messages will be written in correct order", async () => {

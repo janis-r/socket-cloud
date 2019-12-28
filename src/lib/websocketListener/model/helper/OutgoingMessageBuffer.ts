@@ -2,10 +2,10 @@ import {Socket} from "net";
 import {composeWebsocketFrame} from "../../util/websocket-utils";
 import {isPromise} from "../../../utils/is-promise";
 import {DataFrame} from "../../data/DataFrame";
+import {ExecutionQueue} from "ugd10a";
 import {debug} from "../WebsocketClientConnection";
-import {ExecutionQueue} from "../../../utils/ExecutionQueue";
 
-export class OutgoingDataBuffer {
+export class OutgoingMessageBuffer {
 
     private readonly queue = new ExecutionQueue();
 

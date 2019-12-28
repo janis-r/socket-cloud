@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send 1000 compressed messages each of payload size 65536, auto-fragment to 0 octets. Use default permessage-deflate offer.",
    "droppedByMe": false,
-   "duration": 3814,
+   "duration": 3756,
    "expectation": "Receive echo'ed messages (with payload as sent). Timeout case after 480 secs.",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: 2tDWroWzR0q2iUd0ElYeGw==\r\nSec-WebSocket-Extensions: permessage-deflate; client_no_context_takeover; client_max_window_bits\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: +V3AQfJzifYS+f8vBrFLEbT0L9s=\r\nSec-WebSocket-Extensions: permessage-deflate;client_max_window_bits=15;client_no_context_takeover\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: ZXUAb73OOdVKG7pkyO1seA==\r\nSec-WebSocket-Extensions: permessage-deflate; client_no_context_takeover; client_max_window_bits\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: yr7i8E4HixJOuLVTuGFE4//V3ZE=\r\nSec-WebSocket-Extensions: permessage-deflate;client_max_window_bits=15;client_no_context_takeover\r\n\r\n",
    "id": "12.1.9",
    "isServer": false,
    "localCloseCode": 1000,
@@ -209,7 +209,7 @@
       "3091": 3,
       "3092": 1
    },
-   "started": "2019-12-17T14:01:06.311Z",
+   "started": "2019-12-28T17:28:45.496Z",
    "trafficStats": {
       "incomingCompressionRatio": 0.045407745361328126,
       "incomingOctetsAppLevel": 65536000,
@@ -447,7 +447,7 @@
          8,
          true,
          0,
-         "90f4ce57",
+         "19f7100c",
          null,
          null,
          false
@@ -456,7 +456,7 @@
          "TO",
          [
             8,
-            "888290f4ce57931c"
+            "888219f7100c1a1f"
          ],
          false
       ],

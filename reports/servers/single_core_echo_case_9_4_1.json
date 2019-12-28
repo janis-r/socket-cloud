@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send fragmented binary message message with message payload of length 4 * 2**20 (4M). Sent out in fragments of 64.",
    "droppedByMe": false,
-   "duration": 1529,
+   "duration": 1723,
    "expectation": "Receive echo'ed binary message (with payload as sent).",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: jZxUNuCKEIrnGtOO6ssgyQ==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: FUBpYBBubEVKLTe0OItIhfLGKcE=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: nRdb7JqnQyZJq9BYp6UWfg==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: /VXur/ItiUF4MLNl51hbvIw9lwE=\r\n\r\n",
    "id": "9.4.1",
    "isServer": false,
    "localCloseCode": 1000,
@@ -39,23 +39,20 @@
    },
    "rxOctetStats": {
       "4": 1,
-      "16": 1,
-      "48": 1,
       "139": 1,
-      "16388": 1,
-      "16484": 1,
-      "24580": 1,
-      "24584": 1,
-      "32768": 1,
-      "32776": 8,
-      "32784": 1,
-      "40968": 1,
-      "40972": 1,
-      "49164": 5,
-      "49836": 1,
-      "65536": 52
+      "16388": 10,
+      "16392": 1,
+      "20484": 1,
+      "28680": 1,
+      "32772": 1,
+      "32776": 20,
+      "32808": 1,
+      "49164": 8,
+      "49196": 1,
+      "49772": 1,
+      "65536": 42
    },
-   "started": "2019-12-17T14:00:30.809Z",
+   "started": "2019-12-28T17:28:09.076Z",
    "trafficStats": null,
    "txFrameStats": {
       "0": 65536,
@@ -102,7 +99,7 @@
          8,
          true,
          0,
-         "7f64d142",
+         "46c7348f",
          null,
          null,
          false
@@ -111,7 +108,7 @@
          "TO",
          [
             8,
-            "88827f64d1427c8c"
+            "888246c7348f452f"
          ],
          false
       ],

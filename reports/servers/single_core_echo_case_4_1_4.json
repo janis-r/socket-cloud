@@ -1,6 +1,6 @@
 {
    "agent": "Single core Echo",
-   "behavior": "OK",
+   "behavior": "NON-STRICT",
    "behaviorClose": "OK",
    "case": 38,
    "closedByMe": false,
@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send small text message, then send frame with reserved non-control <b>Opcode = 6</b> and non-empty payload, then send Ping.",
    "droppedByMe": false,
-   "duration": 7,
+   "duration": 5,
    "expectation": "Echo for first message is received, but then connection is failed immediately, since reserved opcode frame is used. A Pong is not received.",
    "expected": {
       "NON-STRICT": [],
@@ -28,51 +28,38 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: Wia+TewLx+dfcppPnhS4Aw==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: XK/NeUcpSMNhIbKHZiBdf0HRIKA=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: epboN0H9zsDior03R4fbuw==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: LJty8EtWVXchGtyI3M4wnVXM3Nk=\r\n\r\n",
    "id": "4.1.4",
    "isServer": false,
-   "localCloseCode": 1000,
+   "localCloseCode": null,
    "localCloseReason": null,
-   "received": [
-      [
-         "message",
-         "Hello, world!",
-         false
-      ]
-   ],
-   "remoteCloseCode": 1002,
+   "received": [],
+   "remoteCloseCode": null,
    "remoteCloseReason": null,
    "reportCompressionRatio": false,
    "reportTime": false,
    "result": "Actual events match at least one expected.",
    "resultClose": "Connection was properly closed",
-   "rxFrameStats": {
-      "1": 1,
-      "8": 1
-   },
+   "rxFrameStats": {},
    "rxOctetStats": {
-      "4": 1,
-      "15": 1,
       "139": 1
    },
-   "started": "2019-12-17T14:00:04.649Z",
+   "started": "2019-12-28T17:27:43.238Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 1,
       "6": 1,
-      "8": 1,
       "9": 1
    },
    "txOctetStats": {
       "6": 1,
-      "8": 1,
       "19": 2,
       "240": 1
    },
-   "wasClean": true,
+   "wasClean": false,
    "wasCloseHandshakeTimeout": false,
-   "wasNotCleanReason": null,
+   "wasNotCleanReason": "peer dropped the TCP connection without previous WebSocket closing handshake",
    "wasOpenHandshakeTimeout": false,
    "wasServerConnectionDropTimeout": false,
    "wirelog": [
@@ -100,7 +87,7 @@
          1,
          true,
          0,
-         "9ac009e2",
+         "54792f78",
          null,
          null,
          false
@@ -109,7 +96,7 @@
          "TO",
          [
             19,
-            "818d9ac009e2d2a5658ef5ec2995f5b26586bb"
+            "818d54792f781c1c43143b550f0f3b0b431c75"
          ],
          false
       ],
@@ -122,7 +109,7 @@
          6,
          true,
          0,
-         "a8f03de6",
+         "12e745c6",
          null,
          null,
          false
@@ -131,7 +118,7 @@
          "TO",
          [
             19,
-            "868da8f03de6e095518ac7dc1d91c782518289"
+            "868d12e745c65a8229aa7dcb65b17d9529a233"
          ],
          false
       ],
@@ -144,7 +131,7 @@
          9,
          true,
          0,
-         "5f31b914",
+         "8819ac1e",
          null,
          null,
          false
@@ -153,73 +140,13 @@
          "TO",
          [
             6,
-            "89805f31b914"
+            "89808819ac1e"
          ],
          false
       ],
       [
          "KL",
          1
-      ],
-      [
-         "RO",
-         [
-            15,
-            "810d48656c6c6f2c20776f726c6421"
-         ]
-      ],
-      [
-         "RF",
-         [
-            13,
-            "Hello, world!"
-         ],
-         1,
-         true,
-         0,
-         false,
-         null
-      ],
-      [
-         "RO",
-         [
-            4,
-            "880203ea"
-         ]
-      ],
-      [
-         "RF",
-         [
-            2,
-            "0x03ea"
-         ],
-         8,
-         true,
-         0,
-         false,
-         null
-      ],
-      [
-         "TF",
-         [
-            2,
-            "0x03e8"
-         ],
-         8,
-         true,
-         0,
-         "cf585a49",
-         null,
-         null,
-         false
-      ],
-      [
-         "TO",
-         [
-            8,
-            "8882cf585a49ccb0"
-         ],
-         false
       ]
    ]
 }

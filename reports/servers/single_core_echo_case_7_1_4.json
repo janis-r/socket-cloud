@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send text message after sending a close frame.",
    "droppedByMe": false,
-   "duration": 11,
+   "duration": 12,
    "expectation": "Clean close with normal code. Text message ignored.",
    "expected": {
       "OK": []
@@ -21,8 +21,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: pnyS6lL2bcxZttHc4o2gTA==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: vChoF869dbRWyndl2TwLJlMf4tQ=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: kbqlo7Ep76/lj6zB6aApsg==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: BjD0L6MS/yetwftTGJMUbK+1ZWg=\r\n\r\n",
    "id": "7.1.4",
    "isServer": false,
    "localCloseCode": 1000,
@@ -41,7 +41,7 @@
       "4": 1,
       "139": 1
    },
-   "started": "2019-12-17T14:00:20.500Z",
+   "started": "2019-12-28T17:27:59.195Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 1,
@@ -82,7 +82,7 @@
          8,
          true,
          0,
-         "5bd07e37",
+         "51d7d846",
          null,
          null,
          false
@@ -91,7 +91,7 @@
          "TO",
          [
             8,
-            "88825bd07e375838"
+            "888251d7d846523f"
          ],
          false
       ],
@@ -104,7 +104,7 @@
          1,
          true,
          0,
-         "ec462a5b",
+         "e6dd14a7",
          null,
          null,
          false
@@ -113,7 +113,7 @@
          "TO",
          [
             18,
-            "818cec462a5ba423463783667d349e2a4e7a"
+            "818ce6dd14a7aeb878cb89fd43c894b17086"
          ],
          false
       ],

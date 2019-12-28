@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send small text message, then send again with <b>RSV = 2</b>, then send Ping.",
    "droppedByMe": false,
-   "duration": 11,
+   "duration": 20,
    "expectation": "Echo for first message is received, but then connection is failed immediately, since RSV must be 0, when no extension defining RSV meaning has been negotiated. The Pong is not received.",
    "expected": {
       "NON-STRICT": [],
@@ -28,8 +28,8 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: y1YZnADkIlDxMc4UXVihyg==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: BcQW8tMOCb8Ats7eJ+fP9b9vY50=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: 8m41NB9wEJac8tGLMcQQ+A==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: w/gKnWobsKFr/6ZdXfALuENGrQw=\r\n\r\n",
    "id": "3.2",
    "isServer": false,
    "localCloseCode": 1000,
@@ -42,7 +42,7 @@
       ]
    ],
    "remoteCloseCode": 1002,
-   "remoteCloseReason": null,
+   "remoteCloseReason": "Some RSV fields have not being reset by extensions",
    "reportCompressionRatio": false,
    "reportTime": false,
    "result": "Actual events match at least one expected.",
@@ -52,11 +52,11 @@
       "8": 1
    },
    "rxOctetStats": {
-      "4": 1,
       "15": 1,
+      "54": 1,
       "139": 1
    },
-   "started": "2019-12-17T14:00:04.328Z",
+   "started": "2019-12-28T17:27:42.916Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 2,
@@ -99,7 +99,7 @@
          1,
          true,
          0,
-         "f0a8885b",
+         "4bd60118",
          null,
          null,
          false
@@ -108,7 +108,7 @@
          "TO",
          [
             19,
-            "818df0a8885bb8cde4379f84a82c9fdae43fd1"
+            "818d4bd6011803b36d7424fa216f24a46d7c6a"
          ],
          false
       ],
@@ -121,7 +121,7 @@
          1,
          true,
          2,
-         "b397c2e4",
+         "6c907fd9",
          null,
          null,
          false
@@ -130,7 +130,7 @@
          "TO",
          [
             19,
-            "a18db397c2e4fbf2ae88dcbbe293dce5ae8092"
+            "a18d6c907fd924f513b503bc5fae03e213bd4d"
          ],
          false
       ],
@@ -143,7 +143,7 @@
          9,
          true,
          0,
-         "7cbdec6b",
+         "bd27375b",
          null,
          null,
          false
@@ -152,7 +152,7 @@
          "TO",
          [
             6,
-            "89807cbdec6b"
+            "8980bd27375b"
          ],
          false
       ],
@@ -182,15 +182,15 @@
       [
          "RO",
          [
-            4,
-            "880203ea"
+            54,
+            "883403ea536f6d6520525356206669656c64732068617665206e6f74206265696e6720726573657420627920657874656e73696f6e73"
          ]
       ],
       [
          "RF",
          [
-            2,
-            "0x03ea"
+            52,
+            "0x03ea536f6d6520525356206669656c64732068617665206e6f74206265696e6720726573657420627920657874656e73696f6e73"
          ],
          8,
          true,
@@ -207,7 +207,7 @@
          8,
          true,
          0,
-         "7aef8135",
+         "af95a716",
          null,
          null,
          false
@@ -216,7 +216,7 @@
          "TO",
          [
             8,
-            "88827aef81357907"
+            "8882af95a716ac7d"
          ],
          false
       ]

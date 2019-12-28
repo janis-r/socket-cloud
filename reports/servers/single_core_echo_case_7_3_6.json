@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send a close frame with close code and close reason which is too long (124) - total frame payload 126 octets",
    "droppedByMe": false,
-   "duration": 5,
+   "duration": 7,
    "expectation": "Clean close with protocol error code or dropped TCP connection.",
    "expected": {
       "OK": []
@@ -21,15 +21,15 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: 6Pm1+a70kKUohRyLFFEGgg==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: lv/IjVGHA3wznYhT3JpurdH/oM8=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: zKwBDFVu2iE94KwzRf/kXw==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: xLFbO3hGNPKeTITKwufO/Hau0PU=\r\n\r\n",
    "id": "7.3.6",
    "isServer": false,
    "localCloseCode": 1000,
    "localCloseReason": "****************************************************************************************************************************",
    "received": [],
    "remoteCloseCode": 1002,
-   "remoteCloseReason": null,
+   "remoteCloseReason": "Close frame payload too long",
    "reportCompressionRatio": false,
    "reportTime": false,
    "result": "Actual events match at least one expected.",
@@ -38,10 +38,10 @@
       "8": 1
    },
    "rxOctetStats": {
-      "4": 1,
+      "32": 1,
       "139": 1
    },
-   "started": "2019-12-17T14:00:20.767Z",
+   "started": "2019-12-28T17:27:59.464Z",
    "trafficStats": null,
    "txFrameStats": {
       "8": 1
@@ -80,7 +80,7 @@
          8,
          true,
          0,
-         "2b4e7f30",
+         "3d010748",
          null,
          null,
          false
@@ -89,7 +89,7 @@
          "TO",
          [
             134,
-            "88fe007e2b4e7f3028a6551a0164551a0164551a0164551a0164551a0164551a0164551a0164551a0164551a0164551a0164551a0164551a0164551a0164551a ..."
+            "88fe007e3d0107483ee92d62172b2d62172b2d62172b2d62172b2d62172b2d62172b2d62172b2d62172b2d62172b2d62172b2d62172b2d62172b2d62172b2d62 ..."
          ],
          false
       ],
@@ -100,15 +100,15 @@
       [
          "RO",
          [
-            4,
-            "880203ea"
+            32,
+            "881e03ea436c6f7365206672616d65207061796c6f616420746f6f206c6f6e67"
          ]
       ],
       [
          "RF",
          [
-            2,
-            "0x03ea"
+            30,
+            "0x03ea436c6f7365206672616d65207061796c6f616420746f6f206c6f6e67"
          ],
          8,
          true,

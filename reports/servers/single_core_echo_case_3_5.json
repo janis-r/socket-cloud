@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send small binary message with <b>RSV = 5</b>.",
    "droppedByMe": false,
-   "duration": 11,
+   "duration": 16,
    "expectation": "The connection is failed immediately, since RSV must be 0.",
    "expected": {
       "OK": []
@@ -21,15 +21,15 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: plwhBziOElV2fSkEF2ljbA==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 9S7ikKuPmB8Oi6GhIFDW9H+Tzlw=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: dYTwrCQxC0gKTK7lXKzo2w==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 63g9SBqbbV4HFtZkeGRYoKlmbZg=\r\n\r\n",
    "id": "3.5",
    "isServer": false,
    "localCloseCode": 1000,
    "localCloseReason": null,
    "received": [],
    "remoteCloseCode": 1002,
-   "remoteCloseReason": null,
+   "remoteCloseReason": "Some RSV fields have not being reset by extensions",
    "reportCompressionRatio": false,
    "reportTime": false,
    "result": "Actual events match at least one expected.",
@@ -38,10 +38,10 @@
       "8": 1
    },
    "rxOctetStats": {
-      "4": 1,
+      "54": 1,
       "139": 1
    },
-   "started": "2019-12-17T14:00:04.450Z",
+   "started": "2019-12-28T17:27:43.056Z",
    "trafficStats": null,
    "txFrameStats": {
       "2": 1,
@@ -82,7 +82,7 @@
          2,
          true,
          5,
-         "7256a569",
+         "e37de4de",
          null,
          null,
          false
@@ -91,7 +91,7 @@
          "TO",
          [
             14,
-            "d2887256a56972a95b948eada596"
+            "d288e37de4dee3821a231f86e421"
          ],
          false
       ],
@@ -102,15 +102,15 @@
       [
          "RO",
          [
-            4,
-            "880203ea"
+            54,
+            "883403ea536f6d6520525356206669656c64732068617665206e6f74206265696e6720726573657420627920657874656e73696f6e73"
          ]
       ],
       [
          "RF",
          [
-            2,
-            "0x03ea"
+            52,
+            "0x03ea536f6d6520525356206669656c64732068617665206e6f74206265696e6720726573657420627920657874656e73696f6e73"
          ],
          8,
          true,
@@ -127,7 +127,7 @@
          8,
          true,
          0,
-         "00ace898",
+         "8c5bf158",
          null,
          null,
          false
@@ -136,7 +136,7 @@
          "TO",
          [
             8,
-            "888200ace8980344"
+            "88828c5bf1588fb3"
          ],
          false
       ]

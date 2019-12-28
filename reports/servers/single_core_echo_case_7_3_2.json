@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send a close frame with payload length 1",
    "droppedByMe": false,
-   "duration": 9,
+   "duration": 10,
    "expectation": "Clean close with protocol error or drop TCP.",
    "expected": {
       "OK": []
@@ -21,15 +21,15 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: F/mEobv/9VJfkEi1/l7RQg==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: ER/NbPTloy0uFkWh6T8zK4uGIi4=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: e7FOOD652jNs8uu//+YgiQ==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: V5rGIPMqKYgpixanBRvg4NlSjHM=\r\n\r\n",
    "id": "7.3.2",
    "isServer": false,
    "localCloseCode": null,
    "localCloseReason": "a",
    "received": [],
    "remoteCloseCode": 1002,
-   "remoteCloseReason": null,
+   "remoteCloseReason": "Close frame payload too short (1 byte)",
    "reportCompressionRatio": false,
    "reportTime": false,
    "result": "Actual events match at least one expected.",
@@ -38,10 +38,10 @@
       "8": 1
    },
    "rxOctetStats": {
-      "4": 1,
+      "42": 1,
       "139": 1
    },
-   "started": "2019-12-17T14:00:20.638Z",
+   "started": "2019-12-28T17:27:59.337Z",
    "trafficStats": null,
    "txFrameStats": {
       "8": 1
@@ -80,7 +80,7 @@
          8,
          true,
          0,
-         "0ea53884",
+         "fe192f4b",
          null,
          null,
          false
@@ -89,7 +89,7 @@
          "TO",
          [
             7,
-            "88810ea538846f"
+            "8881fe192f4b9f"
          ],
          false
       ],
@@ -100,15 +100,15 @@
       [
          "RO",
          [
-            4,
-            "880203ea"
+            42,
+            "882803ea436c6f7365206672616d65207061796c6f616420746f6f2073686f7274202831206279746529"
          ]
       ],
       [
          "RF",
          [
-            2,
-            "0x03ea"
+            40,
+            "0x03ea436c6f7365206672616d65207061796c6f616420746f6f2073686f7274202831206279746529"
          ],
          8,
          true,

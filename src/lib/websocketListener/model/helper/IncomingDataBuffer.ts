@@ -8,19 +8,23 @@ import {
 } from "../../util/websocket-utils";
 import chalk from "chalk";
 import {debug} from "../WebsocketClientConnection";
+import {CallbackCollection} from "../../../utils/CallbackCollection";
 
 /**
  * Utility class to buffer up incoming websocket data until they make up full data frame.
  */
 export class IncomingDataBuffer {
 
+    private dataCallback = new CallbackCollection<DataFrame>();
     private chunks = new Array<Buffer>();
     private process: () => void | null = null;
     private _destroyed = false;
 
-    constructor(private readonly dataHandler: (dataFrame: DataFrame) => void) {
+    constructor() {
         this.processNextFrame();
     }
+
+    readonly onData = this.dataCallback.polymorph;
 
     write(chunk: Buffer): void {
         if (!chunk || !(chunk instanceof Buffer)) {
@@ -108,7 +112,7 @@ export class IncomingDataBuffer {
             return;
         }
 
-        this.dataHandler({type, isFinal, rsv1, rsv2, rsv3, payload, masked});
+        this.dataCallback.execute({type, isFinal, rsv1, rsv2, rsv3, payload, masked});
         this.processNextFrame();
     }
 }

@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send small text message, then send again with <b>RSV = 3</b>, then send Ping. Octets are sent in frame-wise chops. Octets are sent in octet-wise chops.",
    "droppedByMe": false,
-   "duration": 13,
+   "duration": 19,
    "expectation": "Echo for first message is received, but then connection is failed immediately, since RSV must be 0, when no extension defining RSV meaning has been negotiated. The Pong is not received.",
    "expected": {
       "NON-STRICT": [],
@@ -28,8 +28,8 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: LWjchJ58zsJTw8JUiyADuQ==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: ppCgN2FXxdRknHhzUFAsl/12fwc=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: VjHciFlp3vMHAAhWSByyUA==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: U15/WP7cKIxdsNbTxYU83iGuhpI=\r\n\r\n",
    "id": "3.3",
    "isServer": false,
    "localCloseCode": 1000,
@@ -42,7 +42,7 @@
       ]
    ],
    "remoteCloseCode": 1002,
-   "remoteCloseReason": null,
+   "remoteCloseReason": "Some RSV fields have not being reset by extensions",
    "reportCompressionRatio": false,
    "reportTime": false,
    "result": "Actual events match at least one expected.",
@@ -52,11 +52,11 @@
       "8": 1
    },
    "rxOctetStats": {
-      "4": 1,
       "15": 1,
+      "54": 1,
       "139": 1
    },
-   "started": "2019-12-17T14:00:04.369Z",
+   "started": "2019-12-28T17:27:42.965Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 2,
@@ -99,7 +99,7 @@
          1,
          true,
          0,
-         "72bb49df",
+         "3efbf341",
          null,
          null,
          true
@@ -108,7 +108,7 @@
          "TO",
          [
             19,
-            "818d72bb49df3ade25b31d9769a81dc925bb53"
+            "818d3efbf341769e9f2d51d7d33651899f251f"
          ],
          true
       ],
@@ -121,7 +121,7 @@
          1,
          true,
          3,
-         "abaefb57",
+         "da1eeeac",
          null,
          null,
          true
@@ -135,7 +135,7 @@
          9,
          true,
          0,
-         "7c4e5a82",
+         "4861feef",
          null,
          null,
          true
@@ -148,7 +148,7 @@
          "TO",
          [
             19,
-            "b18dabaefb57e3cb973bc482db20c4dc97338a"
+            "b18dda1eeeac927b82c0b532cedbb56c82c8fb"
          ],
          true
       ],
@@ -156,7 +156,7 @@
          "TO",
          [
             6,
-            "89807c4e5a82"
+            "89804861feef"
          ],
          true
       ],
@@ -182,15 +182,15 @@
       [
          "RO",
          [
-            4,
-            "880203ea"
+            54,
+            "883403ea536f6d6520525356206669656c64732068617665206e6f74206265696e6720726573657420627920657874656e73696f6e73"
          ]
       ],
       [
          "RF",
          [
-            2,
-            "0x03ea"
+            52,
+            "0x03ea536f6d6520525356206669656c64732068617665206e6f74206265696e6720726573657420627920657874656e73696f6e73"
          ],
          8,
          true,
@@ -207,7 +207,7 @@
          8,
          true,
          0,
-         "c29e537b",
+         "df4ad551",
          null,
          null,
          false
@@ -216,7 +216,7 @@
          "TO",
          [
             8,
-            "8882c29e537bc176"
+            "8882df4ad551dca2"
          ],
          false
       ]

@@ -10,7 +10,7 @@
     "sourceMap": false,
     "declaration": true,
     "downlevelIteration": true,
-//    "strict": true,
+    //    "strict": true,
     "esModuleInterop": true,
     "strictPropertyInitialization": false,
     "lib": [
@@ -18,13 +18,9 @@
     ],
     "baseUrl": "./src",
     "paths": {
-      "@util/*": ["lib/util/index"]
+      "@util/*": [
+        "lib/util/index"
+      ]
     }
-  }/*,
-  "include": [
-    "./src"
-  ],
-  "exclude": [
-    "./test"
-  ]*/
+  }
 }

@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send 1000 compressed messages each of payload size 8192, auto-fragment to 256 octets. Use permessage-deflate client offers (requestNoContextTakeover, requestMaxWindowBits): [(True, 8), (True, 0), (False, 0)]",
    "droppedByMe": false,
-   "duration": 2278,
+   "duration": 2344,
    "expectation": "Receive echo'ed messages (with payload as sent). Timeout case after 480 secs.",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: KVUa7pBgg3rjjZsxvPlm4g==\r\nSec-WebSocket-Extensions: permessage-deflate; client_no_context_takeover; client_max_window_bits; server_no_context_takeover; server_max_window_bits=8, permessage-deflate; client_no_context_takeover; client_max_window_bits; server_no_context_takeover, permessage-deflate; client_no_context_takeover; client_max_window_bits\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: UzR35Ih8PhB7eKPjR0r/Jov5XP8=\r\nSec-WebSocket-Extensions: permessage-deflate;client_max_window_bits=15;server_max_window_bits=8;client_no_context_takeover;server_no_context_takeover\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: /fJD+2ioOB5Vl6vnmBJy1Q==\r\nSec-WebSocket-Extensions: permessage-deflate; client_no_context_takeover; client_max_window_bits; server_no_context_takeover; server_max_window_bits=8, permessage-deflate; client_no_context_takeover; client_max_window_bits; server_no_context_takeover, permessage-deflate; client_no_context_takeover; client_max_window_bits\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: A4MbngrD6Oew4u7Jl3lT1QAo0QY=\r\nSec-WebSocket-Extensions: permessage-deflate;client_max_window_bits=15;server_max_window_bits=8;client_no_context_takeover;server_no_context_takeover\r\n\r\n",
    "id": "13.7.11",
    "isServer": false,
    "localCloseCode": 1000,
@@ -215,7 +215,7 @@
       "597": 1,
       "598": 1
    },
-   "started": "2019-12-17T14:28:19.119Z",
+   "started": "2019-12-28T17:54:28.952Z",
    "trafficStats": {
       "incomingCompressionRatio": 0.0558089599609375,
       "incomingOctetsAppLevel": 8192000,
@@ -466,7 +466,7 @@
          8,
          true,
          0,
-         "f9ae46ed",
+         "fe55138c",
          null,
          null,
          false
@@ -475,7 +475,7 @@
          "TO",
          [
             8,
-            "8882f9ae46edfa46"
+            "8882fe55138cfdbd"
          ],
          false
       ],
