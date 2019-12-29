@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send 1000 compressed messages each of payload size 131072, auto-fragment to 256 octets. Use permessage-deflate client offers (requestNoContextTakeover, requestMaxWindowBits): [(True, 15)]",
    "droppedByMe": false,
-   "duration": 6698,
+   "duration": 6978,
    "expectation": "Receive echo'ed messages (with payload as sent). Timeout case after 480 secs.",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: KW1pOVEgCYJKbfyDYhdlzw==\r\nSec-WebSocket-Extensions: permessage-deflate; client_no_context_takeover; client_max_window_bits; server_no_context_takeover; server_max_window_bits=15\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: tw3PUXs300ZeYjKJlE5ZNzssaYo=\r\nSec-WebSocket-Extensions: permessage-deflate;client_max_window_bits=15;server_max_window_bits=15;client_no_context_takeover;server_no_context_takeover\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: e8xdJYJCnmHKw4+QWMJ3Xg==\r\nSec-WebSocket-Extensions: permessage-deflate; client_no_context_takeover; client_max_window_bits; server_no_context_takeover; server_max_window_bits=15\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 840O9GjvOVhdsUJAcLS+i10LJ7I=\r\nSec-WebSocket-Extensions: permessage-deflate;client_max_window_bits=15;server_max_window_bits=15;client_no_context_takeover;server_no_context_takeover\r\n\r\n",
    "id": "13.6.15",
    "isServer": false,
    "localCloseCode": 1000,
@@ -205,7 +205,7 @@
       "5881": 1,
       "5882": 1
    },
-   "started": "2019-12-28T17:53:16.211Z",
+   "started": "2019-12-29T09:45:46.266Z",
    "trafficStats": {
       "incomingCompressionRatio": 0.044211257934570314,
       "incomingOctetsAppLevel": 131072000,
@@ -441,7 +441,7 @@
          8,
          true,
          0,
-         "61a86738",
+         "d33c5eca",
          null,
          null,
          false
@@ -450,7 +450,7 @@
          "TO",
          [
             8,
-            "888261a867386240"
+            "8882d33c5ecad0d4"
          ],
          false
       ],

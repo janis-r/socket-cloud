@@ -1,5 +1,5 @@
-import {IncomingDataBuffer} from "./IncomingDataBuffer";
-import {DataFrame} from "../../data/DataFrame";
+import {WebsocketDataBuffer} from "./WebsocketDataBuffer";
+import {DataFrame} from "../data/DataFrame";
 
 describe("websocket incoming data buffer", () => {
     
@@ -15,7 +15,7 @@ describe("websocket incoming data buffer", () => {
         };
 
         const parsedMessages = new Array<DataFrame>();
-        const dataBuffer = new IncomingDataBuffer();
+        const dataBuffer = new WebsocketDataBuffer();
         dataBuffer.onData(dataFrame => parsedMessages.push(dataFrame));
         dataBuffer.write(Buffer.from(messageBytes));
 

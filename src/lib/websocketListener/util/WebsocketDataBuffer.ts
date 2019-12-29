@@ -1,19 +1,19 @@
-import {DataFrame} from "../../data/DataFrame";
+import {DataFrame} from "../data/DataFrame";
 import {
     applyXorMask,
     decomposeHeader,
     decomposeWebSocketFrame,
     getMaskBytes,
     read64BitPayloadLength
-} from "../../util/websocket-utils";
+} from "./websocket-utils";
 import chalk from "chalk";
-import {debug} from "../WebsocketClientConnection";
-import {CallbackCollection} from "../../../utils/CallbackCollection";
+import {debug} from "../model/WebsocketClientConnection";
+import {CallbackCollection} from "../../utils/CallbackCollection";
 
 /**
- * Utility class to buffer up incoming websocket data until they make up full data frame.
+ * Utility class to buffer up websocket data until they make up full data frame.
  */
-export class IncomingDataBuffer {
+export class WebsocketDataBuffer {
 
     private dataCallback = new CallbackCollection<DataFrame>();
     private chunks = new Array<Buffer>();
@@ -24,8 +24,15 @@ export class IncomingDataBuffer {
         this.processNextFrame();
     }
 
+    /**
+     * Frame data ready callback
+     */
     readonly onData = this.dataCallback.polymorph;
 
+    /**
+     * Write chunk of binary data to websocket frame data buffer
+     * @param chunk
+     */
     write(chunk: Buffer): void {
         if (!chunk || !(chunk instanceof Buffer)) {
             throw new Error(`This: (${chunk}) is not a Buffer! @WebsocketIncomingDataBuffer:write`);
@@ -95,7 +102,7 @@ export class IncomingDataBuffer {
     };
 
     private async processNextFrame(): Promise<void> {
-        const {read} = this;
+        const {read, dataCallback: {execute: dispatchFrame}} = this;
         const {type, isFinal, rsv1, rsv2, rsv3, masked, payloadLength} = decomposeHeader(await read(2));
 
         let extendedPayloadLength: number;
@@ -112,7 +119,7 @@ export class IncomingDataBuffer {
             return;
         }
 
-        this.dataCallback.execute({type, isFinal, rsv1, rsv2, rsv3, payload, masked});
+        dispatchFrame({type, isFinal, rsv1, rsv2, rsv3, payload, masked});
         this.processNextFrame();
     }
 }

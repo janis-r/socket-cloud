@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send 1000 compressed messages each of payload size 4096, auto-fragment to 0 octets. Use permessage-deflate client offers (requestNoContextTakeover, requestMaxWindowBits): [(True, 8)]",
    "droppedByMe": false,
-   "duration": 2093,
+   "duration": 1931,
    "expectation": "Receive echo'ed messages (with payload as sent). Timeout case after 480 secs.",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: R+cL1iOvvnw3Qx6Aw612jQ==\r\nSec-WebSocket-Extensions: permessage-deflate; client_no_context_takeover; client_max_window_bits; server_no_context_takeover; server_max_window_bits=8\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: w+xZCFs4ssM4buE+KfCZfkXKJAI=\r\nSec-WebSocket-Extensions: permessage-deflate;client_max_window_bits=15;server_max_window_bits=8;client_no_context_takeover;server_no_context_takeover\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: Bl11cmx7vRpoQvhVSIuRXg==\r\nSec-WebSocket-Extensions: permessage-deflate; client_no_context_takeover; client_max_window_bits; server_no_context_takeover; server_max_window_bits=8\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: cRmsvd2wjAPlaBleyLMPQFcKOI4=\r\nSec-WebSocket-Extensions: permessage-deflate;client_max_window_bits=15;server_max_window_bits=8;client_no_context_takeover;server_no_context_takeover\r\n\r\n",
    "id": "13.5.5",
    "isServer": false,
    "localCloseCode": 1000,
@@ -156,7 +156,7 @@
       "389": 1,
       "390": 1
    },
-   "started": "2019-12-28T17:50:52.355Z",
+   "started": "2019-12-29T09:43:32.487Z",
    "trafficStats": {
       "incomingCompressionRatio": 0.073437255859375,
       "incomingOctetsAppLevel": 4096000,
@@ -342,7 +342,7 @@
          8,
          true,
          0,
-         "5ea6d3ee",
+         "2a500673",
          null,
          null,
          false
@@ -351,7 +351,7 @@
          "TO",
          [
             8,
-            "88825ea6d3ee5d4e"
+            "88822a50067329b8"
          ],
          false
       ],

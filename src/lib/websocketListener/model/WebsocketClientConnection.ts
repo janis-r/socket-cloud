@@ -12,7 +12,7 @@ import {WebsocketDescriptor} from "../data/SocketDescriptor";
 import {ClientConnectionEventBase} from "./ClientConnectionEventBase";
 import {OutgoingMessageBuffer} from "./helper/OutgoingMessageBuffer";
 import {KeepAliveManager} from "./clientExtensions/KeepAliveManager";
-import {IncomingMessageManager} from "./helper/IncomingMessageManager";
+import {IncomingMessageBuffer} from "./helper/IncomingMessageBuffer";
 import {ExecutionQueue} from "ugd10a";
 import chalk from "chalk";
 
@@ -24,7 +24,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
 
     private _state = ConnectionState.Connecting;
 
-    private readonly incomingMessageManager: IncomingMessageManager;
+    private readonly incomingMessageManager: IncomingMessageBuffer;
     private readonly outgoingDataBuffer: OutgoingMessageBuffer;
 
     private readonly outgoingMessagePreparationQueue = new ExecutionQueue();
@@ -43,7 +43,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         debug && console.log({descriptor, context});
 
         this.keepAliveManager = new KeepAliveManager(this);
-        this.incomingMessageManager = new IncomingMessageManager();
+        this.incomingMessageManager = new IncomingMessageBuffer();
         this.outgoingDataBuffer = new OutgoingMessageBuffer(socket);
 
         const {incomingMessageManager, parsedDataHandler} = this;
@@ -51,6 +51,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         incomingMessageManager.onData(parsedDataHandler);
         incomingMessageManager.onError(error => {
             // this.close(CloseCode.ProtocolError, error);
+            this.dispatchEvent(new ErrorEvent(this, error));
             this.setState(ConnectionState.Closing);
             this.socket.end();
         });
@@ -280,5 +281,6 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
 
     private readonly socketCloseHandler = () => {
         this.setState(ConnectionState.Closed);
+        this.incomingMessageManager.destroy();
     }
 }

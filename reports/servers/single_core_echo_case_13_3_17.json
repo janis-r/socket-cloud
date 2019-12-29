@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send 1000 compressed messages each of payload size 131072, auto-fragment to 4096 octets. Use permessage-deflate client offers (requestNoContextTakeover, requestMaxWindowBits): [(False, 8)]",
    "droppedByMe": false,
-   "duration": 11582,
+   "duration": 12093,
    "expectation": "Receive echo'ed messages (with payload as sent). Timeout case after 480 secs.",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: epPOWN72YqSHBP+xDrRCxQ==\r\nSec-WebSocket-Extensions: permessage-deflate; client_no_context_takeover; client_max_window_bits; server_max_window_bits=8\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: ehK0/mx9E9DFPn+C68ZNzgsSKbU=\r\nSec-WebSocket-Extensions: permessage-deflate;client_max_window_bits=15;server_max_window_bits=8;client_no_context_takeover\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: HLynAm0h3rTN0TjKfbUXeg==\r\nSec-WebSocket-Extensions: permessage-deflate; client_no_context_takeover; client_max_window_bits; server_max_window_bits=8\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: MJbR5FHMmk4acRNEbOqXvwSaSq0=\r\nSec-WebSocket-Extensions: permessage-deflate;client_max_window_bits=15;server_max_window_bits=8;client_no_context_takeover\r\n\r\n",
    "id": "13.3.17",
    "isServer": false,
    "localCloseCode": 1000,
@@ -333,7 +333,7 @@
       "5148": 1,
       "5151": 1
    },
-   "started": "2019-12-28T17:49:02.905Z",
+   "started": "2019-12-29T09:41:57.820Z",
    "trafficStats": {
       "incomingCompressionRatio": 0.03805109405517578,
       "incomingOctetsAppLevel": 131072000,
@@ -569,7 +569,7 @@
          8,
          true,
          0,
-         "8a055596",
+         "e1d50c28",
          null,
          null,
          false
@@ -578,7 +578,7 @@
          "TO",
          [
             8,
-            "88828a05559689ed"
+            "8882e1d50c28e23d"
          ],
          false
       ],

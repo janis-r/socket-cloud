@@ -9,7 +9,7 @@ export type DataFrame = {
     payload: Buffer;
     /**
      * Defines if incoming data were masked for object that has been decomposed into value object and provides
-     * instructions on how to render binary version of value object when it goes other way around
+     * instructions on how to render binary version of value object when it goes the other way around
      */
     masked: boolean;
 }

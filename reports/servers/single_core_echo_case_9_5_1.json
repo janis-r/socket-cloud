@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send text message message with payload of length 1 * 2**20 (1M). Sent out data in chops of 64 octets.",
    "droppedByMe": false,
-   "duration": 3524,
+   "duration": 3776,
    "expectation": "Receive echo'ed text message (with payload as sent).",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: KfX9Pvj04k5CKI3eFMsB3g==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: w4wZ33cxNcns0yQg4xewHqEA9eI=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: nY6yNd9c2XK0Uy3mxOF6jA==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: k1rPaINMacX/6U9YO2xXDhcqltE=\r\n\r\n",
    "id": "9.5.1",
    "isServer": false,
    "localCloseCode": 1000,
@@ -41,11 +41,12 @@
       "4": 1,
       "139": 1,
       "16388": 2,
+      "16612": 1,
+      "32776": 1,
       "49164": 1,
-      "49388": 1,
       "65536": 14
    },
-   "started": "2019-12-28T17:28:12.495Z",
+   "started": "2019-12-29T09:19:23.316Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 1,
@@ -91,7 +92,7 @@
          8,
          true,
          0,
-         "88a14bfd",
+         "8281b012",
          null,
          null,
          false
@@ -100,7 +101,7 @@
          "TO",
          [
             8,
-            "888288a14bfd8b49"
+            "88828281b0128169"
          ],
          false
       ],
