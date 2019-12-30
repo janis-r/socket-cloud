@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send a text message with payload which is not valid UTF-8 in one fragment.<br><br>Payload: 0xe09fbf",
    "droppedByMe": false,
-   "duration": 11,
+   "duration": 14,
    "expectation": "The connection is failed immediately, since the payload is not valid UTF-8.",
    "expected": {
       "OK": []
@@ -22,40 +22,35 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: yii7iDQ1R0pMYj5LXedSjw==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: PF4fI04Aue9kQCjbxssC/Uy7H4c=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: sYRSXpZXJ+1QgroAdHU6xA==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: aYmG2H/4Hq7y9gpYs43iqEzoUHk=\r\n\r\n",
    "id": "6.18.2",
    "isServer": false,
-   "localCloseCode": 1000,
+   "localCloseCode": null,
    "localCloseReason": null,
    "received": [],
-   "remoteCloseCode": 1007,
-   "remoteCloseReason": "Received invalid UTF8 content",
+   "remoteCloseCode": null,
+   "remoteCloseReason": null,
    "reportCompressionRatio": false,
    "reportTime": false,
    "result": "Actual events match at least one expected.",
    "resultClose": "Connection was properly closed",
-   "rxFrameStats": {
-      "8": 1
-   },
+   "rxFrameStats": {},
    "rxOctetStats": {
-      "33": 1,
       "139": 1
    },
-   "started": "2019-12-29T09:19:06.936Z",
+   "started": "2019-12-30T09:25:38.769Z",
    "trafficStats": null,
    "txFrameStats": {
-      "1": 1,
-      "8": 1
+      "1": 1
    },
    "txOctetStats": {
-      "8": 1,
       "9": 1,
       "240": 1
    },
-   "wasClean": true,
+   "wasClean": false,
    "wasCloseHandshakeTimeout": false,
-   "wasNotCleanReason": null,
+   "wasNotCleanReason": "peer dropped the TCP connection without previous WebSocket closing handshake",
    "wasOpenHandshakeTimeout": false,
    "wasServerConnectionDropTimeout": false,
    "wirelog": [
@@ -83,7 +78,7 @@
          1,
          true,
          0,
-         "ec053fa5",
+         "7c0b6a5e",
          null,
          null,
          false
@@ -92,54 +87,13 @@
          "TO",
          [
             9,
-            "8183ec053fa50c9a80"
+            "81837c0b6a5e9c94d5"
          ],
          false
       ],
       [
          "KL",
          0.5
-      ],
-      [
-         "RO",
-         [
-            33,
-            "881f03ef526563656976656420696e76616c6964205554463820636f6e74656e74"
-         ]
-      ],
-      [
-         "RF",
-         [
-            31,
-            "0x03ef526563656976656420696e76616c6964205554463820636f6e74656e74"
-         ],
-         8,
-         true,
-         0,
-         false,
-         null
-      ],
-      [
-         "TF",
-         [
-            2,
-            "0x03e8"
-         ],
-         8,
-         true,
-         0,
-         "37a5c72a",
-         null,
-         null,
-         false
-      ],
-      [
-         "TO",
-         [
-            8,
-            "888237a5c72a344d"
-         ],
-         false
       ]
    ]
 }

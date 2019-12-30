@@ -22,40 +22,35 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: PADSQokcbeI8d0VzKZzIUg==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: Pn9doM5PRNjXNO3rThTR4NhhPZ8=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: IizuW6K8tGt/i/EjK/wKqA==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: /4/ukVeRhu5XmueGglpDEnjDZD4=\r\n\r\n",
    "id": "6.13.1",
    "isServer": false,
-   "localCloseCode": 1000,
+   "localCloseCode": null,
    "localCloseReason": null,
    "received": [],
-   "remoteCloseCode": 1007,
-   "remoteCloseReason": "Received invalid UTF8 content",
+   "remoteCloseCode": null,
+   "remoteCloseReason": null,
    "reportCompressionRatio": false,
    "reportTime": false,
    "result": "Actual events match at least one expected.",
    "resultClose": "Connection was properly closed",
-   "rxFrameStats": {
-      "8": 1
-   },
+   "rxFrameStats": {},
    "rxOctetStats": {
-      "33": 1,
       "139": 1
    },
-   "started": "2019-12-29T09:19:05.986Z",
+   "started": "2019-12-30T09:25:37.874Z",
    "trafficStats": null,
    "txFrameStats": {
-      "1": 1,
-      "8": 1
+      "1": 1
    },
    "txOctetStats": {
-      "8": 1,
       "68": 1,
       "240": 1
    },
-   "wasClean": true,
+   "wasClean": false,
    "wasCloseHandshakeTimeout": false,
-   "wasNotCleanReason": null,
+   "wasNotCleanReason": "peer dropped the TCP connection without previous WebSocket closing handshake",
    "wasOpenHandshakeTimeout": false,
    "wasServerConnectionDropTimeout": false,
    "wirelog": [
@@ -83,7 +78,7 @@
          1,
          true,
          0,
-         "8ae131c2",
+         "03482400",
          null,
          null,
          false
@@ -92,54 +87,13 @@
          "TO",
          [
             68,
-            "81be8ae131c24ac1f0e248c1f2e24ec1f4e24cc1f6e242c1f8e240c1fae246c1fce244c1fee25ac1e0e258c1e2e25ec1e4e25cc1e6e252c1e8e250c1eae256c1 ..."
+            "81be03482400c368e520c168e720c768e120c568e320cb68ed20c968ef20cf68e920cd68eb20d368f520d168f720d768f120d568f320db68fd20d968ff20df68 ..."
          ],
          false
       ],
       [
          "KL",
          0.5
-      ],
-      [
-         "RO",
-         [
-            33,
-            "881f03ef526563656976656420696e76616c6964205554463820636f6e74656e74"
-         ]
-      ],
-      [
-         "RF",
-         [
-            31,
-            "0x03ef526563656976656420696e76616c6964205554463820636f6e74656e74"
-         ],
-         8,
-         true,
-         0,
-         false,
-         null
-      ],
-      [
-         "TF",
-         [
-            2,
-            "0x03e8"
-         ],
-         8,
-         true,
-         0,
-         "025e3f2d",
-         null,
-         null,
-         false
-      ],
-      [
-         "TO",
-         [
-            8,
-            "8882025e3f2d01b6"
-         ],
-         false
       ]
    ]
 }

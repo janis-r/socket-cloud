@@ -50,10 +50,8 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
 
         incomingMessageManager.onData(parsedDataHandler);
         incomingMessageManager.onError(error => {
-            // this.close(CloseCode.ProtocolError, error);
             this.dispatchEvent(new ErrorEvent(this, error));
-            this.setState(ConnectionState.Closing);
-            this.socket.end();
+            this.close(CloseCode.ProtocolError, error, true);
         });
 
         socket.on("data", incomingMessageManager.write);
@@ -88,9 +86,9 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         return this._state;
     }
 
-    async close(code: CloseCode = CloseCode.NormalClosure, reason?: string, data?: any): Promise<boolean> {
+    async close(code: CloseCode = CloseCode.NormalClosure, reason?: string, immediate?: boolean): Promise<boolean> {
         const {state, socket} = this;
-        console.log('>> close', {code, reason, data});
+        console.log('>> close', {code, reason, immediate});
         if (state >= ConnectionState.Closing) {
             return false;
         }
@@ -101,9 +99,14 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
             payload = Buffer.concat([payload, Buffer.from(reason)]);
         }
 
+        if (immediate) {
+            this.setState(ConnectionState.Closing);
+            socket.end();
+            return true;
+        }
+
         const closeMessageSent = this.sendDataFrame(spawnFrameData(DataFrameType.ConnectionClose, {payload}));
         this.setState(ConnectionState.Closing);
-
         await closeMessageSent;
         socket.end();
         return true;
@@ -147,12 +150,12 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         }
 
         if ([rsv1, rsv2, rsv3].includes(true)) {
-            this.close(ProtocolError, `Some RSV fields have not being reset by extensions`, dataFrame);
+            this.close(ProtocolError, `Some RSV fields have not being reset by extensions: ${JSON.stringify(dataFrame)}`, true);
             return;
         }
 
         if (type === TextFrame && !isValidUTF8(payload)) {
-            this.close(InvalidFramePayloadData, `Received invalid UTF8 content`, dataFrame);
+            this.close(InvalidFramePayloadData, `Received invalid UTF8 content: ${JSON.stringify(dataFrame)}`, true);
             return;
         }
 
@@ -237,7 +240,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
             newState: connectionStateToString(newState)
         });
         if (newState <= currentState) {
-            throw new Error(`Error while transitioning ws connection state: ${{currentState, newState}}`);
+            throw new Error(`Error while transitioning ws connection state - currentState: ${connectionStateToString(currentState)}, newState: ${connectionStateToString(newState)}`);
         }
 
         this._state = newState;

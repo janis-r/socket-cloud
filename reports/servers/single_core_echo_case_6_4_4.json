@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Same as Case 6.4.2, but we send message not in 3 frames, but in 3 chops of the same message frame.\n<br><br>MESSAGE PARTS:<br>\nPART1 = cebae1bdb9cf83cebcceb5f4<br>\nPART2 = 90<br>\nPART3 = <br>\n",
    "droppedByMe": false,
-   "duration": 2010,
+   "duration": 2017,
    "expectation": "The first chop is accepted, we expect to timeout on the first wait. The 2nd chop should be rejected immediately (fail fast on UTF-8). If we timeout, we expect the connection is failed at least then, since the complete message payload is not valid UTF-8.",
    "expected": {
       "NON-STRICT": [
@@ -37,11 +37,11 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: 98nCu/71zw6pEKREQ1Wbtg==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: SigTkxEpl6V9DdDuGOPQb1tMOTk=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: rOMNMrfTCWM4bHsKx41ayQ==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 6go5lq0jlVBBEjMidghS9BsxHy8=\r\n\r\n",
    "id": "6.4.4",
    "isServer": false,
-   "localCloseCode": 1000,
+   "localCloseCode": null,
    "localCloseReason": null,
    "received": [
       [
@@ -53,35 +53,31 @@
          "B"
       ]
    ],
-   "remoteCloseCode": 1007,
-   "remoteCloseReason": "Received invalid UTF8 content",
+   "remoteCloseCode": null,
+   "remoteCloseReason": null,
    "reportCompressionRatio": false,
    "reportTime": false,
    "result": "Actual events match at least one expected.",
    "resultClose": "Connection was properly closed",
-   "rxFrameStats": {
-      "8": 1
-   },
+   "rxFrameStats": {},
    "rxOctetStats": {
-      "33": 1,
       "139": 1
    },
-   "started": "2019-12-29T09:19:02.352Z",
+   "started": "2019-12-30T09:25:34.207Z",
    "trafficStats": null,
    "txFrameStats": {
-      "0": 1,
-      "8": 1
+      "0": 1
    },
    "txOctetStats": {
       "1": 1,
       "6": 2,
-      "8": 2,
+      "8": 1,
       "12": 1,
       "240": 1
    },
-   "wasClean": true,
+   "wasClean": false,
    "wasCloseHandshakeTimeout": false,
-   "wasNotCleanReason": null,
+   "wasNotCleanReason": "peer dropped the TCP connection without previous WebSocket closing handshake",
    "wasOpenHandshakeTimeout": false,
    "wasServerConnectionDropTimeout": false,
    "wirelog": [
@@ -104,7 +100,7 @@
          "TO",
          [
             6,
-            "0195dd463028"
+            "01959be8543e"
          ],
          false
       ],
@@ -112,7 +108,7 @@
          "TO",
          [
             12,
-            "13fcd1956489b3e6618885dc"
+            "5552b5832227d7f02726e1ca"
          ],
          false
       ],
@@ -129,7 +125,7 @@
          "TO",
          [
             1,
-            "4d"
+            "0b"
          ],
          false
       ],
@@ -146,7 +142,7 @@
          "TO",
          [
             8,
-            "c6b04db92f444db9"
+            "68d45bff81205bff"
          ],
          false
       ],
@@ -159,7 +155,7 @@
          0,
          true,
          0,
-         "b80bade4",
+         "560b705d",
          null,
          null,
          false
@@ -168,54 +164,13 @@
          "TO",
          [
             6,
-            "8080b80bade4"
+            "8080560b705d"
          ],
          false
       ],
       [
          "KL",
          1
-      ],
-      [
-         "RO",
-         [
-            33,
-            "881f03ef526563656976656420696e76616c6964205554463820636f6e74656e74"
-         ]
-      ],
-      [
-         "RF",
-         [
-            31,
-            "0x03ef526563656976656420696e76616c6964205554463820636f6e74656e74"
-         ],
-         8,
-         true,
-         0,
-         false,
-         null
-      ],
-      [
-         "TF",
-         [
-            2,
-            "0x03e8"
-         ],
-         8,
-         true,
-         0,
-         "f58444c8",
-         null,
-         null,
-         false
-      ],
-      [
-         "TO",
-         [
-            8,
-            "8882f58444c8f66c"
-         ],
-         false
       ]
    ]
 }
