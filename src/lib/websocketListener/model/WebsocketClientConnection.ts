@@ -22,6 +22,8 @@ export const debug = false;
 
 export class WebsocketClientConnection extends ClientConnectionEventBase implements ClientConnection {
 
+    readonly id: ClientConnection['id'];
+
     private _state = ConnectionState.Connecting;
 
     private readonly incomingMessageManager: IncomingMessageBuffer;
@@ -42,6 +44,8 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         super();
         debug && console.log({descriptor, context});
 
+        this.id = descriptor.connectionId;
+
         this.keepAliveManager = new KeepAliveManager(this);
         this.incomingMessageManager = new IncomingMessageBuffer();
         this.outgoingDataBuffer = new OutgoingMessageBuffer(socket);
@@ -49,10 +53,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         const {incomingMessageManager, parsedDataHandler} = this;
 
         incomingMessageManager.onData(parsedDataHandler);
-        incomingMessageManager.onError(error => {
-            this.dispatchEvent(new ErrorEvent(this, error));
-            this.close(CloseCode.ProtocolError, error, true);
-        });
+        incomingMessageManager.onError(error => this.close(CloseCode.ProtocolError, error, true));
 
         socket.on("data", incomingMessageManager.write);
         socket.once("error", this.socketErrorHandler);
@@ -86,17 +87,18 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         return this._state;
     }
 
-    async close(code: CloseCode = CloseCode.NormalClosure, reason?: string, immediate?: boolean): Promise<boolean> {
+    async close(code: CloseCode = CloseCode.NormalClosure, message?: string, immediate?: boolean): Promise<boolean> {
         const {state, socket} = this;
-        console.log('>> close', {code, reason, immediate});
+        debug && console.log('>> close', {code, reason: message, immediate});
         if (state >= ConnectionState.Closing) {
             return false;
         }
 
         let payload = Buffer.alloc(2);
         payload.writeUInt16BE(code, 0);
-        if (reason) {
-            payload = Buffer.concat([payload, Buffer.from(reason)]);
+        if (message) {
+            payload = Buffer.concat([payload, Buffer.from(message)]);
+            this.dispatchEvent(new ErrorEvent(this, message));
         }
 
         if (immediate) {
@@ -188,19 +190,16 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         }
 
         if (payload.length === 1) {
-            this.dispatchEvent(new ErrorEvent(this, `Close frame payload too short (1 byte)`));
             this.close(ProtocolError, `Close frame payload too short (1 byte)`);
             return;
         }
 
         if (payload.length > 2 && !isValidUTF8(payload.slice(2))) {
-            this.dispatchEvent(new ErrorEvent(this, `Close frame payload contain invalid UTF: ${payload.length}`));
             this.close(ProtocolError, `Close frame payload contain invalid UTF`);
             return;
         }
 
         if (payload.length > 125) {
-            this.dispatchEvent(new ErrorEvent(this, `Close frame payload too long: ${payload.length}`));
             this.close(ProtocolError, `Close frame payload too long`);
             return;
         }
@@ -208,12 +207,9 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         const code = payload.length >= 2 ? payload.readUInt16BE(0) : null;
         const reason = payload.length > 2 ? payload.slice(2).toString("utf8") : null;
 
-        console.log('>> processConnectionCloseFrame', {code, reason});
-
         // NoStatusRcvd & AbnormalClosure are not allowed to appear in data requests
         if (code !== null && ([NoStatusRcvd, AbnormalClosure].includes(code) || !isValidWebsocketCloseCode(code))) {
-            this.dispatchEvent(new ErrorEvent(this, `Invalid close code received: ${{code}}`));
-            this.close(ProtocolError, `Invalid close code received`);
+            this.close(ProtocolError, `Invalid close code received: ${{code}}`);
             return;
         }
 
@@ -235,7 +231,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
 
     private setState(newState: ConnectionState) {
         const {state: currentState} = this;
-        console.log('>> setState', {
+        debug && console.log('>> setState', {
             currentState: connectionStateToString(currentState),
             newState: connectionStateToString(newState)
         });
@@ -276,11 +272,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         return data;
     }
 
-    private readonly socketErrorHandler = (err: Error) => {
-        console.log(`WebsocketClientConnection socket err: ${JSON.stringify(err.message)}`);
-        this.dispatchEvent(new ErrorEvent(this, err.message));
-        this.close(CloseCode.AbnormalClosure, err.message);
-    };
+    private readonly socketErrorHandler = ({message}: Error) => this.close(CloseCode.AbnormalClosure, `Socket error: ${message}`);
 
     private readonly socketCloseHandler = () => {
         this.setState(ConnectionState.Closed);

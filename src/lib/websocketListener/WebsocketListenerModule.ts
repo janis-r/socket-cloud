@@ -1,23 +1,27 @@
 import {ModuleConfig} from "qft";
-import {WebSocketListenerConfig} from "./config/WebSocketListenerConfig";
-import {WebsocketListener} from "./service/WebsocketListener";
 import {WebsocketConnectionValidationRequest} from "./event/WebsocketConnectionValidationRequest";
 import {ValidateNewWebsocket} from "./command/ValidateNewWebsocket";
 import {LoggerModule} from "../logger";
 import {ConfigurationContextModule} from "../configurationContext";
 import {ClientConnectionModule} from "../clientConnectionPool";
+import {HttpConnectionUpgradeEvent, HttpServerModule} from "../httpServer";
+import {HandleConnectionUpgradeRequest} from "./command/HandleConnectionUpgradeRequest";
 
 export const WebsocketListenerModule: ModuleConfig = {
     requires: [
-        LoggerModule,
+        HttpServerModule,
         ConfigurationContextModule,
-        ClientConnectionModule
-    ],
-    mappings: [
-        WebSocketListenerConfig,
-        {map: WebsocketListener, asSingleton: true, instantiate: true}
+        ClientConnectionModule,
+        LoggerModule
     ],
     commands: [
-        {event: WebsocketConnectionValidationRequest.TYPE, command: ValidateNewWebsocket}
+        {
+            event: HttpConnectionUpgradeEvent.TYPE,
+            command: HandleConnectionUpgradeRequest
+        },
+        {
+            event: WebsocketConnectionValidationRequest.TYPE,
+            command: ValidateNewWebsocket
+        }
     ]
 };

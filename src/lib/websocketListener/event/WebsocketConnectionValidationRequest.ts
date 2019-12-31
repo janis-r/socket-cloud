@@ -1,6 +1,6 @@
 import {Event} from "qft";
 import {Socket} from "net";
-import {UpgradeRequest} from "../data/UpgradeRequest";
+import {UpgradeRequest} from "../../httpServer";
 import {SocketDescriptor} from "../data/SocketDescriptor";
 import {ConfigurationContext} from "../../configurationContext";
 import {WebsocketExtensionAgent} from "../../websocketExtension";

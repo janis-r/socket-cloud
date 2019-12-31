@@ -5,6 +5,7 @@ import {ErrorEvent, MessageEvent, StateChangeEvent} from "../connectionEvent";
 
 export interface ClientConnection {
 
+    readonly id: string;
     readonly context: ConfigurationContext;
     readonly state: ConnectionState;
 
