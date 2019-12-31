@@ -12,13 +12,13 @@ export interface ClientConnection {
     send(message: string): Promise<void>;
     send(message: Buffer): Promise<void>;
 
-    addEventListener(event: "state-change", listener: EventListener<StateChangeEvent>, scope?: Object): EventMapping;
-    addEventListener(event: "message", listener: EventListener<MessageEvent>, scope?: Object): EventMapping;
-    addEventListener(event: "error", listener: EventListener<ErrorEvent>, scope?: Object): EventMapping;
+    addEventListener(event: "state-change", listener: EventListener<StateChangeEvent>, scope?: Object): EventMapping<StateChangeEvent>;
+    addEventListener(event: "message", listener: EventListener<MessageEvent>, scope?: Object): EventMapping<MessageEvent>;
+    addEventListener(event: "error", listener: EventListener<ErrorEvent>, scope?: Object): EventMapping<ErrorEvent>;
 
-    removeEventListener(event: "state-change", listener: EventListener<StateChangeEvent>, scope?: Object): EventMapping;
-    removeEventListener(event: "message", listener: EventListener<MessageEvent>, scope?: Object): EventMapping;
-    removeEventListener(event: "error", listener: EventListener<ErrorEvent>, scope?: Object): EventMapping;
+    removeEventListener(event: "state-change", listener: EventListener<StateChangeEvent>, scope?: Object): EventMapping<StateChangeEvent>;
+    removeEventListener(event: "message", listener: EventListener<MessageEvent>, scope?: Object): EventMapping<MessageEvent>;
+    removeEventListener(event: "error", listener: EventListener<ErrorEvent>, scope?: Object): EventMapping<ErrorEvent>;
 
     removeAllEventListeners(scope?: Object): boolean;
 }

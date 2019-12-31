@@ -6,6 +6,7 @@ import {HttpServerConfig} from "../config/HttpServerConfig";
 import {HttpRequestEvent} from "../event/HttpRequestEvent";
 import {HttpConnectionUpgradeEvent} from "../event/HttpConnectionUpgradeEvent";
 import {UpgradeRequest} from "../data/UpgradeRequest";
+import {IncomingMessage, ServerResponse} from "http";
 
 @Injectable()
 export class HttpServerService {
@@ -18,14 +19,12 @@ export class HttpServerService {
     ) {
         const {config: {port}} = this;
 
-        this.httpServer = http.createServer((req, res) => {
-            eventDispatcher.dispatchEvent(new HttpRequestEvent(req, res));
-        });
-        this.httpServer.on("upgrade", (req: UpgradeRequest, socket: Socket) => {
-            eventDispatcher.dispatchEvent(new HttpConnectionUpgradeEvent(req, socket));
-        });
+        this.httpServer = http.createServer(this.requestListener);
+        this.httpServer.on("upgrade", this.upgradeListener);
         this.httpServer.listen(port);
-        this.httpServer.once("listening", () => logger.console(`WebSocketListener running on port ${port}`));
+        this.httpServer.once("listening", () => logger.console(`Server running on port ${port}`));
     }
 
+    private readonly requestListener = (req: IncomingMessage, res: ServerResponse) => this.eventDispatcher.dispatchEvent(new HttpRequestEvent(req, res));
+    private readonly upgradeListener = (req: UpgradeRequest, socket: Socket) => this.eventDispatcher.dispatchEvent(new HttpConnectionUpgradeEvent(req, socket));
 }

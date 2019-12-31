@@ -24,7 +24,7 @@ export class ClientConnectionPool {
             this
         );
         connection.addEventListener("state-change", ({connection}) => this.removeConnection(connection), this)
-            .withGuards(({connection: {state}}: StateChangeEvent) => state >= ConnectionState.Closing)
+            .withGuards(({connection: {state}}) => state >= ConnectionState.Closing)
             .once();
 
         connection.addEventListener("message",

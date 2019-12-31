@@ -26,7 +26,7 @@ export class KeepAliveManager {
         const {connection, handleIncomingMessage, stop, sendPing, pingTimeout} = this;
         connection.addEventListener("data-frame", ({data}) => () => handleIncomingMessage(data), this);
         connection.addEventListener("state-change", stop, this).withGuards(
-            ({connection: {state}}: StateChangeEvent) => state >= ConnectionState.Closing
+            ({connection: {state}}) => state >= ConnectionState.Closing
         ).once();
 
         this.nextPingTimeoutId = setTimeout(sendPing, pingTimeout);

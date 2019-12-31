@@ -7,11 +7,11 @@ type ClientConnectionBroadcastingNature = Pick<ClientConnection, "addEventListen
 
 export abstract class ClientConnectionEventBase extends EventDispatcher implements ClientConnectionBroadcastingNature {
 
-    addEventListener(event: "state-change", listener: EventListener<StateChangeEvent>, scope?: Object): EventMapping;
-    addEventListener(event: "message", listener: EventListener<MessageEvent>, scope?: Object): EventMapping;
-    addEventListener(event: "error", listener: EventListener<ErrorEvent>, scope?: Object): EventMapping;
-    addEventListener(event: "data-frame", listener: EventListener<Event<DataFrame>>, scope?: Object): EventMapping;
-    addEventListener(event: string | Symbol, listener: EventListener<any>, scope?: Object): EventMapping {
+    addEventListener(event: "state-change", listener: EventListener<StateChangeEvent>, scope?: Object): EventMapping<StateChangeEvent>;
+    addEventListener(event: "message", listener: EventListener<MessageEvent>, scope?: Object): EventMapping<MessageEvent>;
+    addEventListener(event: "error", listener: EventListener<ErrorEvent>, scope?: Object): EventMapping<ErrorEvent>;
+    addEventListener(event: "data-frame", listener: EventListener<Event<DataFrame>>, scope?: Object): EventMapping<Event<DataFrame>>;
+    addEventListener(event: string | Symbol, listener: EventListener<any>, scope?: Object): EventMapping<Event> {
         return super.addEventListener(event, listener, scope);
     }
 
