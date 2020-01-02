@@ -1,25 +1,28 @@
 import {Socket} from "net";
-import {composeWebsocketFrame} from "../../util/websocket-utils";
+import {composeWebsocketFrame, fragmentWebsocketFrame} from "../../util/websocket-utils";
 import {isPromise} from "../../../utils/is-promise";
 import {DataFrame} from "../../data/DataFrame";
 import {ExecutionQueue} from "ugd10a";
 import {debug} from "../WebsocketClientConnection";
+import {WebsocketExtensionAgent} from "../../../websocketExtension";
 
 export class OutgoingMessageBuffer {
 
     private readonly queue = new ExecutionQueue();
 
-    constructor(private readonly socket: Socket) {
+    constructor(private readonly socket: Socket,
+                private readonly extensions: Array<WebsocketExtensionAgent>,
+                private readonly fragmentSize: number) {
     }
 
-    async write(data: DataFrame | DataFrame[] | Promise<DataFrame | DataFrame[]>): Promise<void> {
+    async write(data: DataFrame): Promise<void> {
         const {queue: {enqueue}} = this;
-        await enqueue(async () => this.sendData(isPromise(data) ? await data : data));
+        await enqueue(async () => this.sendData(await this.prepareDataFrame(data)));
     }
 
-    private async sendData(data: DataFrame | DataFrame[]): Promise<void> {
+    private async sendData(dataFrames: DataFrame[]): Promise<void> {
         const {socket} = this;
-        for (const frame of Array.isArray(data) ? data : [data]) {
+        for (const frame of dataFrames) {
             if (!socket.writable) {
                 console.log('Skipping some frames as socket.writable eq false');
                 continue;
@@ -34,5 +37,26 @@ export class OutgoingMessageBuffer {
                 await new Promise(resolve => socket.once("drain", resolve));
             }
         }
+    }
+
+    private async prepareDataFrame(dataFrame: DataFrame): Promise<DataFrame[]> {
+        return fragmentWebsocketFrame(
+            await this.extendOutgoingData(dataFrame),
+            this.fragmentSize
+        );
+    }
+
+    private async extendOutgoingData(data: DataFrame): Promise<DataFrame> {
+        const {extensions} = this;
+        if (!extensions || extensions.length === 0) {
+            return data;
+        }
+
+        for (const extension of extensions) {
+            const transformation = extension.transformOutgoingData(data);
+            data = isPromise(transformation) ? await transformation : transformation;
+        }
+
+        return data;
     }
 }

@@ -11,7 +11,7 @@ describe("websocket outgoing data buffer", () => {
 
     beforeEach(() => {
         socket = new FakeSocket();
-        dataBuffer = new OutgoingMessageBuffer(socket);
+        dataBuffer = new OutgoingMessageBuffer(socket, [], 0);
     });
 
     it("Messages will be written in correct order", async () => {
@@ -27,30 +27,6 @@ describe("websocket outgoing data buffer", () => {
         ).toMatchObject(payloads);
     });
 
-    it("Messages will be written in correct order even if some of them are async", async () => {
-        const payloads = ["1", "2", "3"].map(value => Buffer.from(value));
-        const awaitTimes = [3000, 0, 1000];
-        for (const payload of payloads) {
-            const time = awaitTimes.shift();
-            if (!time) {
-                await dataBuffer.write(spawnFrameData(DataFrameType.TextFrame, {payload}));
-                return;
-            }
-
-            await dataBuffer.write(
-                new Promise<DataFrame>(resolve => setTimeout(
-                    () => resolve(spawnFrameData(DataFrameType.TextFrame, {payload})),
-                    time
-                ))
-            );
-        }
-        console.log('>> chunksWritten', socket.chunksWritten);
-        expect(
-            socket.chunksWritten
-                .map(chunk => decomposeWebSocketFrame(chunk))
-                .map(({payload}) => payload)
-        ).toMatchObject(payloads);
-    });
 });
 
 class FakeSocket extends Socket {

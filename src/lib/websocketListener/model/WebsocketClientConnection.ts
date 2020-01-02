@@ -1,8 +1,7 @@
 import {Socket} from "net";
-import {fragmentWebsocketFrame, spawnFrameData} from "../util/websocket-utils";
+import {spawnFrameData} from "../util/websocket-utils";
 import {DataFrame} from "../data/DataFrame";
 import {DataFrameType} from "../data/DataFrameType";
-import {isPromise} from "../../utils/is-promise";
 import {ClientConnection, ConnectionState, connectionStateToString} from "../../clientConnectionPool";
 import {ErrorEvent, MessageEvent, StateChangeEvent} from "../../clientConnectionPool/connectionEvent";
 import {WebsocketExtensionAgent} from "../../websocketExtension";
@@ -26,16 +25,9 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
 
     private _state = ConnectionState.Connecting;
 
-    private readonly incomingMessageManager: IncomingMessageBuffer;
-    private readonly outgoingDataBuffer: OutgoingMessageBuffer;
-
-    private readonly outgoingMessagePreparationQueue = new ExecutionQueue();
-    private readonly incomingMessageExtendingQueue = new ExecutionQueue();
-
-    private readonly incomingDataExtensions: Array<WebsocketExtensionAgent>;
-    private readonly outgoingDataExtensions: Array<WebsocketExtensionAgent>;
-
     private readonly keepAliveManager: KeepAliveManager;
+    private readonly incomingMessageBuffer: IncomingMessageBuffer;
+    private readonly outgoingMessageBuffer: OutgoingMessageBuffer;
 
     constructor(private readonly socket: Socket,
                 readonly descriptor: WebsocketDescriptor,
@@ -47,39 +39,24 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         this.id = descriptor.connectionId;
 
         this.keepAliveManager = new KeepAliveManager(this);
-        this.incomingMessageManager = new IncomingMessageBuffer();
-        this.outgoingDataBuffer = new OutgoingMessageBuffer(socket);
+        this.incomingMessageBuffer = new IncomingMessageBuffer(
+            !extensions ? [] : extensions.filter(({transformIncomingData: f}) => !!f)
+        );
+        this.outgoingMessageBuffer = new OutgoingMessageBuffer(
+            socket,
+            !extensions ? [] : extensions.filter(({transformOutgoingData: f}) => !!f),
+            context.outgoingMessageFragmentSize
+        );
 
-        const {incomingMessageManager, parsedDataHandler} = this;
+        const {incomingMessageBuffer, parsedDataHandler} = this;
 
-        incomingMessageManager.onData(parsedDataHandler);
-        incomingMessageManager.onError(error => this.close(CloseCode.ProtocolError, error, true));
+        incomingMessageBuffer.onData(parsedDataHandler);
+        incomingMessageBuffer.onError(({code, message}) => this.close(code, message, true));
 
-        socket.on("data", incomingMessageManager.write);
+        socket.on("data", incomingMessageBuffer.write);
         socket.once("error", this.socketErrorHandler);
         socket.on("close", this.socketCloseHandler);
 
-        if (extensions && extensions.length > 0) {
-            const incoming = [];
-            const outgoing = [];
-            extensions.forEach(extension => {
-                if (extension.transformIncomingData) {
-                    incoming.push(extension);
-                }
-                if (extension.transformOutgoingData) {
-                    outgoing.push(extension);
-                }
-            });
-
-            if (incoming) {
-                this.incomingDataExtensions = incoming;
-            }
-            if (outgoing) {
-                this.outgoingDataExtensions = outgoing;
-            }
-        }
-
-        // TODO: Do I really don't have any event from Socket that it's ready?
         this.setState(ConnectionState.Open);
     }
 
@@ -98,7 +75,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         payload.writeUInt16BE(code, 0);
         if (message) {
             payload = Buffer.concat([payload, Buffer.from(message)]);
-            this.dispatchEvent(new ErrorEvent(this, message));
+            this.dispatchEvent(new ErrorEvent(this, message, code));
         }
 
         if (immediate) {
@@ -117,47 +94,30 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     send(data: Buffer): Promise<void>;
     send(data: string): Promise<void>;
     async send(data: string | Buffer): Promise<void> {
-        const {outgoingMessagePreparationQueue: {enqueue}} = this;
-        await enqueue(() => this.sendDataFrame(this.prepareDataFrame(data)));
+        const {TextFrame, BinaryFrame} = DataFrameType;
+        const [type, payload] = typeof data === "string" ? [TextFrame, Buffer.from(data)] : [BinaryFrame, data];
+        await this.sendDataFrame(spawnFrameData(type, {payload}));
     }
 
-    async sendDataFrame(data: DataFrame | DataFrame[] | Promise<DataFrame | DataFrame[]>): Promise<void> {
+    async sendDataFrame(data: DataFrame): Promise<void> {
         if (this._state >= ConnectionState.Closing) {
             return;
         }
-        await this.outgoingDataBuffer.write(data);
+        try {
+            await this.outgoingMessageBuffer.write(data);
+        } catch (e) {
+            this.close(CloseCode.AbnormalClosure, `Error while sending data: ${JSON.stringify(e.message)}`);
+        }
+
     }
 
-    private async prepareDataFrame(data: string | Buffer): Promise<DataFrame[]> {
-        const {TextFrame, BinaryFrame} = DataFrameType;
-        const {context: {outgoingMessageFragmentSize: fragmentSize}} = this;
-
-        const [type, payload] = typeof data === "string" ? [TextFrame, Buffer.from(data)] : [BinaryFrame, data];
-        const extendedFrame = await this.extendOutgoingData(spawnFrameData(type, {payload}));
-        return fragmentWebsocketFrame(extendedFrame, fragmentSize);
-    }
-
-    private readonly parsedDataHandler = async (data: DataFrame) => {
-        const {ProtocolError, InvalidFramePayloadData} = CloseCode;
+    private readonly parsedDataHandler = async (dataFrame: DataFrame) => {
         const {TextFrame, ConnectionClose, Ping, Pong, BinaryFrame} = DataFrameType;
-        const {incomingMessageExtendingQueue: {enqueue}} = this;
-        debug && console.log('>> parsedDataHandler', chalk.red(connectionStateToString(this._state)), data);
-
-        const dataFrame = await enqueue(() => this.extendIncomingData(data));
-        const {type, payload, rsv1, rsv2, rsv3} = dataFrame;
+        debug && console.log('>> parsedDataHandler', chalk.red(connectionStateToString(this._state)), dataFrame);
+        const {type, payload} = dataFrame;
 
         if (this._state >= ConnectionState.Closing && type !== ConnectionClose) {
             debug && console.log('>> parsedDataHandler', chalk.red('stop'));
-            return;
-        }
-
-        if ([rsv1, rsv2, rsv3].includes(true)) {
-            this.close(ProtocolError, `Some RSV fields have not being reset by extensions: ${JSON.stringify(dataFrame)}`, true);
-            return;
-        }
-
-        if (type === TextFrame && !isValidUTF8(payload)) {
-            this.close(InvalidFramePayloadData, `Received invalid UTF8 content: ${JSON.stringify(dataFrame)}`, true);
             return;
         }
 
@@ -221,12 +181,12 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         if (this._state >= ConnectionState.Closing) {
             return;
         }
-        const {outgoingDataBuffer} = this;
+
         if (payload.length > 125) {
             this.close(CloseCode.ProtocolError, `Ping payload exceed 125 byte limit`);
             return;
         }
-        await outgoingDataBuffer.write(spawnFrameData(DataFrameType.Pong, {payload}));
+        this.sendDataFrame(spawnFrameData(DataFrameType.Pong, {payload}));
     }
 
     private setState(newState: ConnectionState) {
@@ -243,39 +203,10 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         this.dispatchEvent(new StateChangeEvent(this, currentState));
     }
 
-    private async extendIncomingData(data: DataFrame): Promise<DataFrame> {
-        const {incomingDataExtensions} = this;
-        if (!incomingDataExtensions) {
-            return data;
-        }
-
-        for (const extension of incomingDataExtensions) {
-            try {
-                const transformation = extension.transformIncomingData(data);
-                data = isPromise(transformation) ? await transformation : transformation;
-            } catch (e) {
-                this.close(CloseCode.ProtocolError, e.message);
-            }
-        }
-        return data;
-    }
-
-    private async extendOutgoingData(data: DataFrame): Promise<DataFrame> {
-        const {outgoingDataExtensions} = this;
-        if (!outgoingDataExtensions) {
-            return data;
-        }
-        for (const extension of outgoingDataExtensions) {
-            const transformation = extension.transformOutgoingData(data);
-            data = isPromise(transformation) ? await transformation : transformation;
-        }
-        return data;
-    }
-
     private readonly socketErrorHandler = ({message}: Error) => this.close(CloseCode.AbnormalClosure, `Socket error: ${message}`);
 
     private readonly socketCloseHandler = () => {
         this.setState(ConnectionState.Closed);
-        this.incomingMessageManager.destroy();
+        this.incomingMessageBuffer.destroy();
     }
 }

@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send binary message message with payload of length 65536.",
    "droppedByMe": false,
-   "duration": 35,
+   "duration": 58,
    "expectation": "Receive echo'ed binary message (with payload as sent). Clean close with normal code.",
    "expected": {
       "OK": [
@@ -27,8 +27,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: SfVZ9bfdcltD5bqjwR7a1A==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: BCAD63WxIsq91jjz8QIsl2jqN3s=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: 69GJiy5ijcSnTcoCq2mh6Q==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 2tWE0v/KmVAXpL/TjJ4CYygV93k=\r\n\r\n",
    "id": "1.2.7",
    "isServer": false,
    "localCloseCode": 1000,
@@ -54,9 +54,10 @@
    "rxOctetStats": {
       "4": 1,
       "139": 1,
-      "32776": 2
+      "16388": 2,
+      "32776": 1
    },
-   "started": "2019-12-30T09:25:23.484Z",
+   "started": "2020-01-02T11:21:05.566Z",
    "trafficStats": null,
    "txFrameStats": {
       "2": 1,
@@ -97,7 +98,7 @@
          2,
          true,
          0,
-         "48d0ea4b",
+         "032966f3",
          null,
          null,
          false
@@ -106,7 +107,7 @@
          "TO",
          [
             65550,
-            "82ff000000000001000048d0ea4bb62e14b5b62e14b5b62e14b5b62e14b5b62e14b5b62e14b5b62e14b5b62e14b5b62e14b5b62e14b5b62e14b5b62e14b5b62e ..."
+            "82ff0000000000010000032966f3fdd7980dfdd7980dfdd7980dfdd7980dfdd7980dfdd7980dfdd7980dfdd7980dfdd7980dfdd7980dfdd7980dfdd7980dfdd7 ..."
          ],
          false
       ],
@@ -117,7 +118,7 @@
       [
          "RO",
          [
-            32776,
+            16388,
             "027e4000fefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefe ..."
          ]
       ],
@@ -128,18 +129,6 @@
             "0xfefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefe ..."
          ],
          2,
-         false,
-         0,
-         false,
-         null
-      ],
-      [
-         "RF",
-         [
-            16384,
-            "0xfefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefe ..."
-         ],
-         0,
          false,
          0,
          false,
@@ -171,6 +160,25 @@
             "0xfefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefe ..."
          ],
          0,
+         false,
+         0,
+         false,
+         null
+      ],
+      [
+         "RO",
+         [
+            16388,
+            "807e4000fefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefe ..."
+         ]
+      ],
+      [
+         "RF",
+         [
+            16384,
+            "0xfefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefe ..."
+         ],
+         0,
          true,
          0,
          false,
@@ -185,7 +193,7 @@
          8,
          true,
          0,
-         "8a8784d9",
+         "2eb53933",
          null,
          null,
          false
@@ -194,7 +202,7 @@
          "TO",
          [
             8,
-            "88828a8784d9896f"
+            "88822eb539332d5d"
          ],
          false
       ],

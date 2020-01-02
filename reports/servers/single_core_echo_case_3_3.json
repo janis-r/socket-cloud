@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send small text message, then send again with <b>RSV = 3</b>, then send Ping. Octets are sent in frame-wise chops. Octets are sent in octet-wise chops.",
    "droppedByMe": false,
-   "duration": 19,
+   "duration": 15,
    "expectation": "Echo for first message is received, but then connection is failed immediately, since RSV must be 0, when no extension defining RSV meaning has been negotiated. The Pong is not received.",
    "expected": {
       "NON-STRICT": [],
@@ -28,8 +28,8 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: VSIkXzLBQamTClVKCKCKkA==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: /Fywxk3KgDzE+/Hi0aYW9gVjbn4=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: sIiKZPsY9mS2r9K2Ui6pzQ==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: wxBldhUtt96FdMRFJIPxz+c0RQQ=\r\n\r\n",
    "id": "3.3",
    "isServer": false,
    "localCloseCode": null,
@@ -54,7 +54,7 @@
       "15": 1,
       "139": 1
    },
-   "started": "2019-12-30T09:25:24.301Z",
+   "started": "2020-01-02T11:21:06.579Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 2,
@@ -95,7 +95,7 @@
          1,
          true,
          0,
-         "b2481133",
+         "1d7b3ba7",
          null,
          null,
          true
@@ -104,7 +104,7 @@
          "TO",
          [
             19,
-            "818db2481133fa2d7d5fdd643144dd3a7d5793"
+            "818d1d7b3ba7551e57cb72571bd0720957c33c"
          ],
          true
       ],
@@ -117,7 +117,7 @@
          1,
          true,
          3,
-         "3f9c467e",
+         "2db4d34c",
          null,
          null,
          true
@@ -131,7 +131,7 @@
          9,
          true,
          0,
-         "1de39735",
+         "6771bfc5",
          null,
          null,
          true
@@ -144,7 +144,7 @@
          "TO",
          [
             19,
-            "b18d3f9c467e77f92a1250b0660950ee2a1a1e"
+            "b18d2db4d34c65d1bf204298f33b42c6bf280c"
          ],
          true
       ],
@@ -152,7 +152,7 @@
          "TO",
          [
             6,
-            "89801de39735"
+            "89806771bfc5"
          ],
          true
       ],
