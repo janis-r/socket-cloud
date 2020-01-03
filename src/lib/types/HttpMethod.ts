@@ -1,3 +1,5 @@
+import {valueBelongsToEnum} from "ugd10a";
+
 export enum HttpMethod {
     GET = 'GET',
     POST = 'POST',
@@ -9,3 +11,5 @@ export enum HttpMethod {
     OPTIONS = 'OPTIONS',
     CONNECT = 'CONNECT'
 }
+
+export const isHttpMethod = (value: unknown): value is HttpMethod => valueBelongsToEnum(HttpMethod, value);

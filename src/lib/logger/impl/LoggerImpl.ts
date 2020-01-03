@@ -14,48 +14,56 @@ export class LoggerImpl extends Logger {
     private readonly logDir: string;
     private readonly logToConsole: boolean;
     private readonly logFileMode: LoggerConfig["logFileMode"];
-    private readonly entities: Record<string, LoggerEntity> = {};
+    private readonly entities = new Map<string, LoggerEntity>();
 
     constructor({logDir, logToConsole, logFileMode}: LoggerConfig) {
         super();
 
-        this.logDir = logDir!;
+        this.logDir = logDir;
         this.logToConsole = logToConsole || !logDir;
         this.logFileMode = logFileMode;
 
-        if (this.logDir && !fs.existsSync(this.logDir)) {
-            fs.mkdirSync(this.logDir);
+        if (logDir && !fs.existsSync(logDir)) {
+            fs.mkdirSync(logDir);
         }
     }
 
     spawnEntity(level: LogLevel, logTime?: boolean, format?: Chalk): LoggerEntity;
     spawnEntity(name: string, logTime?: boolean, format?: Chalk): LoggerEntity;
-    spawnEntity(nameOrLevel: LogLevel | string, logTime: boolean = true, format?: Chalk): LoggerEntity {
+    spawnEntity(name: LogLevel | string, logTime = true, format?: Chalk): LoggerEntity {
         const {entities, logToConsole} = this;
-        if (!(nameOrLevel in entities)) {
-            entities[nameOrLevel] = {
-                name: nameOrLevel,
-                log: (...message: any[]) => {
-                    const formatter = getMessageFormatter(nameOrLevel);
-                    if (nameOrLevel !== LogLevel.Console) { // Never write LogLevel.Console messages to file
-                        this.writeMessage(message.join(' '), nameOrLevel, logTime);
-                    }
-                    if (nameOrLevel === LogLevel.Error || logToConsole) { // Always log to console LogLevel.Error messages
-                        console.log(formatter(`[${nameOrLevel}] ${format ? format(...message) : message}`));
-                    }
+        if (!entities.has(name)) {
+            entities.set(
+                name,
+                {
+                    name,
+                    log: (...message: any[]) => this.prepareMessage(message, name, logTime, format)
                 }
-            }
+            );
         }
-        return entities[nameOrLevel];
+        return entities.get(name);
     }
 
     readonly log = (message: any, level: LogLevel | string = LogLevel.Log) => this.spawnEntity(level).log(message);
-    readonly error = (...message: any[]) => this.spawnEntity(LogLevel.Error).log(message.join(' '));
-    readonly debug = (...message: any[]) => this.spawnEntity(LogLevel.Debug).log(message.join(' '));
-    readonly notice = (...message: any[]) => this.spawnEntity(LogLevel.Notice).log(message.join(' '));
-    readonly console = (...message: any[]) => this.spawnEntity(LogLevel.Console).log(message.join(' '));
+    readonly error = (...message: any[]) => this.spawnEntity(LogLevel.Error).log(...message);
+    readonly debug = (...message: any[]) => this.spawnEntity(LogLevel.Debug).log(...message);
+    readonly notice = (...message: any[]) => this.spawnEntity(LogLevel.Notice).log(...message);
+    readonly console = (...message: any[]) => this.spawnEntity(LogLevel.Console).log(...message);
 
-    private writeMessage(message: string, logFileName: string, logTime: boolean): void {
+    protected prepareMessage(message: any[], logLevel: string, logTime: boolean, format: Chalk): void {
+        const {logToConsole} = this;
+
+        const formatter = getMessageFormatter(logLevel);
+        if (logLevel !== LogLevel.Console) {
+            this.writeMessage(message.join(' '), logLevel, logTime);
+        }
+
+        if (logLevel === LogLevel.Error || logToConsole) {
+            console.log(`[${logLevel}]`, ...message);
+        }
+    }
+
+    protected writeMessage(message: string, logFileName: string, logTime: boolean): void {
         if (!this.logDir) {
             return;
         }

@@ -22,7 +22,7 @@ export class HttpServerService {
         this.httpServer = http.createServer(this.requestListener);
         this.httpServer.on("upgrade", this.upgradeListener);
         this.httpServer.listen(port);
-        this.httpServer.once("listening", () => logger.console(`Server running on port ${port}`));
+        this.httpServer.once("listening", () => logger.console(`Http server running on port ${port}`));
     }
 
     private readonly requestListener = (req: IncomingMessage, res: ServerResponse) => this.eventDispatcher.dispatchEvent(new HttpRequestEvent(req, res));

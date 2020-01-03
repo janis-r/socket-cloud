@@ -58,7 +58,7 @@ const initSocket = async () => {
             }
         )
         .initialize();
-    injector.get(Logger).console(`Web socket context initialized`);
+    injector.get(Logger).console(`Dev server context initialized`);
 
     await new Promise(resolve => setTimeout(resolve, 1000));
 

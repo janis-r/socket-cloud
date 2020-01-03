@@ -51,13 +51,17 @@ export class ValidateNewWebsocket<T extends boolean> extends MacroCommand<T> {
     }
 
     protected async executeSubCommand(command: SubCommand<T>): Promise<T> {
+        const {logger: {console}} = this;
         const result = super.executeSubCommand(command);
 
         const value = isPromise(result) ? await result : result;
-        console.log('>> done -> executeSubCommand', {command: referenceToString(command.type), value});
+        console('>> done -> executeSubCommand', {
+            command: referenceToString(command.type),
+            value
+        });
 
         if (value === false) {
-            console.log('Halt ValidateNewWebsocket at', referenceToString(command.type));
+            console('Halt ValidateNewWebsocket at', referenceToString(command.type));
             this.haltExecution();
         }
         return result;

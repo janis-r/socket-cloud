@@ -36,15 +36,11 @@ export class RespondToHandshake implements Command<boolean> {
             `Sec-WebSocket-Accept: ${handshakeResponse(secWebSocketKeyHeader)}`
         ];
 
-        // console.log({extensions})
-        // process.exit();
-
         if (extensions && extensions.length > 0) {
             responseHeaders.push('Sec-WebSocket-Extensions: ' + extensions.map(({configOfferResponse}) => configOfferResponse).join(", "))
-            // responseHeaders.push('Sec-WebSocket-Extensions: permessage-deflate;client_no_context_takeover;client_max_window_bits=15')
         }
 
-        console.info('>> responseHeaders:', responseHeaders);
+        debug('>> responseHeaders:', responseHeaders);
         socket.write(responseHeaders.join(delimiter) + delimiter + delimiter);
 
         return true;
