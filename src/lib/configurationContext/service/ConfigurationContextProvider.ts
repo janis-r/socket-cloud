@@ -9,9 +9,21 @@ export class ConfigurationContextProvider {
     @Inject()
     private readonly logger: Logger;
 
+    private readonly knownContexts = new Map<ConfigurationContext['id'], ConfigurationContext>([
+        ['test', {
+            id: 'test',
+            maxConnectionCount: 100,
+            connectionValidationUrl: 'http://localhost:8000/validate-socket',
+            pingTimeout: 30000,
+            outgoingMessageFragmentSize: 2 ** 14 // 16 kb
+        }]
+    ]);
+
     readonly getSocketConfigurationContext = async (descriptor: SocketDescriptor): Promise<ConfigurationContext | null> => {
+        const {knownContexts} = this;
+
         if (descriptor.type === SocketConnectionType.Direct) {
-            // TODO: Implement direct socket configuration retrieval in here
+            // TODO: Implement socket configuration retrieval in here
             return null;
         }
 
@@ -20,16 +32,12 @@ export class ConfigurationContextProvider {
             return null;
         }
 
-        const config: ConfigurationContext = {
-            id: 'test',
-            maxConnectionCount: 100,
-            connectionValidationUrl: 'http://localhost:8000/validate-socket',
-            pingTimeout: 30000,
-            outgoingMessageFragmentSize: 2 ** 14 // 16 kb
-            // outgoingMessageFragmentSize: 2 ** 3
-        };
+        return knownContexts.get('test') ?? null;
+    };
 
-        return config;
+    readonly getConfigurationContext = async (id: ConfigurationContext['id']): Promise<ConfigurationContext | null> => {
+        const {knownContexts} = this;
+        return knownContexts.get(id) ?? null;
     };
 }
 

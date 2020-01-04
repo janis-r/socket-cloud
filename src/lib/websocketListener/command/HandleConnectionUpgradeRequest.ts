@@ -23,8 +23,6 @@ export class HandleConnectionUpgradeRequest implements Command {
             logger: {console}
         } = this;
 
-
-
         const requestInfo = {remoteAddress, url, method, headers};
         console('>> requestInfo:', requestInfo);
 

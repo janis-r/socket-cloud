@@ -2,11 +2,7 @@ import {Injectable} from "qft";
 import {currentDateToObject} from "ugd10a";
 import * as fs from "fs";
 import chalk, {Chalk} from "chalk";
-import {LogLevel} from "../data/LogLevel";
-import {Logger} from "../service/Logger";
-import {LoggerConfig} from "../data/LoggerConfig";
-import {LoggerEntity} from "../data/LoggerEntity";
-import {createLogFileName} from "../util/createLogFileName";
+import {createLogFileName, Logger, LoggerConfig, LoggerEntity, LogLevel} from "..";
 
 @Injectable()
 export class LoggerImpl extends Logger {
@@ -48,6 +44,11 @@ export class LoggerImpl extends Logger {
     readonly error = (...message: any[]) => this.spawnEntity(LogLevel.Error).log(...message);
     readonly debug = (...message: any[]) => this.spawnEntity(LogLevel.Debug).log(...message);
     readonly notice = (...message: any[]) => this.spawnEntity(LogLevel.Notice).log(...message);
+    /**
+     * This is special log level that'll never be written to file and will be shown on console only when
+     * logToConsole is enabled
+     * @param message
+     */
     readonly console = (...message: any[]) => this.spawnEntity(LogLevel.Console).log(...message);
 
     protected prepareMessage(message: any[], logLevel: string, logTime: boolean, format: Chalk): void {
@@ -55,7 +56,7 @@ export class LoggerImpl extends Logger {
 
         const formatter = getMessageFormatter(logLevel);
         if (logLevel !== LogLevel.Console) {
-            this.writeMessage(message.join(' '), logLevel, logTime);
+            this.writeMessage(message, logLevel, logTime);
         }
 
         if (logLevel === LogLevel.Error || logToConsole) {
@@ -63,14 +64,15 @@ export class LoggerImpl extends Logger {
         }
     }
 
-    protected writeMessage(message: string, logFileName: string, logTime: boolean): void {
+    protected writeMessage(message: any[], logFileName: string, logTime: boolean): void {
         if (!this.logDir) {
             return;
         }
         const {getFilePath, logErrorHandler, logFileMode} = this;
 
+        const unifiedMessage = message.map(entry => ["string", "number"].includes(typeof entry) ? entry : JSON.stringify(entry)).join(' ');
         const filePath = getFilePath(logFileMode === "one-file-per-level" ? logFileName : "log");
-        const formattedMessage = `${logTime ? getTimestamp() + ': ' : ''}${message}\n`;
+        const formattedMessage = `${logTime ? getTimestamp() + ': ' : ''}${unifiedMessage}\n`;
 
         fs.appendFile(filePath, formattedMessage, err => err && logErrorHandler(filePath, err));
     }

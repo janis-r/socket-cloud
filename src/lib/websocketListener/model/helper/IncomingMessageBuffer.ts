@@ -56,7 +56,7 @@ export class IncomingMessageBuffer {
 
         if (!isFinal && controlFrame) {
             dispatchError({
-                message: `Control frames cannot be fragmented: ${JSON.stringify(dataFrame)}`,
+                message: `Control frames cannot be fragmented: ${dumpDataFrame(dataFrame)}`,
                 code: ProtocolError
             });
             return;
@@ -64,7 +64,7 @@ export class IncomingMessageBuffer {
 
         if ([rsv1, rsv2, rsv3].includes(true) && controlFrame) {
             dispatchError({
-                message: `RSV fields must be empty on control frames: ${JSON.stringify(dataFrame)}`,
+                message: `RSV fields must be empty on control frames: ${dumpDataFrame(dataFrame)}`,
                 code: ProtocolError
             });
             return;
@@ -78,7 +78,7 @@ export class IncomingMessageBuffer {
 
         if (queue.length === 0 && type === ContinuationFrame) {
             dispatchError({
-                message: `Received continuation frame with not preceding opening frame: ${JSON.stringify(dataFrame)}`,
+                message: `Received continuation frame with not preceding opening frame: ${dumpDataFrame(dataFrame)}`,
                 code: ProtocolError
             });
             return;
@@ -86,7 +86,7 @@ export class IncomingMessageBuffer {
 
         if (queue.length > 0 && type !== ContinuationFrame) {
             dispatchError({
-                message: `Received double opening frames: ${JSON.stringify(dataFrame)}`,
+                message: `Received double opening frames: ${dumpDataFrame(dataFrame)}`,
                 code: ProtocolError
             });
             return;
@@ -125,7 +125,7 @@ export class IncomingMessageBuffer {
             const {type, payload, rsv1, rsv2, rsv3} = processedFrame;
             if ([rsv1, rsv2, rsv3].includes(true)) {
                 dispatchError({
-                    message: `RSV fields must be empty: ${JSON.stringify(dataFrame)}`,
+                    message: `RSV fields must be empty: ${dumpDataFrame(dataFrame)}`,
                     code: ProtocolError
                 });
                 return;
@@ -133,7 +133,7 @@ export class IncomingMessageBuffer {
 
             if (type === DataFrameType.TextFrame && !isValidUTF8(payload)) {
                 dispatchError({
-                    message: `Received invalid UTF8 content: ${JSON.stringify(dataFrame)}`,
+                    message: `Received invalid UTF8 content: ${dumpDataFrame(dataFrame)}`,
                     code: InvalidFramePayloadData
                 });
                 return;
@@ -167,3 +167,12 @@ const isControlFrame = (type: DataFrameType) => ![
     DataFrameType.BinaryFrame,
     DataFrameType.ContinuationFrame
 ].includes(type);
+
+const dumpDataFrame = (dataFrame: DataFrame) => {
+    const lengthLimit = 200;
+    const asStr = JSON.stringify(dataFrame);
+    if (asStr.length < lengthLimit) {
+        return asStr;
+    }
+    return `${asStr.slice(0, lengthLimit)}...`;
+};

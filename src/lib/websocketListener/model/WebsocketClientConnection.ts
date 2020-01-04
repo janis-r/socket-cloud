@@ -12,7 +12,6 @@ import {ClientConnectionEventBase} from "./ClientConnectionEventBase";
 import {OutgoingMessageBuffer} from "./helper/OutgoingMessageBuffer";
 import {KeepAliveManager} from "./clientExtensions/KeepAliveManager";
 import {IncomingMessageBuffer} from "./helper/IncomingMessageBuffer";
-import {ExecutionQueue} from "ugd10a";
 import chalk from "chalk";
 
 const isValidUTF8: (data: Buffer) => boolean = require('utf-8-validate');
@@ -51,7 +50,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         const {incomingMessageBuffer, parsedDataHandler} = this;
 
         incomingMessageBuffer.onData(parsedDataHandler);
-        incomingMessageBuffer.onError(({code, message}) => this.close(code, message, true));
+        incomingMessageBuffer.onError(({code, message}) => this.close(code, message, code !== CloseCode.InternalServerError));
 
         socket.on("data", incomingMessageBuffer.write);
         socket.once("error", this.socketErrorHandler);

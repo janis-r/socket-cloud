@@ -6,7 +6,7 @@
   "scripts": {
     "serve": "ts-node server/exp/main.ts",
     "test": "jest --colors --runInBand",
-    "dev": "ts-node src/app/dev/main.ts",
+    "dev": "ts-node src/app/dev-server/main.ts",
     "echo-server": "ts-node src/app/echo-server/single-core.ts"
   },
   "author": "",

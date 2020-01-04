@@ -1,6 +1,7 @@
 import {SocketConnectionType} from "../../types/SocketConnectionType";
 
-export type ConfigurationContext = Readonly<{
+export abstract class ConfigurationContext {
+    // Unique id of configuration context
     id: string;
     // Maximum number of simultaneous connections
     maxConnectionCount?: number;
@@ -14,4 +15,4 @@ export type ConfigurationContext = Readonly<{
     // Fragmentation directive for outgoing messages. No message fragmentation will be applied
     // if this property is absent.
     outgoingMessageFragmentSize?: number
-}>;
+}

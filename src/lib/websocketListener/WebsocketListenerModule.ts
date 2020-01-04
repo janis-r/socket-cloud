@@ -3,7 +3,7 @@ import {WebsocketConnectionValidationRequest} from "./event/WebsocketConnectionV
 import {ValidateNewWebsocket} from "./command/ValidateNewWebsocket";
 import {LoggerModule} from "../logger";
 import {ConfigurationContextModule} from "../configurationContext";
-import {ClientConnectionModule} from "../clientConnectionPool";
+import {ClientConnectionPoolModule} from "../clientConnectionPool";
 import {HttpConnectionUpgradeEvent, HttpServerModule} from "../httpServer";
 import {HandleConnectionUpgradeRequest} from "./command/HandleConnectionUpgradeRequest";
 
@@ -11,7 +11,7 @@ export const WebsocketListenerModule: ModuleConfig = {
     requires: [
         HttpServerModule,
         ConfigurationContextModule,
-        ClientConnectionModule,
+        ClientConnectionPoolModule,
         LoggerModule
     ],
     commands: [

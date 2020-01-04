@@ -1,7 +1,7 @@
 import {ModuleConfig} from "qft";
 import {ClientConnectionPool} from "./model/ClientConnectionPool";
 
-export const ClientConnectionModule: ModuleConfig = {
+export const ClientConnectionPoolModule: ModuleConfig = {
     mappings: [
         ClientConnectionPool
     ]

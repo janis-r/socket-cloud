@@ -1,8 +1,7 @@
 import {ClientConnection} from "./ClientConnection";
-import {ConnectionState, NewConnectionEvent} from "..";
+import {ConnectionRemovedEvent, ConnectionState, NewConnectionEvent} from "..";
 import {EventDispatcher, Inject} from "qft";
 import {ClientMessageEvent} from "../event/ClientMessageEvent";
-import {StateChangeEvent} from "../connectionEvent";
 import chalk from "chalk";
 
 export class ClientConnectionPool {
@@ -49,8 +48,10 @@ export class ClientConnectionPool {
         eventDispatcher.dispatchEvent(new NewConnectionEvent(connection));
     }
 
+    readonly getConnectionsByContext = (contextId: ClientConnection['context']['id']) => this.byContextId.get(contextId) ?? null;
+
     private removeConnection(connection: ClientConnection): void {
-        const {byContextId, byConnectionId} = this;
+        const {byContextId, byConnectionId, eventDispatcher} = this;
 
         console.log(chalk.red('Remove connection'), connection.id);
 
@@ -65,5 +66,7 @@ export class ClientConnectionPool {
         if (dataSet.size === 0) {
             byContextId.delete(contextId);
         }
+
+        eventDispatcher.dispatchEvent(new ConnectionRemovedEvent(connection));
     }
 }
