@@ -1,37 +1,37 @@
 import {MessageType} from "./MessageType";
-import {validateObject} from "../../utils/validate-object";
+import {FieldConfiguration, validateObject} from "../../utils/validate-object";
 import {isArrayOfStrings} from "../../utils/is-array-of";
 
 export type RestoreRequest = {
     type: MessageType.Restore,
-    target: RestoreTarget[],
+    target: RestoreTarget[]
 }
-export const isRestoreRequest = (value: Partial<RestoreRequest>): value is RestoreRequest => validateObject(value, [
+
+const restoreRequestConfig: FieldConfiguration<RestoreRequest>[] = [
     {name: "type", exactValue: MessageType.Restore},
     {
         name: "target",
-        type: "object",
-        validator: (value: RestoreRequest['target']) => !value.some(subValue => !RestoreTargetUtils.validate(subValue))
+        type: "array",
+        validator: (value: RestoreRequest['target']) => !value.some(subValue => !isRestoreTarget(subValue))
     }
-]) === true;
+];
+
+export const isRestoreRequest = (value: unknown): value is RestoreRequest => validateObject(value, restoreRequestConfig) === true;
 
 export function serializeRestoreRequest(value: RestoreRequest): string | null {
     if (!isRestoreRequest(value)) {
         return null;
     }
-    const {serialize: serializeRestoreTarget} = RestoreTargetUtils;
     const {type, target} = value;
     return JSON.stringify([type, target.map(value => serializeRestoreTarget(value))]);
 }
 
 export function deserializeRestoreRequest(value: string): RestoreRequest | null {
-    const {deserialize: deserializeRestoreTarget} = RestoreTargetUtils;
     try {
         const data = JSON.parse(value);
         if (!Array.isArray(data) || data.length !== 2) {
             return null;
         }
-        console.log({data});
 
         const [type, target] = data;
         if (!Array.isArray(target)) {
@@ -39,8 +39,6 @@ export function deserializeRestoreRequest(value: string): RestoreRequest | null 
         }
 
         const parsed = {type, target: target.map(value => deserializeRestoreTarget(value))};
-        console.log({parsed})
-
         if (isRestoreRequest(parsed)) {
             return parsed;
         }
@@ -51,43 +49,44 @@ export function deserializeRestoreRequest(value: string): RestoreRequest | null 
     return null;
 }
 
-// ----------------------------------------------
+//-------------------------------------
+// RestoreTarget definition goes here.
+// Content wise it should be a separate file while semantically it's part of RestoreRequest and
+// thus will stay isolated from rest of app in here
+//-------------------------------------
+
+
 type RestoreTarget = {
     name: string,
     lastKnownMessageId?: string
 }
+const restoreTargetConfig: FieldConfiguration<RestoreTarget>[] = [
+    {name: "name", type: "string"},
+    {name: "lastKnownMessageId", optional: true, type: "string"},
+];
 
-class RestoreTargetUtils {
-
-    static readonly validate = (value: unknown): value is RestoreTarget =>
-        validateObject(value, [
-            {name: "name", type: "string"},
-            {name: "lastKnownMessageId", optional: true, type: "string"},
-        ]) === true;
-
-    static readonly serialize = (value: RestoreTarget): string | null => {
-        if (!RestoreTargetUtils.validate(value)) {
-            return null;
-        }
-        const {name, lastKnownMessageId} = value;
-        if (lastKnownMessageId) {
-            return JSON.stringify([name, lastKnownMessageId]);
-        }
-        return JSON.stringify(name);
-    };
-
-    static readonly deserialize = (value: string): RestoreTarget | null => {
-        try {
-            const data = JSON.parse(value);
-            if (typeof data === "string") {
-                return {name: data};
-            }
-            if (Array.isArray(data) && data.length === 2 && isArrayOfStrings(data)) {
-                return {name: data[0], lastKnownMessageId: data[1]};
-            }
-        } catch (e) {
-            console.log(`Error while deserialize RestoreTarget`, {value, e})
-        }
+const isRestoreTarget = (value: RestoreTarget): value is RestoreTarget => validateObject(value, restoreTargetConfig) === true;
+const serializeRestoreTarget = (value: RestoreTarget): string | null => {
+    if (!isRestoreTarget(value)) {
         return null;
     }
-}
+    const {name, lastKnownMessageId} = value;
+    if (lastKnownMessageId) {
+        return JSON.stringify([name, lastKnownMessageId]);
+    }
+    return JSON.stringify(name);
+};
+const deserializeRestoreTarget = (value: string): RestoreTarget | null => {
+    try {
+        const data = JSON.parse(value);
+        if (typeof data === "string") {
+            return {name: data};
+        }
+        if (Array.isArray(data) && data.length === 2 && isArrayOfStrings(data)) {
+            return {name: data[0], lastKnownMessageId: data[1]};
+        }
+    } catch (e) {
+        console.log(`Error while deserialize RestoreTarget`, {value, e})
+    }
+    return null;
+};

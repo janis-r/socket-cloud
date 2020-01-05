@@ -26,7 +26,7 @@ describe('RestoreRequest', () => {
         })).toBe(true);
         expect(isRestoreRequest({type: 'jiberish'} as any)).toBe(false);
         expect(isRestoreRequest({type: 'Restore'} as any)).toBe(false);
-        expect(isRestoreRequest({type: MessageType.Restore})).toBe(false);
+        expect(isRestoreRequest({type: MessageType.Restore} as any)).toBe(false);
         expect(isRestoreRequest({
             type: MessageType.Restore,
             target: [{name: "target"}],
@@ -34,10 +34,7 @@ describe('RestoreRequest', () => {
         } as any)).toBe(false);
         expect(isRestoreRequest({
             type: MessageType.Restore,
-            target: [{
-                name: "target",
-                unAllowedKey: 1
-            }]
+            target: [{name: "target", unAllowedKey: 1}]
         } as any)).toBe(false);
     });
 
@@ -47,11 +44,7 @@ describe('RestoreRequest', () => {
             target: [{name: 'restore-target'}]
         };
 
-        const serialized = serializeRestoreRequest(data);
-        console.log({serialized});
-        const deserialize = deserializeRestoreRequest(serialized);
-        console.log(deserialize);
-        expect(deserialize).toMatchObject(data);
+        expect(data).toMatchObject(deserializeRestoreRequest(serializeRestoreRequest(data)));
     });
     it('Can serialize and deserialize complex message', () => {
         const data: RestoreRequest = {
@@ -64,11 +57,6 @@ describe('RestoreRequest', () => {
                 {name: 'restore-target5', lastKnownMessageId: "E"},
             ]
         };
-
-        const serialized = serializeRestoreRequest(data);
-        console.log({serialized});
-        const deserialize = deserializeRestoreRequest(serialized);
-        console.log(deserialize);
-        expect(deserialize).toMatchObject(data);
+        expect(data).toMatchObject(deserializeRestoreRequest(serializeRestoreRequest(data)));
     });
-})
+});

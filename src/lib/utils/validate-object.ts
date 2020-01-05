@@ -1,9 +1,15 @@
-export function validateObject(value: Record<any, any>, configuration: FieldConfiguration[], allowExtraFields = false): true | { name?: string, error: string } {
-    console.log(arguments)
+import {isArrayOfStrings} from "./is-array-of";
+
+export function validateObject(value: unknown, configuration: FieldConfiguration[], allowExtraFields = false): true | { name?: string | number | symbol, error: string } {
+    if (typeof value !== "object") {
+        return {error: `Value is not an object: ${value}`};
+    }
+
+    // console.log(arguments);
     const valueKeys = Object.keys(value);
     for (const config of configuration) {
         const {name, optional, exactValue, type, validator} = config;
-        const index = valueKeys.indexOf(name);
+        const index = valueKeys.indexOf(name as string);
         if (index === -1) {
             if (optional) {
                 continue;
@@ -14,9 +20,19 @@ export function validateObject(value: Record<any, any>, configuration: FieldConf
             return {name, error: `Exact value mismatch. Expected: ${exactValue}, actual: ${value[name]}`};
         }
         if (type) {
-            const actualType = typeof value[name];
-            if (type !== actualType) {
-                return {name, error: `Type mismatch. Expected: ${type}, actual: ${actualType}`};
+            if (type === "array") {
+                if (!Array.isArray(value[name])) {
+                    return {name, error: `Type mismatch. Type is expected to be an array`};
+                }
+            } else if (type === "string[]") {
+                if (!isArrayOfStrings(value[name])) {
+                    return {name, error: `Type mismatch. Type is expected to be an array of strings`};
+                }
+            } else {
+                const actualType = typeof value[name];
+                if (type !== actualType) {
+                    return {name, error: `Type mismatch. Expected: ${type}, actual: ${actualType}`};
+                }
             }
         }
         if (validator && !validator(value[name], name)) {
@@ -32,10 +48,22 @@ export function validateObject(value: Record<any, any>, configuration: FieldConf
     return true;
 }
 
-type FieldConfiguration = {
-    name: string,
+type SupportedType =
+    "undefined"
+    | "object"
+    | "boolean"
+    | "number"
+    | "bigint"
+    | "string"
+    | "string[]"
+    | "symbol"
+    | "function"
+    | "array";
+
+export type FieldConfiguration<T extends Record<string, any> = any> = {
+    name: keyof T,
     optional?: true,
     exactValue?: any,
-    type?: "undefined" | "object" | "boolean" | "number" | "bigint" | "string" | "symbol" | "function",
-    validator?: (value: any, field?: string) => boolean
+    type?: SupportedType | SupportedType[],
+    validator?: (value: any, field?: keyof T) => boolean
 }
