@@ -10,6 +10,10 @@ import {HandleNewConnection} from "./command/HandleNewConnection";
 import {HandleClientMessage} from "./command/HandleClientMessage";
 import {DataContextManagerProvider} from "./service/DataContextManagerProvider";
 import {HandleRemovedConnection} from "./command/HandleRemovedConnection";
+import {syntheticEventType} from "../utils/SyntheticEvent";
+import {protocolName} from "./protocolName";
+
+const protocol = protocolName;
 
 export const DeliveryProtocolModule: ModuleConfig = {
     requires: [
@@ -20,8 +24,17 @@ export const DeliveryProtocolModule: ModuleConfig = {
         DataContextManagerProvider
     ],
     commands: [
-        {event: NewConnectionEvent.TYPE, command: HandleNewConnection},
-        {event: ClientMessageEvent.TYPE, command: HandleClientMessage},
-        {event: ConnectionRemovedEvent.TYPE, command: HandleRemovedConnection}
+        {
+            event: syntheticEventType({type: NewConnectionEvent.TYPE, protocol}),
+            command: HandleNewConnection
+        },
+        {
+            event: syntheticEventType({type: ClientMessageEvent.TYPE, protocol}),
+            command: HandleClientMessage
+        },
+        {
+            event: syntheticEventType({type: ConnectionRemovedEvent.TYPE, protocol}),
+            command: HandleRemovedConnection
+        }
     ]
 };

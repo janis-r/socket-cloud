@@ -2,15 +2,18 @@ import {EventListener, EventMapping} from "qft";
 import {ConnectionState} from "../data/ConnectionState";
 import {ConfigurationContext} from "../../configurationContext";
 import {ErrorEvent, MessageEvent, StateChangeEvent} from "../connectionEvent";
+import {CloseReason} from "../data/CloseReason";
 
 export interface ClientConnection {
 
     readonly id: string;
-    readonly context: ConfigurationContext;
+    readonly context: Readonly<ConfigurationContext>;
     readonly state: ConnectionState;
 
     send(message: string): Promise<void>;
     send(message: Buffer): Promise<void>;
+
+    closeConnection(reason: CloseReason, message?: string): Promise<void>;
 
     addEventListener(event: "state-change", listener: EventListener<StateChangeEvent>, scope?: Object): EventMapping<StateChangeEvent>;
     addEventListener(event: "message", listener: EventListener<MessageEvent>, scope?: Object): EventMapping<MessageEvent>;

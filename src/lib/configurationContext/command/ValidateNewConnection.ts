@@ -15,27 +15,9 @@ export class ValidateNewConnection implements Command<void> {
 
     async execute() {
         const {event: {addValidator}} = this;
-        addValidator(this.validateSocketType);
         addValidator(this.validateConnectionCount);
         addValidator(this.validateWithExternalApi);
     }
-
-    readonly validateSocketType = async (): Promise<true | ValidationError> => {
-        const {context, descriptor: {type}} = this.event;
-
-        if ('allowedSocketType' in context === false) {
-            return true;
-        }
-
-        if (context.allowedSocketType.includes(type)) {
-            return true;
-        }
-
-        return {
-            error: ConnectionValidationError.SocketTypeNotAllowed,
-            message: 'Socket type is not allowed by context configuration.'
-        };
-    };
 
     readonly validateConnectionCount = async (): Promise<true | ValidationError> => {
         const {context: {maxConnectionCount}} = this.event;

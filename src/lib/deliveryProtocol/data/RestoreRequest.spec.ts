@@ -39,22 +39,19 @@ describe('RestoreRequest', () => {
     });
 
     it('Can serialize and deserialize simple message', () => {
-        const data: RestoreRequest = {
-            type: MessageType.Restore,
-            target: [{name: 'restore-target'}]
-        };
-
+        const data: RestoreRequest = {type: MessageType.Restore, channels: [{channel: 'restore-target'}]};
         expect(data).toMatchObject(deserializeRestoreRequest(serializeRestoreRequest(data)));
+        expect(data).toMatchObject(deserializeRestoreRequest(JSON.parse(serializeRestoreRequest(data))));
     });
     it('Can serialize and deserialize complex message', () => {
         const data: RestoreRequest = {
             type: MessageType.Restore,
-            target: [
-                {name: 'restore-target1', lastKnownMessageId: "A"},
-                {name: 'restore-target2', lastKnownMessageId: "B"},
-                {name: 'restore-target3', lastKnownMessageId: "C"},
-                {name: 'restore-target4', lastKnownMessageId: "D"},
-                {name: 'restore-target5', lastKnownMessageId: "E"},
+            channels: [
+                {channel: 'restore-target1', mid: "A"},
+                {channel: 'restore-target2', mid: "B"},
+                {channel: 'restore-target3', mid: "C"},
+                {channel: 'restore-target4', mid: "D"},
+                {channel: 'restore-target5', mid: "E"},
             ]
         };
         expect(data).toMatchObject(deserializeRestoreRequest(serializeRestoreRequest(data)));

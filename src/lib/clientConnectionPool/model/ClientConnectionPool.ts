@@ -55,7 +55,7 @@ export class ClientConnectionPool {
 
         console.log(chalk.red('Remove connection'), connection.id);
 
-        const {id: connectionId, context: {id: contextId}} = connection;
+        const {id: connectionId, context: {id: contextId, protocol}} = connection;
 
         connection.removeAllEventListeners(this);
 

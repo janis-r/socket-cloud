@@ -1,3 +1,5 @@
+import {realpath} from "fs";
+
 export class CallbackCollection<T> {
 
     private readonly callbacks = new Set<Callback<T>>();
@@ -6,13 +8,13 @@ export class CallbackCollection<T> {
         this.polymorph = this.polymorph.bind(this);
     }
 
-    readonly add = (callback: Callback<T>): boolean => {
+    readonly add = (callback: Callback<T>): { success: boolean, once?: () => void } => {
         const {callbacks} = this;
         if (callbacks.has(callback)) {
-            return false;
+            return {success: false};
         }
         callbacks.add(callback);
-        return true;
+        return {success: true, once: () => this.remove(callback)};
     };
 
     readonly has = (callback: Callback<T>) => this.callbacks.has(callback);
@@ -30,7 +32,7 @@ export class CallbackCollection<T> {
      * Add callback to collection
      * @param callback
      */
-    polymorph(callback: Callback<T>): boolean;
+    polymorph(callback: Callback<T>): { success: boolean, once?: () => void };
     /**
      * If no callback is specified proceed to collection management methods
      */

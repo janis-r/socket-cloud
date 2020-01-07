@@ -1,5 +1,5 @@
 import {Inject, Injector} from "qft";
-import {ConfigurationContext, ConfigurationContextProvider} from "../../configurationContext";
+import {ConfigurationContext, ConfigurationContextProvider, ContextId} from "../../configurationContext";
 import {DataContextManager} from "./DataContextManager";
 
 export class DataContextManagerProvider {
@@ -33,5 +33,3 @@ export class DataContextManagerProvider {
         return false;
     }
 }
-
-type ContextId = ConfigurationContext['id'];

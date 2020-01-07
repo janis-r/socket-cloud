@@ -2,7 +2,7 @@ import {Socket} from "net";
 import {spawnFrameData} from "../util/websocket-utils";
 import {DataFrame} from "../data/DataFrame";
 import {DataFrameType} from "../data/DataFrameType";
-import {ClientConnection, ConnectionState, connectionStateToString} from "../../clientConnectionPool";
+import {ClientConnection, CloseReason, ConnectionState, connectionStateToString} from "../../clientConnectionPool";
 import {ErrorEvent, MessageEvent, StateChangeEvent} from "../../clientConnectionPool/connectionEvent";
 import {WebsocketExtensionAgent} from "../../websocketExtension";
 import {ConfigurationContext} from "../../configurationContext";
@@ -88,6 +88,10 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
         await closeMessageSent;
         socket.end();
         return true;
+    }
+
+    async closeConnection(reason: keyof CloseReason, message?: string): Promise<void> {
+        await this.close(reason, message);
     }
 
     send(data: Buffer): Promise<void>;

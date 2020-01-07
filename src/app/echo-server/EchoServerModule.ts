@@ -5,7 +5,7 @@ import {ConfigurationContextProvider} from "../../lib/configurationContext";
 import {SocketDescriptor} from "../../lib/websocketListener/data/SocketDescriptor";
 import {PermessageDeflateConfig, PermessageDeflateExtensionModule} from "../../lib/permessageDeflateExtension";
 import {ClientMessageEvent} from "../../lib/clientConnectionPool";
-import {EchoMessage} from "./command/EchoMessage";
+import {EchoMessageCommand} from "./EchoMessageCommand";
 import {HttpServerConfig, HttpServerRouter} from "../../lib/httpServer";
 import {IncomingMessage, ServerResponse} from "http";
 
@@ -31,7 +31,7 @@ import {IncomingMessage, ServerResponse} from "http";
         PermessageDeflateConfig
     ],
     commands: [
-        {event: ClientMessageEvent.TYPE, command: EchoMessage}
+        {event: ClientMessageEvent.TYPE, command: EchoMessageCommand}
     ]
 })
 export class EchoServerModule {

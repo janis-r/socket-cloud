@@ -1,7 +1,7 @@
 import {Command, Inject} from "qft";
-import {ClientMessageEvent} from "../../../lib/clientConnectionPool";
+import {ClientMessageEvent} from "../../lib/clientConnectionPool";
 
-export class EchoMessage implements Command {
+export class EchoMessageCommand implements Command {
 
     @Inject()
     private event: ClientMessageEvent;

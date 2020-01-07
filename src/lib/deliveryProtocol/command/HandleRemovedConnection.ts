@@ -1,11 +1,12 @@
 import {Command, Inject} from "qft";
 import {ClientConnectionPool, ConnectionRemovedEvent} from "../../clientConnectionPool";
 import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
+import {SyntheticEvent} from "../../utils/SyntheticEvent";
 
 export class HandleRemovedConnection implements Command {
 
     @Inject()
-    private event: ConnectionRemovedEvent;
+    private event: SyntheticEvent<ConnectionRemovedEvent>;
     @Inject()
     private dataContextManagerProvider: DataContextManagerProvider;
     @Inject()
@@ -14,8 +15,10 @@ export class HandleRemovedConnection implements Command {
     async execute(): Promise<void> {
         const {
             event: {
-                connection,
-                connection: {context: {id: contextId}}
+                source: {
+                    connection,
+                    connection: {context: {id: contextId}}
+                }
             },
             dataContextManagerProvider: {getContextManager, resetContextManager},
             clientConnectionPool: {getConnectionsByContext}

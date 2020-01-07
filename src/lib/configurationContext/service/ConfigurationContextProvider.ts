@@ -3,6 +3,7 @@ import {Logger} from "../../logger";
 import {ConfigurationContext} from "../data/ConfigurationContext";
 import {SocketDescriptor} from "../../websocketListener/data/SocketDescriptor";
 import {SocketConnectionType} from "../../types/SocketConnectionType";
+import {protocolName} from "../../deliveryProtocol";
 
 export class ConfigurationContextProvider {
 
@@ -12,6 +13,7 @@ export class ConfigurationContextProvider {
     private readonly knownContexts = new Map<ConfigurationContext['id'], ConfigurationContext>([
         ['test', {
             id: 'test',
+            protocol: protocolName,
             maxConnectionCount: 100,
             connectionValidationUrl: 'http://localhost:8000/validate-socket',
             pingTimeout: 30000,
@@ -35,7 +37,7 @@ export class ConfigurationContextProvider {
         return knownContexts.get('test') ?? null;
     };
 
-    readonly getConfigurationContext = async (id: ConfigurationContext['id']): Promise<ConfigurationContext | null> => {
+    readonly getConfigurationContext = async (id: ConfigurationContext['id']): Promise<Readonly<ConfigurationContext> | null> => {
         const {knownContexts} = this;
         return knownContexts.get(id) ?? null;
     };
