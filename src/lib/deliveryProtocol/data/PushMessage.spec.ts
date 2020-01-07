@@ -3,12 +3,12 @@ import {deserializePushMessage, isPushMessage, PushMessage, serializePushMessage
 
 describe('PushMessage', () => {
     it('Is validated properly', () => {
-        expect(isPushMessage({type: MessageType.Push, destination: "d12", payload: "payload"})).toBe(true);
-        expect(isPushMessage({type: MessageType.Push, destination: ["d12", "d13"], payload: "payload"})).toBe(true);
-        expect(isPushMessage({type: "A", destination: "d12", payload: "payload"})).toBe(false);
-        expect(isPushMessage({type: MessageType.Push, destination: 12, payload: "payload"})).toBe(false);
-        expect(isPushMessage({type: MessageType.Push, destination: [12, 13], payload: "payload"})).toBe(false);
-        expect(isPushMessage({type: MessageType.Push, destination: "d12", payload: 1})).toBe(false);
+        expect(isPushMessage({type: MessageType.Push, channels: "d12", payload: "payload"})).toBe(false);
+        expect(isPushMessage({type: MessageType.Push, channels: ["d12", "d13"], payload: "payload"})).toBe(true);
+        expect(isPushMessage({type: "A", channels: "d12", payload: "payload"})).toBe(false);
+        expect(isPushMessage({type: MessageType.Push, channels: 12, payload: "payload"})).toBe(false);
+        expect(isPushMessage({type: MessageType.Push, channels: [12, 13], payload: "payload"})).toBe(false);
+        expect(isPushMessage({type: MessageType.Push, channels: "d12", payload: 1})).toBe(false);
     });
 
     it ('Can be serialized and deserialized', () => {

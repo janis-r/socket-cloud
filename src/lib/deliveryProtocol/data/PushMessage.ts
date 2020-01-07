@@ -39,8 +39,8 @@ export function deserializePushMessage(value: string | Array<any>): PushMessage 
     if (!Array.isArray(data) || data.length !== 3) {
         return null;
     }
-    const [type, destination, payload] = data;
-    const parsed = {type, destination, payload};
+    const [type, channels, payload] = data;
+    const parsed = {type, channels, payload};
     if (isPushMessage(parsed)) {
         const {type, channels, payload} = parsed;
         return {type, channels: uniqueValues(channels), payload};

@@ -43,12 +43,12 @@ export function deserializeRestoreRequest(value: string | Array<any>): RestoreRe
         return null;
     }
 
-    const [type, channel] = data;
-    if (!Array.isArray(channel)) {
+    const [type, channels] = data;
+    if (!Array.isArray(channels)) {
         return null;
     }
 
-    const parsed = {type, channel: channel.map(value => deserializeRestoreTarget(value))};
+    const parsed = {type, channels: channels.map(value => deserializeRestoreTarget(value))};
     if (isRestoreRequest(parsed)) {
         return parsed;
     }

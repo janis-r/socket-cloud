@@ -3,25 +3,25 @@ import {MessageType} from "./MessageType";
 
 describe('RestoreRequest', () => {
     it('Is validated properly', () => {
-        expect(isRestoreRequest({type: MessageType.Restore, target: [{name: "restore-target"}]})).toBe(true);
+        expect(isRestoreRequest({type: MessageType.Restore, channels: [{channel: "restore-channels"}]})).toBe(true);
         expect(isRestoreRequest({
             type: MessageType.Restore,
-            target: [{
-                name: "restore-target",
-                lastKnownMessageId: "lastKnownMessageId"
+            channels: [{
+                channel: "restore-channels",
+                mid: "mid"
             }]
         })).toBe(true);
         expect(isRestoreRequest({
             type: MessageType.Restore,
-            target: [{
-                name: "restore-target1",
-                lastKnownMessageId: "lastKnownMessageId"
+            channels: [{
+                channel: "restore-channels1",
+                mid: "mid"
             }, {
-                name: "restore-target2",
-                lastKnownMessageId: "lastKnownMessageId"
+                channel: "restore-channels2",
+                mid: "mid"
             }, {
-                name: "restore-target3",
-                lastKnownMessageId: "lastKnownMessageId"
+                channel: "restore-channels3",
+                mid: "mid"
             }]
         })).toBe(true);
         expect(isRestoreRequest({type: 'jiberish'} as any)).toBe(false);
@@ -29,17 +29,17 @@ describe('RestoreRequest', () => {
         expect(isRestoreRequest({type: MessageType.Restore} as any)).toBe(false);
         expect(isRestoreRequest({
             type: MessageType.Restore,
-            target: [{name: "target"}],
+            channels: [{channel: "channels"}],
             unAllowedKey: 1
         } as any)).toBe(false);
         expect(isRestoreRequest({
             type: MessageType.Restore,
-            target: [{name: "target", unAllowedKey: 1}]
+            channels: [{channel: "channels", unAllowedKey: 1}]
         } as any)).toBe(false);
     });
 
     it('Can serialize and deserialize simple message', () => {
-        const data: RestoreRequest = {type: MessageType.Restore, channels: [{channel: 'restore-target'}]};
+        const data: RestoreRequest = {type: MessageType.Restore, channels: [{channel: 'restore-channels'}]};
         expect(data).toMatchObject(deserializeRestoreRequest(serializeRestoreRequest(data)));
         expect(data).toMatchObject(deserializeRestoreRequest(JSON.parse(serializeRestoreRequest(data))));
     });
@@ -47,11 +47,11 @@ describe('RestoreRequest', () => {
         const data: RestoreRequest = {
             type: MessageType.Restore,
             channels: [
-                {channel: 'restore-target1', mid: "A"},
-                {channel: 'restore-target2', mid: "B"},
-                {channel: 'restore-target3', mid: "C"},
-                {channel: 'restore-target4', mid: "D"},
-                {channel: 'restore-target5', mid: "E"},
+                {channel: 'restore-channels1', mid: "A"},
+                {channel: 'restore-channels2', mid: "B"},
+                {channel: 'restore-channels3', mid: "C"},
+                {channel: 'restore-channels4', mid: "D"},
+                {channel: 'restore-channels5', mid: "E"},
             ]
         };
         expect(data).toMatchObject(deserializeRestoreRequest(serializeRestoreRequest(data)));
