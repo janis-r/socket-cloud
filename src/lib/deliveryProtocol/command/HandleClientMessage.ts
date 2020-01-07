@@ -17,7 +17,7 @@ export class HandleClientMessage implements Command {
                 source: {
                     message,
                     connection,
-                    connection: {id: connectionId, context: {id: contextId}}
+                    connection: {context: {id: contextId}}
                 }
             },
             dataContextManagerProvider: {getContextManager}

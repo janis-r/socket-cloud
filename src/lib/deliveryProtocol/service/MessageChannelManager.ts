@@ -15,6 +15,8 @@ export class MessageChannelManager {
     private readonly messageCache = new Map<string, CachedMessage>();
     private readonly sadAndUselessCallback = new CallbackCollection<void>();
 
+    private cleanupTimerId: ReturnType<typeof setTimeout>;
+
     constructor(readonly channelId: string) {
 
     }
@@ -26,17 +28,29 @@ export class MessageChannelManager {
     }
 
     unsubscribe(connection: ClientConnection): void {
-        this.connections.delete(connection);
+        const {connections, messageCache, sadAndUselessCallback} = this;
+        connections.delete(connection);
+        if (connections.size === 0 && messageCache.size === 0) {
+            sadAndUselessCallback.execute();
+        }
     }
 
     async write(payload: string, connection: ClientConnection): Promise<number> {
         const {cacheConfig: {cacheTimeMs, maxCacheSize}, messageCache, connections} = this;
-        const cachingEnabled = cacheTimeMs || maxCacheSize;
 
+        const cachingEnabled = cacheTimeMs || maxCacheSize;
         const outgoingMessage: OutgoingClientMessage = {payload};
         if (cachingEnabled) {
             outgoingMessage.mid = this.nextMessageId;
             messageCache.set(outgoingMessage.mid, {...outgoingMessage, time: Date.now()});
+            if (maxCacheSize) {
+                while (messageCache.size > maxCacheSize) {
+                    messageCache.delete([...messageCache.values()][0].mid);
+                }
+            }
+            if (cacheTimeMs && !this.cleanupTimerId) {
+                this.cleanupOutdatedMessages();
+            }
         }
         if (connections.size === 0) {
             return 0;
@@ -89,6 +103,37 @@ export class MessageChannelManager {
             this.messageId = 0;
         }
         return id;
+    }
+
+    private cleanupOutdatedMessages(): void {
+        const {cacheConfig: {cacheTimeMs}, messageCache} = this;
+
+        if (messageCache.size === 0) {
+            return;
+        }
+
+        const now = Date.now();
+        while (true) {
+            const entry = [...messageCache.values()][0];
+            if (entry.time + cacheTimeMs < now) {
+                messageCache.delete(entry.mid);
+                continue;
+            }
+            break;
+        }
+
+        if (messageCache.size === 0) {
+            return;
+        }
+
+
+        const {time} = [...messageCache.values()][0];
+        const expireTime = time + cacheTimeMs;
+
+        this.cleanupTimerId = setTimeout(() => {
+            this.cleanupTimerId = null;
+            this.cleanupOutdatedMessages();
+        }, expireTime - now);
     }
 }
 
