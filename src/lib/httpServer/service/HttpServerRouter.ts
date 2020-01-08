@@ -36,4 +36,4 @@ export class HttpServerRouter {
 }
 
 type UrlDescriptor = string;
-type UrlHandler = (request: IncomingMessage, response: ServerResponse) => void | Promise<void>;
+export type UrlHandler = (request: IncomingMessage, response: ServerResponse) => void | Promise<void>;

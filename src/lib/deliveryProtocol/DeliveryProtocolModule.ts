@@ -12,13 +12,15 @@ import {DataContextManagerProvider} from "./service/DataContextManagerProvider";
 import {HandleRemovedConnection} from "./command/HandleRemovedConnection";
 import {syntheticEventType} from "../utils/SyntheticEvent";
 import {protocolName} from "./protocolName";
+import {HttpServerModule} from "../httpServer";
 
 const protocol = protocolName;
 
 export const DeliveryProtocolModule: ModuleConfig = {
     requires: [
         ClientConnectionPoolModule,
-        ConfigurationContextModule
+        ConfigurationContextModule,
+        HttpServerModule
     ],
     mappings: [
         DataContextManagerProvider
