@@ -1,5 +1,4 @@
-import * as fs from "fs";
-import {InjectionConfig, Module} from "qft";
+import {InjectionConfig, Injector, Module} from "qft";
 import {WebsocketListenerModule} from "../../lib/websocketListener";
 import {ConfigurationContextProvider} from "../../lib/configurationContext";
 import {SocketDescriptor} from "../../lib/websocketListener/data/SocketDescriptor";
@@ -7,7 +6,6 @@ import {PermessageDeflateConfig, PermessageDeflateExtensionModule} from "../../l
 import {ClientMessageEvent} from "../../lib/clientConnectionPool";
 import {EchoMessageCommand} from "./EchoMessageCommand";
 import {HttpServerConfig, HttpServerRouter} from "../../lib/httpServer";
-import {IncomingMessage, ServerResponse} from "http";
 
 @Module({
     requires: [
@@ -35,25 +33,19 @@ import {IncomingMessage, ServerResponse} from "http";
     ]
 })
 export class EchoServerModule {
-    constructor(router: HttpServerRouter) {
-        router.get('/', (request: IncomingMessage, response: ServerResponse) => {
-            response.writeHead(200, {'Content-Type': 'text/html'});
-            response.write(fs.readFileSync(`${__dirname}/index.html`));
-            response.end();
+    constructor(router: HttpServerRouter, i: Injector) {
+
+        // console.log(i)
+        // console.log(router)
+        // process.exit()
+
+        router.get('/', (request, response) => {
+            response.sendFile(`${__dirname}/index.html`);
         });
 
-        router.post('/validate-socket', async (request: IncomingMessage, response: ServerResponse) => {
-            await new Promise<void>(resolve => {
-                const chunks = new Array<Buffer>();
-                request.on("data", chunk => chunks.push(chunk));
-                request.on("end", () => {
-                    console.log({body: JSON.parse(Buffer.concat(chunks).toString("utf8"))});
-                    resolve();
-                });
-            });
-            response.writeHead(200, {'Content-Type': 'application/json'});
-            response.write(JSON.stringify(true));
-            response.end();
+        router.post('/validate-socket', async (request, response) => {
+            console.log({body: request.body});
+            response.json(true);
         });
     }
 }

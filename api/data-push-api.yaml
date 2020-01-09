@@ -1,0 +1,137 @@
+openapi: 3.0.1
+info:
+  title: Data push API
+  description: An API designed and provided to push messages to clients.
+  contact:
+    name: Jānis Radiņš
+    email: jr@janisradins.com
+  version: 1.0.0
+tags:
+  - name: Data push
+paths:
+  /individual/{connectionIds}/:
+    post:
+      summary: Post message to individual connection (or connections), identified by connection id provided upon initialization.
+      tags:
+        - Data push
+      parameters:
+        - name: connectionIds
+          in: path
+          required: true
+          description: Pipe separated list of connection identifiers.
+          schema:
+            type: array
+            items:
+              type: string
+      requestBody:
+        required: true
+        description: Payload data to be transfered to one or multiple connections.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IndividualMessage"
+      responses:
+        200:
+          description: Message delivery report.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageDeliveryReport"
+        410:
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - ApiAuthKey: []
+  /channel-message/:
+    post:
+      summary: Post message to data channels.
+      tags:
+        - Data push
+      requestBody:
+        description: Message data object to be delivered to recipients.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChannelMessage"
+      responses:
+        200:
+          description: Message delivery report.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageDeliveryReport"
+        410:
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - ApiAuthKey: []
+  /multi-channel-message/:
+    post:
+      summary: Post list of messages to data channels.
+      tags:
+        - Data push
+      requestBody:
+        description: List of message data objects to be delivered to recipients.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/ChannelMessage"
+      responses:
+        200:
+          description: Array of message delivery reports in same order as incoming messages.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MessageDeliveryReport"
+        410:
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - ApiAuthKey: []
+components:
+  schemas:
+    ChannelMessage:
+      description: Message data format to be delivered to data cahnnel.
+      type: object
+      properties:
+        channel:
+          description: List of data channel names to which message should be delivered.
+          type: array
+          items:
+            type: string
+        payload:
+          type: string
+      required:
+        - channel
+        - payload
+    IndividualMessage:
+      description: Message data format to be delivered to indiviual connection.
+      type: object
+      properties:
+        payload:
+          type: string
+      required:
+        - payload
+    MessageDeliveryReport:
+      type: object
+      properties:
+        recipients:
+          description: Number of recipients for whom message was delivered.
+          type: number
+      required:
+        - recipients
+  responses:
+    UnauthorizedError:
+      description: API key is missing or invalid
+      headers:
+        WWW_Authenticate:
+          schema:
+            type: string
+  securitySchemes:
+    ApiAuthKey:
+      type: apiKey
+      in: header
+      name: X-API-KEY

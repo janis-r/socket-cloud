@@ -1,30 +1,54 @@
 import * as http from "http";
+import * as https from "https";
+import express, {Express} from "express";
+import fs from "fs";
+import {json} from "body-parser";
+import compression from "compression";
 import {Socket} from "net";
 import {EventDispatcher, Injectable} from "qft";
 import {Logger} from "../../logger";
 import {HttpServerConfig} from "../config/HttpServerConfig";
-import {HttpRequestEvent} from "../event/HttpRequestEvent";
 import {HttpConnectionUpgradeEvent} from "../event/HttpConnectionUpgradeEvent";
 import {UpgradeRequest} from "../data/UpgradeRequest";
-import {IncomingMessage, ServerResponse} from "http";
+import {HttpRequestHandler} from "../data/HttpRequestHandler";
+import {HttpServerRouter} from "./HttpServerRouter";
 
 @Injectable()
-export class HttpServerService {
+export class HttpServerService implements HttpServerRouter {
 
-    private readonly httpServer: http.Server;
+    readonly expressApp: Express;
+    private readonly server: http.Server | https.Server;
 
     constructor(private readonly config: HttpServerConfig,
                 private readonly logger: Logger,
                 private readonly eventDispatcher: EventDispatcher
     ) {
-        const {config: {port}} = this;
+        const {config: {port, httpsCredentials}} = this;
 
-        this.httpServer = http.createServer(this.requestListener);
-        this.httpServer.on("upgrade", this.upgradeListener);
-        this.httpServer.listen(port);
-        this.httpServer.once("listening", () => logger.console(`Http server running on port ${port}`));
+        this.expressApp = express();
+        this.expressApp.use(json());
+        this.expressApp.use(compression());
+
+        if (!httpsCredentials) {
+            this.server = http.createServer(this.expressApp);
+        } else {
+            const key = fs.readFileSync(httpsCredentials.privateKey, "utf8");
+            const cert = fs.readFileSync(httpsCredentials.certificate, "utf8");
+            this.server = https.createServer({key, cert}, this.expressApp);
+        }
+
+        this.server.on("upgrade", this.upgradeListener);
+        this.server.listen(port);
+        this.server.once("listening", () => logger.console(`Http${httpsCredentials ? 's' : ''} server running on port ${port}`));
     }
 
-    private readonly requestListener = (req: IncomingMessage, res: ServerResponse) => this.eventDispatcher.dispatchEvent(new HttpRequestEvent(req, res));
     private readonly upgradeListener = (req: UpgradeRequest, socket: Socket) => this.eventDispatcher.dispatchEvent(new HttpConnectionUpgradeEvent(req, socket));
+
+    get(url: string, handler: HttpRequestHandler): void {
+        this.expressApp.get(url, handler);
+    }
+
+    post(url: string, handler: HttpRequestHandler): void {
+        this.expressApp.post(url, handler);
+    }
 }

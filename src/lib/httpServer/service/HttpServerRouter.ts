@@ -1,39 +1,24 @@
 import {Injectable} from "qft";
-import {HttpMethod} from "../../types/HttpMethod";
-import {IncomingMessage, ServerResponse} from "http";
+import {HttpRequestHandler} from "../data/HttpRequestHandler";
+import {HttpServerService} from "./HttpServerService";
 
-@Injectable()
-export class HttpServerRouter {
+// @Injectable()
+export abstract class HttpServerRouter {
 
-    private readonly mappings = new Map<HttpMethod, Map<UrlDescriptor, UrlHandler>>();
+    abstract get(url: string, handler: HttpRequestHandler): void;
+    abstract post(url: string, handler: HttpRequestHandler): void;
 
-    get(url: UrlDescriptor, handler: UrlHandler): void {
-        this.setHandler(HttpMethod.GET, url, handler);
+    /*constructor(readonly httpServerService: HttpServerService) {
     }
 
-    post(url: UrlDescriptor, handler: UrlHandler): void {
-        this.setHandler(HttpMethod.POST, url, handler);
+    get(url: string, handler: UrlHandler): void {
+        const {httpServerService: {expressApp}} = this;
+        expressApp.get(url, handler);
     }
 
-    getHandler(method: HttpMethod, url: UrlDescriptor): UrlHandler | null {
-        const {mappings} = this;
-        if (mappings.has(method) && mappings.get(method).has(url)) {
-            return mappings.get(method).get(url);
-        }
-
-        return null;
-    }
-
-
-    private setHandler(method: HttpMethod, url: UrlDescriptor, handler: UrlHandler): void {
-        const {mappings} = this;
-        if (!mappings.has(method)) {
-            mappings.set(method, new Map<UrlDescriptor, UrlHandler>([[url, handler]]));
-        } else {
-            mappings.get(method).set(url, handler);
-        }
-    }
+    post(url: string, handler: UrlHandler): void {
+        const {httpServerService: {expressApp}} = this;
+        expressApp.post(url, handler);
+    }*/
 }
 
-type UrlDescriptor = string;
-export type UrlHandler = (request: IncomingMessage, response: ServerResponse) => void | Promise<void>;
