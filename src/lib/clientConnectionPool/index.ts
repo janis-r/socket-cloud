@@ -1,4 +1,6 @@
 export * from "./data/CloseReason";
+export * from "./data/ConnectionId";
+export * from "./data/ExternalId";
 export * from "./data/ConnectionState";
 export * from "./event/NewConnectionEvent";
 export * from "./event/ClientMessageEvent";

@@ -1,6 +1,6 @@
 import * as http from "http";
 import * as https from "https";
-import express, {Express} from "express";
+import express, {Express, NextFunction, Request, Response} from "express";
 import fs from "fs";
 import {json} from "body-parser";
 import compression from "compression";
@@ -12,6 +12,7 @@ import {HttpConnectionUpgradeEvent} from "../event/HttpConnectionUpgradeEvent";
 import {UpgradeRequest} from "../data/UpgradeRequest";
 import {HttpRequestHandler} from "../data/HttpRequestHandler";
 import {HttpServerRouter} from "./HttpServerRouter";
+import {RequestContext} from "../data/RequestContext";
 
 @Injectable()
 export class HttpServerService implements HttpServerRouter {
@@ -45,10 +46,12 @@ export class HttpServerService implements HttpServerRouter {
     private readonly upgradeListener = (req: UpgradeRequest, socket: Socket) => this.eventDispatcher.dispatchEvent(new HttpConnectionUpgradeEvent(req, socket));
 
     get(url: string, handler: HttpRequestHandler): void {
-        this.expressApp.get(url, handler);
+        this.expressApp.get(url, (req, res, next) => handler(requestContextFactory(req, res, next)));
     }
 
     post(url: string, handler: HttpRequestHandler): void {
-        this.expressApp.post(url, handler);
+        this.expressApp.post(url, (req, res, next) => handler(requestContextFactory(req, res, next)));
     }
 }
+
+const requestContextFactory = (req: Request, res: Response, next: NextFunction) => new RequestContext(req, res, next);

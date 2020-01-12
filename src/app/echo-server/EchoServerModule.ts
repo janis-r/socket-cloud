@@ -34,18 +34,10 @@ import {HttpServerConfig, HttpServerRouter} from "../../lib/httpServer";
 })
 export class EchoServerModule {
     constructor(router: HttpServerRouter, i: Injector) {
-
-        // console.log(i)
-        // console.log(router)
-        // process.exit()
-
-        router.get('/', (request, response) => {
-            response.sendFile(`${__dirname}/index.html`);
-        });
-
-        router.post('/validate-socket', async (request, response) => {
-            console.log({body: request.body});
-            response.json(true);
+        router.get('/', ({sendFile}) => sendFile(`${__dirname}/index.html`));
+        router.post('/validate-socket', ({body, sendJson}) => {
+            console.log({body});
+            sendJson(true);
         });
     }
 }

@@ -11,14 +11,21 @@ export class DataContextManagerProvider {
     private readonly configurationContextProvider: ConfigurationContextProvider;
 
     private readonly entities = new Map<ContextId, DataContextManager>();
+    private readonly entityPromise = new Map<ContextId, Promise<void>>();
 
     readonly getContextManager = async (contextId: ContextId): Promise<DataContextManager> => {
-        const {entities, configurationContextProvider: {getConfigurationContext}, injector} = this;
-
-        if (!entities.has(contextId)) {
-            const subInjector = injector.createSubInjector();
-            subInjector.map(ConfigurationContext).toValue(await getConfigurationContext(contextId));
-            entities.set(contextId, subInjector.instantiateInstance(DataContextManager))
+        const {entities, entityPromise, configurationContextProvider: {getConfigurationContext}, injector} = this;
+        if (!entities.has(contextId) && entityPromise.has(contextId)) {
+            await entityPromise.get(contextId);
+        } else if (!entities.has(contextId)) {
+            const promise = (async () => {
+                const subInjector = injector.createSubInjector();
+                subInjector.map(ConfigurationContext).toValue(await getConfigurationContext(contextId));
+                entities.set(contextId, subInjector.instantiateInstance(DataContextManager));
+            })();
+            entityPromise.set(contextId, promise);
+            await promise;
+            entityPromise.delete(contextId);
         }
 
         return entities.get(contextId);

@@ -1,5 +1,5 @@
 import {MessageType} from "./MessageType";
-import {FieldConfiguration, validateObject} from "../../utils/validate-object";
+import {FieldConfiguration, validateObject} from "../../../utils/validate-object";
 import {uniqueValues} from "ugd10a";
 
 export type PushMessage = {
@@ -8,9 +8,9 @@ export type PushMessage = {
     payload: string
 }
 const messageConfig: FieldConfiguration<PushMessage>[] = [
-    {name: "type", exactValue: MessageType.Push},
-    {name: "channels", type: "string[]"},
-    {name: "payload", type: "string"}
+    {field: "type", exactValue: MessageType.Push},
+    {field: "channels", type: "string[]"},
+    {field: "payload", type: "string"}
 ];
 
 export const isPushMessage = (value: unknown): value is PushMessage => validateObject(value, messageConfig) === true;

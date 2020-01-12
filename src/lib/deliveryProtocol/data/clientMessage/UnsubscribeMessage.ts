@@ -1,5 +1,5 @@
 import {MessageType} from "./MessageType";
-import {FieldConfiguration, validateObject} from "../../utils/validate-object";
+import {FieldConfiguration, validateObject} from "../../../utils/validate-object";
 import {uniqueValues} from "ugd10a";
 
 export type UnsubscribeMessage = {
@@ -7,8 +7,8 @@ export type UnsubscribeMessage = {
     channels: string[]
 }
 const messageConfig: FieldConfiguration<UnsubscribeMessage>[] = [
-    {name: "type", exactValue: MessageType.Unsubscribe},
-    {name: "channels", type: "string[]"}
+    {field: "type", exactValue: MessageType.Unsubscribe},
+    {field: "channels", type: "string[]"}
 ];
 
 export const isUnsubscribeMessage = (value: unknown): value is UnsubscribeMessage => validateObject(value, messageConfig) === true;

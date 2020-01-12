@@ -1,12 +1,11 @@
 import {Command, Inject} from "qft";
 import {ClientConnectionPool, NewConnectionEvent} from "../../clientConnectionPool";
 import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
-import {SyntheticEvent} from "../../utils/SyntheticEvent";
 
 export class HandleNewConnection implements Command {
 
     @Inject()
-    private event: SyntheticEvent<NewConnectionEvent>;
+    private event: NewConnectionEvent;
     @Inject()
     private dataContextManagerProvider: DataContextManagerProvider;
     @Inject()
@@ -14,17 +13,12 @@ export class HandleNewConnection implements Command {
 
     async execute(): Promise<void> {
         const {
-            event: {
-                source: {
-                    connection,
-                    connection: {context: {id: contextId}}
-                }
-            },
+            event: {connection, connection: {context: {id: contextId}}},
             dataContextManagerProvider: {getContextManager}
         } = this;
 
         const manager = await getContextManager(contextId);
-        manager.handleNewConnection(connection);
+        manager.addConnection(connection);
     }
 
 }

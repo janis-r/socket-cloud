@@ -9,36 +9,29 @@ info:
 tags:
   - name: Data push
 paths:
-  /individual/{connectionIds}/:
+  /individual-message/:
     post:
       summary: Post message to individual connection (or connections), identified by connection id provided upon initialization.
       tags:
         - Data push
-      parameters:
-        - name: connectionIds
-          in: path
-          required: true
-          description: Pipe separated list of connection identifiers.
-          schema:
-            type: array
-            items:
-              type: string
       requestBody:
         required: true
-        description: Payload data to be transfered to one or multiple connections.
+        description: Data to be transfered to one or multiple connections.
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/IndividualMessage"
       responses:
         200:
-          description: Message delivery report.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageDeliveryReport"
-        410:
-          $ref: "#/components/responses/UnauthorizedError"
+          $ref: "#/components/responses/MessageDeliveryReport"
+        400:
+          $ref: "#/components/responses/BadRequestData"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        405:
+          $ref: "#/components/responses/ActionProhibited"
+        413:
+          $ref: "#/components/responses/PayloadTooLarge"
       security:
         - ApiAuthKey: []
   /channel-message/:
@@ -55,13 +48,15 @@ paths:
               $ref: "#/components/schemas/ChannelMessage"
       responses:
         200:
-          description: Message delivery report.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageDeliveryReport"
-        410:
-          $ref: "#/components/responses/UnauthorizedError"
+          $ref: "#/components/responses/MessageDeliveryReport"
+        400:
+          $ref: "#/components/responses/BadRequestData"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        405:
+          $ref: "#/components/responses/ActionProhibited"
+        413:
+          $ref: "#/components/responses/PayloadTooLarge"
       security:
         - ApiAuthKey: []
   /multi-channel-message/:
@@ -80,15 +75,15 @@ paths:
                 $ref: "#/components/schemas/ChannelMessage"
       responses:
         200:
-          description: Array of message delivery reports in same order as incoming messages.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/MessageDeliveryReport"
-        410:
-          $ref: "#/components/responses/UnauthorizedError"
+          $ref: "#/components/responses/MessageDeliveryReport"
+        400:
+          $ref: "#/components/responses/BadRequestData"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        405:
+          $ref: "#/components/responses/ActionProhibited"
+        413:
+          $ref: "#/components/responses/PayloadTooLarge"
       security:
         - ApiAuthKey: []
 components:
@@ -111,25 +106,80 @@ components:
       description: Message data format to be delivered to indiviual connection.
       type: object
       properties:
+        connectionIds:
+          type: array
+          items:
+            type: string
         payload:
           type: string
       required:
+        - connectionIds
         - payload
-    MessageDeliveryReport:
-      type: object
-      properties:
-        recipients:
-          description: Number of recipients for whom message was delivered.
-          type: number
-      required:
-        - recipients
   responses:
-    UnauthorizedError:
-      description: API key is missing or invalid
+    MessageDeliveryReport:
+      description: Message delivery report.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              recipients:
+                description: Number of recipients for whom message was sent.
+                type: number
+            required:
+              - recipients
+    Unauthorized:
+      description: API key is missing, invalid or data context is disabled.
       headers:
         WWW_Authenticate:
           schema:
             type: string
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+            required:
+              - error
+    ActionProhibited:
+      description: Action is not allowed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+            required:
+              - error
+    BadRequestData:
+      description: Malformed request data.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              name:
+                type: string
+                description: Name of a data field that produced error.
+            required:
+              - error
+    PayloadTooLarge:
+      description: Paylaod exceed limit.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+            required:
+              - error
+
   securitySchemes:
     ApiAuthKey:
       type: apiKey

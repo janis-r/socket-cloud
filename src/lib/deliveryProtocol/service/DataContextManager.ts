@@ -1,57 +1,110 @@
 import {Inject} from "qft";
-import {ConfigurationContext} from "../../configurationContext";
-import {ClientConnection, ClientConnectionPool} from "../../clientConnectionPool";
-import {IncomingClientMessage, MessageType} from "../data";
-import {MessageChannelManagerProvider} from "./MessageChannelManagerProvider";
+import {CachingPolicy, ConfigurationContext} from "../../configurationContext";
+import {ClientConnection} from "../../clientConnectionPool";
+import {ChannelId} from "../data/ChannelId";
+import {Logger} from "../../logger";
 
 export class DataContextManager {
 
     @Inject()
-    readonly context: ConfigurationContext;
-
+    readonly context: Readonly<ConfigurationContext>;
     @Inject()
-    readonly connectionPool: ClientConnectionPool;
+    private readonly logger: Logger;
 
-    @Inject()
-    readonly messageChannelManagerProvider: MessageChannelManagerProvider;
+    private readonly contextChannelsByConnection = new Map<ClientConnection, Set<ChannelId>>();
+    private readonly contextChannels = new Map<ChannelId, Set<ClientConnection>>();
 
-    handleNewConnection(connection: ClientConnection): void {
-
+    get connectionCount(): number {
+        return this.contextChannelsByConnection.size;
     }
 
-    handleRemovedConnection(connection: ClientConnection): void {
-
+    get channelCount(): number {
+        return this.contextChannels.size;
     }
 
-    async handleClientMessage(message: IncomingClientMessage, connection: ClientConnection): Promise<void> {
-        const {messageChannelManagerProvider: {getChannelManager}} = this;
-        const {context: {id: contextId}} = connection;
+    addConnection(connection: ClientConnection): void {
+        const {contextChannelsByConnection} = this;
+        contextChannelsByConnection.set(connection, new Set<ChannelId>());
+    }
 
-        switch (message.type) {
-            case MessageType.Subscribe:
-                for (const channelId of message.channels) {
-                    const manager = await getChannelManager(contextId, channelId);
-                    manager.subscribe(connection);
-                }
-                break;
-            case MessageType.Unsubscribe:
-                for (const channelId of message.channels) {
-                    const manager = await getChannelManager(contextId, channelId);
-                    manager.unsubscribe(connection);
-                }
-                break;
-            case MessageType.Push:
-                for (const channelId of message.channels) {
-                    const manager = await getChannelManager(contextId, channelId);
-                    manager.write(message.payload, connection)
-                }
-                break;
-            case MessageType.Restore :
-                for (const {channel, mid} of message.channels) {
-                    const manager = await getChannelManager(contextId, channel);
-                    manager.restoreSubscription(connection, mid);
-                }
-                break;
+    removeConnection(connection: ClientConnection): void {
+        const {contextChannels, contextChannelsByConnection} = this;
+
+        contextChannelsByConnection.get(connection).forEach(channelId => {
+            const collection = contextChannels.get(channelId);
+            collection.delete(connection);
+            if (collection.size === 0) {
+                contextChannels.delete(channelId);
+            }
+        });
+
+        contextChannelsByConnection.delete(connection);
+    }
+
+    subscribeToChannel(channels: ChannelId[], connection: ClientConnection): void {
+        const {contextChannels, contextChannelsByConnection} = this;
+        for (const channelId of channels) {
+            if (!contextChannels.has(channelId)) {
+                contextChannels.set(channelId, new Set<ClientConnection>([connection]));
+            } else {
+                this.contextChannels.get(channelId).add(connection);
+            }
+            contextChannelsByConnection.get(connection).add(channelId);
         }
     }
+
+    unsubscribeFromChannel(channels: ChannelId[], connection: ClientConnection): void {
+        const {logger, contextChannels, contextChannelsByConnection} = this;
+        for (const channelId of channels) {
+            if (!contextChannels.has(channelId)) {
+                logger.debug(`DataContextManager inconsistency - connection id ${connection.id} is not present in channel ${channelId}`);
+                continue;
+            }
+
+            const collection = contextChannels.get(channelId);
+            collection.delete(connection);
+            if (collection.size === 0) {
+                contextChannels.delete(channelId);
+            }
+
+            contextChannelsByConnection.get(connection).delete(channelId);
+        }
+    }
+
+    getConnectionsChannels(connection: ClientConnection): ReadonlySet<ChannelId> | null {
+        return this.contextChannelsByConnection.get(connection) ?? null;
+    }
+
+    getConnections(): ReadonlySet<ClientConnection> {
+        return new Set([...this.contextChannelsByConnection.keys()]);
+    }
+
+    getChannelConnections(channelId: ChannelId): ReadonlySet<ClientConnection> | null {
+        return this.contextChannels.get(channelId) ?? null;
+    }
+
+    getChannelCachingPolicy(channelId: ChannelId): Readonly<CachingPolicy> | null {
+        const {
+            context: {
+                cachingPolicy: generalPolicy,
+                perChannelCachingPolicy
+            }
+        } = this;
+
+        const channelPolicy = channelId in perChannelCachingPolicy ? perChannelCachingPolicy[channelId] : null;
+
+        if (!generalPolicy && !channelPolicy) {
+            return null;
+        }
+
+        if (!!generalPolicy !== !!channelPolicy) {
+            return channelPolicy ?? generalPolicy;
+        }
+
+        return {
+            cacheTimeMs: channelPolicy.cacheTimeMs ?? generalPolicy.cacheTimeMs,
+            maxCacheSize: channelPolicy.maxCacheSize ?? generalPolicy.maxCacheSize
+        }
+    }
+
 }

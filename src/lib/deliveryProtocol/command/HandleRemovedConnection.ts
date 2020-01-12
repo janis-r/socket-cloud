@@ -1,32 +1,27 @@
 import {Command, Inject} from "qft";
-import {ClientConnectionPool, ConnectionRemovedEvent} from "../../clientConnectionPool";
+import {ConnectionRemovedEvent} from "../../clientConnectionPool";
 import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
-import {SyntheticEvent} from "../../utils/SyntheticEvent";
 
 export class HandleRemovedConnection implements Command {
 
     @Inject()
-    private event: SyntheticEvent<ConnectionRemovedEvent>;
+    private event: ConnectionRemovedEvent;
     @Inject()
     private dataContextManagerProvider: DataContextManagerProvider;
-    @Inject()
-    private clientConnectionPool: ClientConnectionPool;
 
     async execute(): Promise<void> {
         const {
             event: {
-                source: {
-                    connection,
-                    connection: {context: {id: contextId}}
-                }
+                connection,
+                connection: {context: {id: contextId}}
             },
-            dataContextManagerProvider: {getContextManager, resetContextManager},
-            clientConnectionPool: {getConnectionsByContext}
+            dataContextManagerProvider: {getContextManager, resetContextManager}
         } = this;
 
         const manager = await getContextManager(contextId);
-        await manager.handleRemovedConnection(connection);
-        if (getConnectionsByContext(contextId).size === 0) {
+        manager.removeConnection(connection);
+
+        if (!manager.connectionCount) {
             resetContextManager(contextId);
         }
     }

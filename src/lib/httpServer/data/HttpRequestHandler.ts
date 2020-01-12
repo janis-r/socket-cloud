@@ -1,3 +1,3 @@
-import {Request, Response} from "express";
+import {RequestContext} from "./RequestContext";
 
-export type HttpRequestHandler = (request: Request, response: Response) => void | Promise<void>;
+export type HttpRequestHandler = (context: RequestContext) => void | Promise<void>;

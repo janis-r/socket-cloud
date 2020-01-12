@@ -1,6 +1,6 @@
 import {MessageType} from "./MessageType";
-import {FieldConfiguration, validateObject} from "../../utils/validate-object";
-import {isArrayOfStrings} from "../../utils/is-array-of";
+import {FieldConfiguration, validateObject} from "../../../utils/validate-object";
+import {isArrayOfStrings} from "../../../utils/is-array-of";
 
 export type RestoreRequest = {
     type: MessageType.Restore,
@@ -8,9 +8,9 @@ export type RestoreRequest = {
 }
 
 const restoreRequestConfig: FieldConfiguration<RestoreRequest>[] = [
-    {name: "type", exactValue: MessageType.Restore},
+    {field: "type", exactValue: MessageType.Restore},
     {
-        name: "channels",
+        field: "channels",
         type: "array",
         validator: (value: RestoreRequest['channels']) => !value.some(subValue => !isRestoreTarget(subValue))
     }
@@ -68,8 +68,8 @@ type RestoreTarget = {
     mid?: string
 }
 const restoreTargetConfig: FieldConfiguration<RestoreTarget>[] = [
-    {name: "channel", type: "string"},
-    {name: "mid", optional: true, type: "string"},
+    {field: "channel", type: "string"},
+    {field: "mid", optional: true, type: "string"},
 ];
 
 const isRestoreTarget = (value: RestoreTarget): value is RestoreTarget => validateObject(value, restoreTargetConfig) === true;

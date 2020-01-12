@@ -1,4 +1,4 @@
-import {MessageCachingPolicy} from "./MessageCachingPolicy";
+import {CachingPolicy} from "./CachingPolicy";
 
 export abstract class ConfigurationContext {
     // Unique id of configuration context
@@ -15,10 +15,11 @@ export abstract class ConfigurationContext {
     // Fragmentation directive for outgoing messages. No message fragmentation will be applied
     // if this property is absent.
     outgoingMessageFragmentSize?: number;
-    // Instructions on how to cache outgoing messages.
-    // No caching will be applied and no messages will be available for recovery, in case if this entry is missing.
-    messageCaching?:MessageCachingPolicy & {
-        // Channel specific configurations that'll override values set in general configuration
-        perChannelCachingConfig?: Record<string, MessageCachingPolicy>;
-    }
+    // General instructions on how to cache outgoing messages applicable to all channels unless channel
+    // specific instructions are provided
+    cachingPolicy?: CachingPolicy;
+    // Channel specific configurations that'll override values set in general configuration
+    perChannelCachingPolicy?: Record<string, CachingPolicy>;
+    // Max payload size
+    maxPayloadSize?: number;
 }

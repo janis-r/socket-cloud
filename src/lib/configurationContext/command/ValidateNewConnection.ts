@@ -1,7 +1,7 @@
 import {Command, Inject} from "qft";
 import {Logger} from "../../logger";
 import fetch from "node-fetch";
-import {HttpStatusCode} from "../../types/HttpStatusCodes";
+import {HttpStatusCode} from "../../types/HttpStatusCode";
 import {Json} from "../../types/Json";
 import {ValidateSocketConnectionEvent, ValidationError} from "../../websocketListener";
 import {ConnectionValidationError} from "../data/ConnectionValidationError";

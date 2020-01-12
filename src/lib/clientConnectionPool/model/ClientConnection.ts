@@ -7,6 +7,7 @@ import {CloseReason} from "../data/CloseReason";
 export interface ClientConnection {
 
     readonly id: string;
+    readonly externalId: string;
     readonly context: Readonly<ConfigurationContext>;
     readonly state: ConnectionState;
 

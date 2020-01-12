@@ -1,5 +1,6 @@
-import {ModuleConfig} from "qft";
+import {Event, ModuleConfig} from "qft";
 import {
+    ClientConnection,
     ClientConnectionPoolModule,
     ClientMessageEvent,
     ConnectionRemovedEvent,
@@ -10,11 +11,18 @@ import {HandleNewConnection} from "./command/HandleNewConnection";
 import {HandleClientMessage} from "./command/HandleClientMessage";
 import {DataContextManagerProvider} from "./service/DataContextManagerProvider";
 import {HandleRemovedConnection} from "./command/HandleRemovedConnection";
-import {syntheticEventType} from "../utils/SyntheticEvent";
 import {protocolName} from "./protocolName";
 import {HttpServerModule} from "../httpServer";
+import {AccessTokenManager} from "./service/AccessTokenManager";
+import {DataPushApiListener} from "./service/DataPushApiListener";
+import {IncomingClientMessageEvent} from "./event/IncomingClientMessageEvent";
+import {MessageType} from "./data";
+import {UpdateClientSubscriptions} from "./command/UpdateClientSubscriptions";
+import {PrepareOutgoingClientMessage} from "./command/PrepareOutgoingClientMessage";
+import {OutgoingMessageEvent} from "./event/OutgoingMessageEvent";
+import {BroadcastOutgoingMessage} from "./command/BroadcastOutgoingMessage";
 
-const protocol = protocolName;
+const protocolGuard = ({data: {context: {protocol}}}: Event<ClientConnection>) => protocol === protocolName;
 
 export const DeliveryProtocolModule: ModuleConfig = {
     requires: [
@@ -23,20 +31,35 @@ export const DeliveryProtocolModule: ModuleConfig = {
         HttpServerModule
     ],
     mappings: [
-        DataContextManagerProvider
+        DataContextManagerProvider,
+        {map: DataPushApiListener, instantiate: true},
+        AccessTokenManager
     ],
     commands: [
+        {event: NewConnectionEvent.TYPE, command: HandleNewConnection, guard: protocolGuard},
+        {event: ConnectionRemovedEvent.TYPE, command: HandleRemovedConnection, guard: protocolGuard},
+        {event: ClientMessageEvent.TYPE, command: HandleClientMessage, guard: protocolGuard},
         {
-            event: syntheticEventType({type: NewConnectionEvent.TYPE, protocol}),
-            command: HandleNewConnection
+            event: IncomingClientMessageEvent.TYPE,
+            command: UpdateClientSubscriptions,
+            guard: ({message: {type}}: IncomingClientMessageEvent) => [
+                MessageType.Subscribe,
+                MessageType.Unsubscribe
+            ].includes(type)
         },
         {
-            event: syntheticEventType({type: ClientMessageEvent.TYPE, protocol}),
-            command: HandleClientMessage
+            event: IncomingClientMessageEvent.TYPE,
+            command: PrepareOutgoingClientMessage,
+            guard: ({message: {type}}: IncomingClientMessageEvent) => type === MessageType.Push
         },
-        {
-            event: syntheticEventType({type: ConnectionRemovedEvent.TYPE, protocol}),
-            command: HandleRemovedConnection
-        }
+        // {
+        //     event: IncomingClientMessageEvent.TYPE,
+        //     command: RestoreClientSubscription,
+        //     guard: ({message: {type}}: IncomingClientMessageEvent) => type === MessageType.Restore
+        // },
+
+        {event: OutgoingMessageEvent.TYPE, command: BroadcastOutgoingMessage}
     ]
 };
+
+

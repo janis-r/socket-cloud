@@ -1,26 +1,19 @@
-import {Command, Inject} from "qft";
+import {Command, EventDispatcher, Inject} from "qft";
 import {ClientMessageEvent, CloseReason} from "../../clientConnectionPool";
-import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
-import {SyntheticEvent} from "../../utils/SyntheticEvent";
 import {deserializeIncomingClientMessage} from "../data";
+import {IncomingClientMessageEvent} from "../event/IncomingClientMessageEvent";
 
 export class HandleClientMessage implements Command {
 
     @Inject()
-    private event: SyntheticEvent<ClientMessageEvent>;
+    private event: ClientMessageEvent;
     @Inject()
-    private dataContextManagerProvider: DataContextManagerProvider;
+    private eventDispatcher: EventDispatcher;
 
     async execute(): Promise<void> {
         const {
-            event: {
-                source: {
-                    message,
-                    connection,
-                    connection: {context: {id: contextId}}
-                }
-            },
-            dataContextManagerProvider: {getContextManager}
+            event: {message, connection},
+            eventDispatcher
         } = this;
 
         if (message instanceof Buffer) {
@@ -34,8 +27,7 @@ export class HandleClientMessage implements Command {
             return;
         }
 
-        const manager = await getContextManager(contextId);
-        manager.handleClientMessage(parsedMessage, connection);
+        eventDispatcher.dispatchEvent(new IncomingClientMessageEvent(connection, parsedMessage));
     }
 
 }
