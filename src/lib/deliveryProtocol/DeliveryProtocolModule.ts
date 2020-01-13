@@ -21,6 +21,7 @@ import {UpdateClientSubscriptions} from "./command/UpdateClientSubscriptions";
 import {PrepareOutgoingClientMessage} from "./command/PrepareOutgoingClientMessage";
 import {OutgoingMessageEvent} from "./event/OutgoingMessageEvent";
 import {BroadcastOutgoingMessage} from "./command/BroadcastOutgoingMessage";
+import {RestoreClientSubscription} from "./command/RestoreClientSubscription";
 
 const protocolGuard = ({data: {context: {protocol}}}: Event<ClientConnection>) => protocol === protocolName;
 
@@ -50,14 +51,13 @@ export const DeliveryProtocolModule: ModuleConfig = {
         {
             event: IncomingClientMessageEvent.TYPE,
             command: PrepareOutgoingClientMessage,
-            guard: ({message: {type}}: IncomingClientMessageEvent) => type === MessageType.Push
+            guard: ({message: {type}}: IncomingClientMessageEvent) => type === MessageType.PushToServer
         },
-        // {
-        //     event: IncomingClientMessageEvent.TYPE,
-        //     command: RestoreClientSubscription,
-        //     guard: ({message: {type}}: IncomingClientMessageEvent) => type === MessageType.Restore
-        // },
-
+        {
+            event: IncomingClientMessageEvent.TYPE,
+            command: RestoreClientSubscription,
+            guard: ({message: {type}}: IncomingClientMessageEvent) => type === MessageType.RestoreRequest
+        },
         {event: OutgoingMessageEvent.TYPE, command: BroadcastOutgoingMessage}
     ]
 };

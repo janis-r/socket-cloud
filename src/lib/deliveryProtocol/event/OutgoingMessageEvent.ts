@@ -1,7 +1,7 @@
 import {Event} from "qft";
 import {ContextId} from "../../configurationContext";
-import {OutgoingMessage} from "../data";
 import {ExternalId} from "../../clientConnectionPool";
+import {PushToClientMessage} from "../data/serverMessage/PushToClientMessage";
 
 export class OutgoingMessageEvent extends Event {
     static readonly TYPE = Symbol("outgoing-message");
@@ -10,7 +10,7 @@ export class OutgoingMessageEvent extends Event {
     private recipientCount = 0;
 
     constructor(readonly contextId: ContextId,
-                readonly message: OutgoingMessage,
+                readonly message: PushToClientMessage,
                 readonly externalIds?: ExternalId[]) {
         super(OutgoingMessageEvent.TYPE);
     }

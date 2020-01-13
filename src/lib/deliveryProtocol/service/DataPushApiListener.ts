@@ -5,9 +5,12 @@ import {RequestContext} from "../../httpServer/data/RequestContext";
 import {TokenInfo} from "../data/TokenInfo";
 import {ClientConnectionPool} from "../../clientConnectionPool";
 import {HttpStatusCode} from "../../types/HttpStatusCode";
-import {getLastValidationError as lastIMError, isIndividualMessage} from "../data/apiMessage/IndividualMessage";
-import {getLastValidationError as lastCMError, isChannelMessage} from "../data/apiMessage/ChannelMessage";
 import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
+import {channelMessageUtil} from "../data/apiMessage/ChannelMessage";
+import {individualMessageUtil} from "../data/apiMessage/IndividualMessage";
+import {MessageType} from "../data";
+import {PushToClientMessage} from "../data/serverMessage/PushToClientMessage";
+import {nextMessageId} from "../util/nextMessageId";
 
 @Injectable()
 export class DataPushApiListener {
@@ -46,8 +49,8 @@ export class DataPushApiListener {
             return;
         }
         // Check data format
-        if (!isIndividualMessage(body)) {
-            sendJson(lastIMError(), {status: HttpStatusCode.BadRequest});
+        if (!individualMessageUtil.validate(body)) {
+            sendJson(individualMessageUtil.lastValidationError, {status: HttpStatusCode.BadRequest});
             return;
         }
 
@@ -59,9 +62,17 @@ export class DataPushApiListener {
             return;
         }
 
-        const event = new OutgoingMessageEvent(contextId, {payload}, connectionIds);
+        const message: PushToClientMessage = {
+            type: MessageType.PushToClient,
+            messageId: nextMessageId(),
+            channels: [],
+            payload
+        };
+
+        const event = new OutgoingMessageEvent(contextId, message, connectionIds);
         eventDispatcher.dispatchEvent(event);
         const recipients = await event.getRecipientCount();
+        // TODO: log message to message cache
         sendJson({recipients});
     };
 
@@ -81,8 +92,8 @@ export class DataPushApiListener {
             return;
         }
         // Check data format
-        if (!isChannelMessage(body)) {
-            sendJson(lastCMError(), {status: HttpStatusCode.BadRequest});
+        if (!channelMessageUtil.validate(body)) {
+            sendJson(channelMessageUtil.lastValidationError(), {status: HttpStatusCode.BadRequest});
             return;
         }
 
@@ -94,9 +105,16 @@ export class DataPushApiListener {
             return;
         }
 
-        const event = new OutgoingMessageEvent(contextId, {payload, channels});
+        const message: PushToClientMessage = {
+            type: MessageType.PushToClient,
+            messageId: nextMessageId(),
+            channels,
+            payload
+        };
+        const event = new OutgoingMessageEvent(contextId, message);
         eventDispatcher.dispatchEvent(event);
         const recipients = await event.getRecipientCount();
+        // TODO: log message to message cache
         sendJson({recipients});
     };
 
@@ -121,9 +139,9 @@ export class DataPushApiListener {
             return;
         }
         for (const message of body) {
-            if (!isChannelMessage(message)) {
+            if (!channelMessageUtil.validate(message)) {
                 sendJson(`Some message is faulty: ${JSON.stringify(
-                    {message, error: lastCMError()}
+                    {message, error: channelMessageUtil.lastValidationError}
                 )}`, {status: HttpStatusCode.BadRequest});
                 return;
             }
@@ -136,19 +154,25 @@ export class DataPushApiListener {
 
         let recipients = 0;
         let recipientDataPromises = new Set<Promise<number>>();
-        for (const message of body) {
-            if (!isChannelMessage(message)) {
+        for (const data of body) {
+            if (!channelMessageUtil.validate(data)) {
                 continue; // It's here only for typecasting
             }
 
-            const {payload, channels} = message;
-            const event = new OutgoingMessageEvent(contextId, {payload, channels});
+            const {payload, channels} = data;
+            const message: PushToClientMessage = {
+                type: MessageType.PushToClient,
+                messageId: nextMessageId(),
+                channels,
+                payload
+            };
+            const event = new OutgoingMessageEvent(contextId, message);
             eventDispatcher.dispatchEvent(event);
             const promise = event.getRecipientCount();
             promise.then(value => recipients += value);
             recipientDataPromises.add(promise);
         }
-
+        // TODO: log message to message cache
         await Promise.all([...recipientDataPromises]);
         sendJson({recipients});
     };

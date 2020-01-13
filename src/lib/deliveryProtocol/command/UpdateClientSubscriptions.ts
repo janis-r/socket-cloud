@@ -19,7 +19,7 @@ export class UpdateClientSubscriptions implements Command {
                     message
                 },
             },
-            dataContextManagerProvider: {getContextManager},
+            dataContextManagerProvider: {getContextManager}
         } = this;
 
         const contextManager = await getContextManager(contextId);
