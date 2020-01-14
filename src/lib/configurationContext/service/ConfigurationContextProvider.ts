@@ -2,7 +2,6 @@ import {Inject} from "qft";
 import {Logger} from "../../logger";
 import {ConfigurationContext} from "../data/ConfigurationContext";
 import {SocketDescriptor} from "../../websocketListener/data/SocketDescriptor";
-import {SocketConnectionType} from "../../types/SocketConnectionType";
 import {protocolName} from "../../deliveryProtocol";
 
 export class ConfigurationContextProvider {
@@ -15,7 +14,10 @@ export class ConfigurationContextProvider {
             id: 'test',
             protocol: protocolName,
             maxConnectionCount: 100,
-            connectionValidationUrl: 'http://localhost:8000/validate-socket',
+            validationApi: {
+                url: 'http://localhost:8000/validationAPI',
+                validateNewConnections: true
+            },
             pingTimeout: 30000,
             outgoingMessageFragmentSize: 2 ** 14 // 16 kb
         }]
@@ -23,11 +25,6 @@ export class ConfigurationContextProvider {
 
     readonly getSocketConfigurationContext = async (descriptor: SocketDescriptor): Promise<ConfigurationContext | null> => {
         const {knownContexts} = this;
-
-        if (descriptor.type === SocketConnectionType.Direct) {
-            // TODO: Implement socket configuration retrieval in here
-            return null;
-        }
 
         const {origin} = descriptor;
         if (!origin) {

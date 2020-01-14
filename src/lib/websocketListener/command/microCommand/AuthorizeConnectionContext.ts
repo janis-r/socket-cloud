@@ -1,6 +1,5 @@
 import {Command, EventDispatcher, Inject} from "qft";
 import {SocketDescriptor} from "../../data/SocketDescriptor";
-import {SocketConnectionType} from "../../../types/SocketConnectionType";
 import {ValidateSocketConnectionEvent} from "../..";
 import {WebsocketConnectionValidationRequest} from "../../event/WebsocketConnectionValidationRequest";
 import {Logger} from "../../../logger";
@@ -20,6 +19,7 @@ export class AuthorizeConnectionContext implements Command<boolean> {
     async execute() {
 
         const {
+            event,
             event: {
                 request: {
                     headers: {
@@ -27,7 +27,7 @@ export class AuthorizeConnectionContext implements Command<boolean> {
                         host,
                         'sec-websocket-key': secWebSocketKeyHeader,
                         'sec-websocket-origin': secWebsocketOriginHeader,
-                        'x-forwarded-for': forwardedFor,
+                        'x-forwarded-for': xForwardedForHeader,
                         'sec-websocket-version': websocketVersion
                     },
                     connection: {remoteAddress},
@@ -41,16 +41,24 @@ export class AuthorizeConnectionContext implements Command<boolean> {
             configurationContextProvider: {getSocketConfigurationContext}
         } = this;
 
+        const forwardedFor = xForwardedForHeader ? xForwardedForHeader.split(",") : null;
+        const ipAddress = forwardedFor && forwardedFor.length ? forwardedFor[0] : remoteAddress;
+        const origin = originHeader ?? secWebsocketOriginHeader;
+
         const socketDescriptor: SocketDescriptor = {
-            type: SocketConnectionType.WebSocket,
-            connectionId: <string>secWebSocketKeyHeader,
-            host,
-            origin: originHeader ?? secWebsocketOriginHeader,
+            connectionId: secWebSocketKeyHeader,
             remoteAddress,
-            websocketVersion: parseInt(websocketVersion as string),
-            forwardedFor: forwardedFor && typeof forwardedFor === "string" ? forwardedFor : null,
-            url: url && url.replace(/\/|\//g, '').length > 0 ? url : null
+            ipAddress,
+            host,
+            url: url && url.replace(/\/|\//g, '').length > 0 ? url : null,
+            websocketVersion: parseInt(websocketVersion)
         };
+        if (forwardedFor) {
+            socketDescriptor.forwardedFor = forwardedFor;
+        }
+        if (origin) {
+            socketDescriptor.origin = origin;
+        }
 
         const configuration = await getSocketConfigurationContext(socketDescriptor);
         if (configuration === null) {
@@ -69,9 +77,14 @@ export class AuthorizeConnectionContext implements Command<boolean> {
             return false;
         }
 
-        this.event.socketDescriptor = socketDescriptor;
-        this.event.configurationContext = configuration;
+        event.socketDescriptor = socketDescriptor;
+        event.configurationContext = configuration;
+        if(validationEvent.operatorData) {
+            event.operatorData = validationEvent.operatorData;
+        }
 
         return true;
     }
 }
+
+

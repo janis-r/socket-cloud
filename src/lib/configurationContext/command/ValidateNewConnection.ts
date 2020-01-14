@@ -5,6 +5,7 @@ import {HttpStatusCode} from "../../types/HttpStatusCode";
 import {Json} from "../../types/Json";
 import {ValidateSocketConnectionEvent, ValidationError} from "../../websocketListener";
 import {ConnectionValidationError} from "../data/ConnectionValidationError";
+import {isOperatorData} from "../../websocketListener/data/OperatorData";
 
 export class ValidateNewConnection implements Command<void> {
     @Inject()
@@ -39,17 +40,17 @@ export class ValidateNewConnection implements Command<void> {
     readonly validateWithExternalApi = async (): Promise<true | ValidationError> => {
         const {
             logger,
-            event: {
+            event, event: {
                 descriptor,
-                context: {connectionValidationUrl}
+                context: {validationApi}
             }
         } = this;
 
-        if (!connectionValidationUrl) {
+        if (!validationApi.validateNewConnections) {
             return true;
         }
 
-        const request = await fetch(connectionValidationUrl, {
+        const request = await fetch(validationApi.url, {
             method: "POST",
             headers: {
                 "Accept": "application/json",
@@ -70,24 +71,11 @@ export class ValidateNewConnection implements Command<void> {
             };
         }
 
-        try {
-            const data: Json = await request.json();
-            if (data === true) {
-                return true;
-            }
-            return {
-                error: ConnectionValidationError.ConnectionNotAllowed,
-                message: 'Connection not allowed by external API'
-            };
-        } catch {
-            logger.error(`ConfigurationContextProvider invalid JSON in response while validating new connection`, JSON.stringify({
-                request: {descriptor},
-                response: {status}
-            }, null, ' '));
-            return {
-                error: ConnectionValidationError.ApiDataFormatError,
-                message: 'Json error while validating with external API'
-            };
+        const response: Json = await request.json();
+        if (isOperatorData(response)) {
+            event.operatorData = response;
         }
+
+        return true;
     }
 }

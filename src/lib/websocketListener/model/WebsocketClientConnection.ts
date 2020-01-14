@@ -7,12 +7,13 @@ import {ErrorEvent, MessageEvent, StateChangeEvent} from "../../clientConnection
 import {WebsocketExtensionAgent} from "../../websocketExtension";
 import {ConfigurationContext} from "../../configurationContext";
 import {CloseCode, isValidWebsocketCloseCode} from "../data/CloseCode";
-import {WebsocketDescriptor} from "../data/SocketDescriptor";
+import {SocketDescriptor} from "../data/SocketDescriptor";
 import {ClientConnectionEventBase} from "./ClientConnectionEventBase";
 import {OutgoingMessageBuffer} from "./helper/OutgoingMessageBuffer";
 import {KeepAliveManager} from "./clientExtensions/KeepAliveManager";
 import {IncomingMessageBuffer} from "./helper/IncomingMessageBuffer";
 import chalk from "chalk";
+import {OperatorData} from "../data/OperatorData";
 
 const isValidUTF8: (data: Buffer) => boolean = require('utf-8-validate');
 
@@ -30,13 +31,15 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     private readonly outgoingMessageBuffer: OutgoingMessageBuffer;
 
     constructor(private readonly socket: Socket,
-                readonly descriptor: WebsocketDescriptor,
+                readonly descriptor: SocketDescriptor,
                 readonly context: ConfigurationContext,
+                readonly operatorData?: OperatorData,
                 private readonly extensions?: ReadonlyArray<WebsocketExtensionAgent>) {
         super();
         debug && console.log({descriptor, context});
 
         this.id = descriptor.connectionId;
+        this.externalId = operatorData?.externalId;
 
         this.keepAliveManager = new KeepAliveManager(this);
         this.incomingMessageBuffer = new IncomingMessageBuffer(

@@ -7,7 +7,6 @@ import {WebsocketClientConnection} from "../model/WebsocketClientConnection";
 import {PrepareWebsocketExtensions} from "./microCommand/PrepareWebsocketExtensions";
 import {isPromise} from "../../utils/is-promise";
 import {RespondToHandshake} from "./microCommand/RespondToHandshake";
-import {WebsocketDescriptor} from "../data/SocketDescriptor";
 import {ClientConnectionPool} from "../../clientConnectionPool";
 
 export class ValidateNewWebsocket<T extends boolean> extends MacroCommand<T> {
@@ -29,7 +28,7 @@ export class ValidateNewWebsocket<T extends boolean> extends MacroCommand<T> {
         const {
             event: {
                 request: {socket},
-                requestInfo, configurationContext, extensions, socketDescriptor
+                requestInfo, configurationContext, extensions, socketDescriptor, operatorData
             },
             logger: {debug},
             clientConnectionPool
@@ -42,8 +41,9 @@ export class ValidateNewWebsocket<T extends boolean> extends MacroCommand<T> {
 
         const connection = new WebsocketClientConnection(
             socket,
-            socketDescriptor as WebsocketDescriptor,
+            socketDescriptor,
             configurationContext,
+            operatorData,
             extensions
         );
 

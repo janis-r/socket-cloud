@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
-  title: Data push API
-  description: An API designed and provided to push messages to clients.
+  title: Operator API
+  description: An API designed and provided to Operators in order to enable data context management via API calls.
   contact:
     name: Jānis Radiņš
     email: jr@janisradins.com

@@ -7,8 +7,13 @@ export abstract class ConfigurationContext {
     protocol: string;
     // Maximum number of simultaneous connections
     maxConnectionCount?: number;
-    // End-point address to send new connection data in order to validate new connection
-    connectionValidationUrl?: string;
+    // Validation API configuration
+    validationApi?: {
+        // Url to external validation API
+        url: string;
+        // Whether to invoke external API to validate emerging client connections
+        validateNewConnections?: boolean;
+    };
     // Number in milliseconds within which to send ping messages to client.
     // No messages will be sent is value is set to 0 or key is not present.
     pingTimeout?: number;
@@ -18,7 +23,7 @@ export abstract class ConfigurationContext {
     // General instructions on how to cache outgoing messages applicable to all channels unless channel
     // specific instructions are provided
     cachingPolicy?: CachingPolicy;
-    // Channel specific configurations that'll override values set in general configuration
+    // Channel specific message caching configurations that'll override values set in general configuration
     perChannelCachingPolicy?: Record<string, CachingPolicy>;
     // Max payload size
     maxPayloadSize?: number;

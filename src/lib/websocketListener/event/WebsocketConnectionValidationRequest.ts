@@ -4,6 +4,7 @@ import {UpgradeRequest} from "../../httpServer";
 import {SocketDescriptor} from "../data/SocketDescriptor";
 import {ConfigurationContext} from "../../configurationContext";
 import {WebsocketExtensionAgent} from "../../websocketExtension";
+import {OperatorData} from "../data/OperatorData";
 
 /**
  * Event notification dispatched as new websocket connection is encountered and needs to be validated before it
@@ -11,11 +12,13 @@ import {WebsocketExtensionAgent} from "../../websocketExtension";
  * (This is only initial validation there will be more once this event is done)
  */
 export class WebsocketConnectionValidationRequest extends Event {
+
     static readonly TYPE = Symbol('validate-websocket-connection-event');
 
     private _socketDescriptor: SocketDescriptor;
     private _configurationContext: ConfigurationContext;
     private _extensions: ReadonlyArray<WebsocketExtensionAgent>;
+    private _operatorData: OperatorData;
 
     constructor(readonly request: UpgradeRequest, readonly socket: Socket, readonly requestInfo: string) {
         super(WebsocketConnectionValidationRequest.TYPE);
@@ -54,5 +57,16 @@ export class WebsocketConnectionValidationRequest extends Event {
             throw new Error('extensions cannot be overwritten');
         }
         this._extensions = value;
+    }
+
+    get operatorData(): OperatorData {
+        return this._operatorData;
+    }
+
+    set operatorData(value: OperatorData) {
+        if (this._operatorData) {
+            throw new Error(`operatorData is one time set property`);
+        }
+        this._operatorData = value;
     }
 }
