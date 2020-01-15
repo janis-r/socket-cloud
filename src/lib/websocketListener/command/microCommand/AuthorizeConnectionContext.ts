@@ -72,7 +72,7 @@ export class AuthorizeConnectionContext implements Command<boolean> {
         const validationResponse = await validationEvent.validate();
 
         if (validationResponse !== true) {
-            debug(`WebSocketListener new connection prevented with reason: ${validationResponse}`, requestInfo);
+            debug(`WebSocketListener new connection prevented with reason: ${JSON.stringify(validationResponse)}`, requestInfo);
             socket.end("HTTP/1.1 403 Forbidden");
             return false;
         }

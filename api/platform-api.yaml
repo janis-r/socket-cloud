@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
-  title: Operator API
-  description: An API designed and provided to Operators in order to enable data context management via API calls.
+  title: Platform API
+  description: An API designed to enable data context management via API calls.
   contact:
     name: Jānis Radiņš
     email: jr@janisradins.com
@@ -36,7 +36,7 @@ paths:
         - ApiAuthKey: []
   /channel-message/:
     post:
-      summary: Post message to data channels.
+      summary: Post message to data channel (or channels).
       tags:
         - Data push
       requestBody:

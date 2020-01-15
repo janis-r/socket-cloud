@@ -42,4 +42,9 @@ export abstract class Logger {
      * later product lifecycle stages.
      */
     abstract console: (...message: any[]) => void;
+
+    /**
+     * Logging context name to identify general scope of logged content
+     */
+    abstract context?: string;
 }

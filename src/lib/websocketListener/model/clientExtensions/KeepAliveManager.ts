@@ -24,7 +24,7 @@ export class KeepAliveManager {
 
     private start(): void {
         const {connection, handleIncomingMessage, stop, sendPing, pingTimeout} = this;
-        connection.addEventListener("data-frame", ({data}) => () => handleIncomingMessage(data), this);
+        connection.addEventListener("data-frame", ({data}) => handleIncomingMessage(data), this);
         connection.addEventListener("state-change", stop, this).withGuards(
             ({connection: {state}}) => state >= ConnectionState.Closing
         ).once();
@@ -56,7 +56,6 @@ export class KeepAliveManager {
 
     private readonly handleIncomingMessage = ({type, payload}: DataFrame): void => {
         const {pingInProgress, sendPing, pingTimeout} = this;
-
         if (type === DataFrameType.Pong && payload && payload.length > 0) {
             const pingId = payload.toString("hex");
             if (pingId === pingInProgress?.id) {

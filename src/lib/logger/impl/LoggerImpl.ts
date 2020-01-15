@@ -6,6 +6,7 @@ import {createLogFileName, Logger, LoggerConfig, LoggerEntity, LogLevel} from ".
 
 @Injectable()
 export class LoggerImpl extends Logger {
+    context?: string;
 
     private readonly logDir: string;
     private readonly logToConsole: boolean;
@@ -52,8 +53,10 @@ export class LoggerImpl extends Logger {
     readonly console = (...message: any[]) => this.spawnEntity(LogLevel.Console).log(...message);
 
     protected prepareMessage(message: any[], logLevel: string, logTime: boolean, format: Chalk): void {
-        const {logToConsole} = this;
-
+        const {logToConsole, context} = this;
+        if (context) {
+            message.unshift(`(#${context})`);
+        }
         const formatter = getMessageFormatter(logLevel);
         if (logLevel !== LogLevel.Console) {
             this.writeMessage(message, logLevel, logTime);

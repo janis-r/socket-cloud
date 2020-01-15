@@ -27,4 +27,6 @@ export abstract class ConfigurationContext {
     perChannelCachingPolicy?: Record<string, CachingPolicy>;
     // Max payload size
     maxPayloadSize?: number;
+    // Whether to compress data
+    compressData?: boolean;
 }

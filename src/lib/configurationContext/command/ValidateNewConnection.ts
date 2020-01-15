@@ -6,13 +6,15 @@ import {Json} from "../../types/Json";
 import {ValidateSocketConnectionEvent, ValidationError} from "../../websocketListener";
 import {ConnectionValidationError} from "../data/ConnectionValidationError";
 import {isOperatorData} from "../../websocketListener/data/OperatorData";
+import {ClientConnectionPool} from "../../clientConnectionPool";
 
 export class ValidateNewConnection implements Command<void> {
     @Inject()
     private readonly logger: Logger;
-
     @Inject()
     private readonly event: ValidateSocketConnectionEvent;
+    @Inject()
+    private readonly connectionPool: ClientConnectionPool;
 
     async execute() {
         const {event: {addValidator}} = this;
@@ -21,13 +23,12 @@ export class ValidateNewConnection implements Command<void> {
     }
 
     readonly validateConnectionCount = async (): Promise<true | ValidationError> => {
-        const {context: {maxConnectionCount}} = this.event;
+        const {
+            event: {context: {id: contextId, maxConnectionCount}},
+            connectionPool: {getConnectionsByContext}
+        } = this;
 
-        if (!maxConnectionCount) {
-            return true;
-        }
-
-        if (true /*TODO: Check connection count of this context here*/) {
+        if (!maxConnectionCount || getConnectionsByContext(contextId).size < maxConnectionCount) {
             return true;
         }
 
@@ -50,7 +51,7 @@ export class ValidateNewConnection implements Command<void> {
             return true;
         }
 
-        const request = await fetch(validationApi.url, {
+        const request = await fetch(validationApi.url + '/validate-connection', {
             method: "POST",
             headers: {
                 "Accept": "application/json",
@@ -61,7 +62,7 @@ export class ValidateNewConnection implements Command<void> {
 
         const {status} = request;
         if (status !== HttpStatusCode.Ok) {
-            logger.error(`ConfigurationContextProvider wrong status while validating new connection`, JSON.stringify({
+            logger.error(`ConfigurationContextProvider wrong status:${status} while validating new connection`, JSON.stringify({
                 request: {descriptor},
                 response: {status, data: await request.text()}
             }, null, ' '));

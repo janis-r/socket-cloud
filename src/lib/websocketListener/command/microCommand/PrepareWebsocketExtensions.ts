@@ -26,12 +26,18 @@ export class PrepareWebsocketExtensions implements Command<boolean> {
                         'sec-websocket-extensions': secWebsocketExtensions,
                     }
                 },
+                configurationContext: {compressData},
                 socket
             }
         } = this;
 
         if (!websocketExtensionRegistry) {
             // websocketExtensionRegistry and extensions are not present
+            return true;
+        }
+
+        if (!compressData) {
+            // compression is disabled by configuration context
             return true;
         }
 

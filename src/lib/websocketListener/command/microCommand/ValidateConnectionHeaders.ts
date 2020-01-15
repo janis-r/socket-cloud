@@ -58,13 +58,6 @@ export class ValidateConnectionHeaders implements Command<boolean> {
             return false;
         }
 
-        // TODO: Spec doesn't say that connection must be closed if there's no origin in headers ...
-        /*if (!originHeader && !secWebsocketOriginHeader) {
-            error(`Websocket validation err - origin is not set in header`, requestInfo);
-            socket.end("HTTP/1.1 400 Bad Request");
-            return false;
-        }*/
-
         return true;
     }
 

@@ -22,7 +22,7 @@ export const debug = false;
 export class WebsocketClientConnection extends ClientConnectionEventBase implements ClientConnection {
 
     readonly id: ClientConnection['id'];
-    readonly externalId: string = "A"; // TODO: .................
+    readonly externalId: string;
 
     private _state = ConnectionState.Connecting;
 

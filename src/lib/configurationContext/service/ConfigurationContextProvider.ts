@@ -15,7 +15,7 @@ export class ConfigurationContextProvider {
             protocol: protocolName,
             maxConnectionCount: 100,
             validationApi: {
-                url: 'http://localhost:8000/validationAPI',
+                url: 'http://localhost:8001/validationAPI',
                 validateNewConnections: true
             },
             pingTimeout: 30000,

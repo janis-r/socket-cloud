@@ -3,7 +3,6 @@ import {HttpRequestHandler, HttpServerRouter} from "../../httpServer";
 import {AccessTokenManager} from "./AccessTokenManager";
 import {RequestContext} from "../../httpServer/data/RequestContext";
 import {TokenInfo} from "../data/TokenInfo";
-import {ClientConnectionPool} from "../../clientConnectionPool";
 import {HttpStatusCode} from "../../types/HttpStatusCode";
 import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
 import {channelMessageUtil} from "../data/apiMessage/ChannelMessage";
@@ -11,6 +10,7 @@ import {individualMessageUtil} from "../data/apiMessage/IndividualMessage";
 import {MessageType} from "../data";
 import {PushToClientMessage} from "../data/serverMessage/PushToClientMessage";
 import {nextMessageId} from "../util/nextMessageId";
+import {MessageCache} from "../model/MessageCache";
 
 @Injectable()
 export class DataPushApiListener {
@@ -25,7 +25,7 @@ export class DataPushApiListener {
 
     constructor(router: HttpServerRouter,
                 private readonly tokenManager: AccessTokenManager,
-                private readonly connectionPool: ClientConnectionPool,
+                private readonly messageCache: MessageCache,
                 private readonly eventDispatcher: EventDispatcher) {
 
         router.post("individual-message", this.individualMessageHandler);
@@ -34,7 +34,7 @@ export class DataPushApiListener {
     }
 
     private readonly individualMessageHandler: HttpRequestHandler = async request => {
-        const {connectionPool: {getConnectionsByContextAndExternalId}, eventDispatcher} = this;
+        const {messageCache, eventDispatcher} = this;
         const config = await this.validateApiCall(request);
         if (!config) {
             return;
@@ -69,15 +69,18 @@ export class DataPushApiListener {
             payload
         };
 
+        const {type, ...typelessMessage} = message;
+        messageCache.write(contextId, typelessMessage);
+
         const event = new OutgoingMessageEvent(contextId, message, connectionIds);
         eventDispatcher.dispatchEvent(event);
         const recipients = await event.getRecipientCount();
-        // TODO: log message to message cache
+
         sendJson({recipients});
     };
 
     private readonly channelMessageHandler: HttpRequestHandler = async request => {
-        const {eventDispatcher} = this;
+        const {messageCache, eventDispatcher} = this;
         const config = await this.validateApiCall(request);
         if (!config) {
             return;
@@ -111,15 +114,19 @@ export class DataPushApiListener {
             channels,
             payload
         };
+
+        const {type, ...typelessMessage} = message;
+        messageCache.write(contextId, typelessMessage);
+
         const event = new OutgoingMessageEvent(contextId, message);
         eventDispatcher.dispatchEvent(event);
         const recipients = await event.getRecipientCount();
-        // TODO: log message to message cache
+
         sendJson({recipients});
     };
 
     private readonly multiChannelMessageHandler: HttpRequestHandler = async request => {
-        const {eventDispatcher} = this;
+        const {messageCache, eventDispatcher} = this;
         const config = await this.validateApiCall(request);
         if (!config) {
             return;
@@ -166,13 +173,17 @@ export class DataPushApiListener {
                 channels,
                 payload
             };
+
+            const {type, ...typelessMessage} = message;
+            messageCache.write(contextId, typelessMessage);
+
             const event = new OutgoingMessageEvent(contextId, message);
             eventDispatcher.dispatchEvent(event);
             const promise = event.getRecipientCount();
             promise.then(value => recipients += value);
             recipientDataPromises.add(promise);
         }
-        // TODO: log message to message cache
+
         await Promise.all([...recipientDataPromises]);
         sendJson({recipients});
     };

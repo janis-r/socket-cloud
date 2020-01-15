@@ -110,7 +110,6 @@ export class RequestContext {
         }
         switch (type) {
             case "text":
-                //TODO: Not 100% sure this is a right way to distinguish between html and text contents
                 response.set("Content-Type", "text/plain");
             case "html":
                 response.send(data);
