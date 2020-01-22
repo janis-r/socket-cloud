@@ -27,7 +27,7 @@ export class HandleClientMessage implements Command {
         }
 
         const parsedMessage = deserializeClientMessage(message);
-        // console.log(chalk.bgCyan('>> parsedMessage'), parsedMessage)
+        console.log(chalk.bgCyan('>> parsedMessage'), parsedMessage);
         if (!parsedMessage) {
             connection.close(CloseReason.ProtocolError, `Cannot deserialize message!`);
             return;

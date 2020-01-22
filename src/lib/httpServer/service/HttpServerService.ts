@@ -40,7 +40,7 @@ export class HttpServerService implements HttpServerRouter {
 
         this.server.on("upgrade", this.upgradeListener);
         this.server.listen(port);
-        this.server.once("listening", () => logger.console(`Http${httpsCredentials ? 's' : ''} server running on port ${port}`));
+        this.server.once("listening", () => console.log(`Http${httpsCredentials ? 's' : ''} server running on port ${port}`));
     }
 
     private readonly upgradeListener = (req: UpgradeRequest, socket: Socket) => this.eventDispatcher.dispatchEvent(new HttpConnectionUpgradeEvent(req, socket));

@@ -5,7 +5,7 @@ const url = "http://localhost:8001";
 
 const connections: SocketClient[] = [];
 const connectionInitPromises = new Array(10).fill(0).map(async () => {
-    const promise = new SocketClient(url).initialized;
+    const promise = new SocketClient(url, 'tests-runner').initialized;
     promise.then(value => {
         connections.push(value);
         value.connection.onMessage(message => console.log({connectionId: value.connectionId, message}));

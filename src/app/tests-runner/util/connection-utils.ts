@@ -10,6 +10,7 @@ import {
     subscribeMessageUtil,
     unsubscribeMessageUtil
 } from "../../../lib/deliveryProtocol/data";
+import {ContextId} from "../../../lib/configurationContext";
 
 const protocol = pocmddpProtocol;
 
@@ -25,14 +26,14 @@ export class SocketClient {
     private _connection: WebsocketConnection;
     private _authKey: string;
 
-    constructor(readonly url: string) {
+    constructor(readonly url: string, readonly contextId: ContextId) {
         this.initialized = this.initialize();
     }
 
     private async initialize(): Promise<this> {
-        const {url, connectionId} = this;
-        const {socket, authKey} = await connectWebsocket(`${url}?externalId=${connectionId}`);
-        this._connection = new WebsocketConnection(socket, {id: 'test', protocol});
+        const {url, contextId, connectionId} = this;
+        const {socket, authKey} = await connectWebsocket(`${url}/${contextId}?externalId=${connectionId}`);
+        this._connection = new WebsocketConnection(socket, {id: contextId, protocol});
         this._authKey = authKey;
 
         this._connection.onMessage(data => {
@@ -56,12 +57,12 @@ export class SocketClient {
     }
 
     subscribe(...channels: string[]): void {
-        console.log('>> subscribe', ...channels);
+        // console.log('>> subscribe', ...channels);
         this._connection.send(subscribeMessageUtil.serialize({type: MessageType.Subscribe, channels}));
     }
 
     unsubscribe(...channels: string[]): void {
-        console.log('>> unsubscribe', ...channels);
+        // console.log('>> unsubscribe', ...channels);
         this._connection.send(unsubscribeMessageUtil.serialize({type: MessageType.Unsubscribe, channels}));
     }
 
@@ -70,7 +71,7 @@ export class SocketClient {
     }
 
     sendChannelMessage(data: string, ...channels: string[]): void {
-        console.log('>> sendChannelMessage', channels, data);
+        // console.log('>> sendChannelMessage', channels, data);
         this._connection.send(pushToServerUtil.serialize({
             type: MessageType.PushToServer,
             channels,
@@ -83,10 +84,8 @@ export class SocketClient {
     }
 }
 
-export const spawnConnections = async (count: number, serverUrl: string): Promise<Array<SocketClient>> => {
-
-    const wrappers: Array<SocketClient> = new Array(count).fill(0).map(() => new SocketClient(serverUrl));
-    await Promise.all(wrappers.map(({initialized}) => initialized));
-
-    return wrappers;
+export const spawnConnections = async (serverUrl: string, contextId: ContextId, count: number): Promise<Array<SocketClient>> => {
+    const clients: Array<SocketClient> = new Array(count).fill(0).map(() => new SocketClient(serverUrl, contextId));
+    await Promise.all(clients.map(({initialized}) => initialized));
+    return clients;
 };

@@ -35,6 +35,7 @@ export const devServerModule: ModuleConfig = {
         } as InjectionConfig<SwaggerApiConfig>
     ],
     setup: injector => {
+
         injector.get(Logger).context = cluster?.worker?.id.toString();
 
         const router = injector.get(HttpServerRouter);
