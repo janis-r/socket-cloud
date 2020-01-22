@@ -3,11 +3,12 @@ import {CachingPolicy, ConfigurationContext} from "../../configurationContext";
 import {ClientConnection} from "../../clientConnectionPool";
 import {ChannelId} from "../data/ChannelId";
 import {Logger} from "../../logger";
+import {globalMessageChannel} from "..";
 
 export class DataContextManager {
 
     @Inject()
-    readonly context: Readonly<ConfigurationContext>;
+    readonly context: ConfigurationContext;
     @Inject()
     private readonly logger: Logger;
 
@@ -80,7 +81,11 @@ export class DataContextManager {
     }
 
     getChannelConnections(channelId: ChannelId): ReadonlySet<ClientConnection> | null {
-        return this.contextChannels.get(channelId) ?? null;
+        const {contextChannels, contextChannelsByConnection} = this;
+        if (channelId === globalMessageChannel) {
+            return new Set(contextChannelsByConnection.keys());
+        }
+        return contextChannels.get(channelId) ?? null;
     }
 
     getChannelCachingPolicy(channelId: ChannelId): Readonly<CachingPolicy> | null {
@@ -91,7 +96,7 @@ export class DataContextManager {
             }
         } = this;
 
-        const channelPolicy = channelId in perChannelCachingPolicy ? perChannelCachingPolicy[channelId] : null;
+        const channelPolicy = perChannelCachingPolicy && channelId in perChannelCachingPolicy ? perChannelCachingPolicy[channelId] : null;
 
         if (!generalPolicy && !channelPolicy) {
             return null;

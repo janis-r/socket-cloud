@@ -41,10 +41,10 @@ export class ValidateNewWebsocket<T extends boolean> extends MacroCommand<T> {
 
         const connection = new WebsocketClientConnection(
             socket,
-            socketDescriptor,
             configurationContext,
+            extensions,
+            socketDescriptor,
             operatorData,
-            extensions
         );
 
         clientConnectionPool.registerConnection(connection);

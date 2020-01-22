@@ -11,12 +11,12 @@ export interface WebsocketExtensionAgent {
      * @param dataFrame Incoming data frame
      * followed by continuation frames.
      */
-    transformIncomingData?(dataFrame: DataFrame): DataFrame | Promise<DataFrame>;
+    incomingDataPipe?(dataFrame: DataFrame): DataFrame | Promise<DataFrame>;
 
     /**
      * Transformation action to be applied on outgoing data frame
      * @param dataFrame Outgoing data frame
      * followed by continuation frames.
      */
-    transformOutgoingData?(dataFrame: DataFrame): DataFrame | Promise<DataFrame>;
+    outgoingDataPipe?(dataFrame: DataFrame): DataFrame | Promise<DataFrame>;
 }

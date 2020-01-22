@@ -1,11 +1,10 @@
 import * as crypto from "crypto";
-import {WebsocketClientConnection} from "../WebsocketClientConnection";
 import {ConnectionState} from "../../../clientConnectionPool";
 import {CloseCode} from "../../data/CloseCode";
 import {spawnFrameData} from "../../util/websocket-utils";
 import {DataFrameType} from "../../data/DataFrameType";
 import {DataFrame} from "../../data/DataFrame";
-import {StateChangeEvent} from "../../../clientConnectionPool/connectionEvent";
+import {WebsocketConnection} from "../WebsocketConnection";
 
 export class KeepAliveManager {
 
@@ -14,7 +13,7 @@ export class KeepAliveManager {
     private nextPingTimeoutId: ReturnType<typeof setTimeout> | null = null;
     private connectivityErrorTimoutId: ReturnType<typeof setTimeout> | null = null;
 
-    constructor(readonly connection: WebsocketClientConnection) {
+    constructor(readonly connection: WebsocketConnection) {
         if (!connection.context.pingTimeout) {
             return;
         }
@@ -24,10 +23,12 @@ export class KeepAliveManager {
 
     private start(): void {
         const {connection, handleIncomingMessage, stop, sendPing, pingTimeout} = this;
-        connection.addEventListener("data-frame", ({data}) => handleIncomingMessage(data), this);
-        connection.addEventListener("state-change", stop, this).withGuards(
-            ({connection: {state}}) => state >= ConnectionState.Closing
-        ).once();
+        connection.onData(data => handleIncomingMessage(data));
+        connection.onStateChange(({state}) => {
+            if (state >= ConnectionState.Closing) {
+                stop();
+            }
+        });
 
         this.nextPingTimeoutId = setTimeout(sendPing, pingTimeout);
     }
@@ -41,7 +42,6 @@ export class KeepAliveManager {
             clearTimeout(this.connectivityErrorTimoutId);
             this.connectivityErrorTimoutId = null;
         }
-        this.connection.removeAllEventListeners(this);
     };
 
     private sendPing = async (): Promise<void> => {

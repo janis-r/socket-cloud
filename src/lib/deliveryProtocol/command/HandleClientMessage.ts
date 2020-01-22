@@ -3,6 +3,7 @@ import {ClientMessageEvent, CloseReason} from "../../clientConnectionPool";
 import {deserializeClientMessage, MessageType} from "../data";
 import {IncomingClientMessageEvent} from "../event/IncomingClientMessageEvent";
 import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
+import chalk from "chalk";
 
 export class HandleClientMessage implements Command {
 
@@ -21,20 +22,21 @@ export class HandleClientMessage implements Command {
         } = this;
 
         if (message instanceof Buffer) {
-            connection.closeConnection(CloseReason.UnsupportedData, `Binary data is not supported!`);
+            connection.close(CloseReason.UnsupportedData, `Binary data is not supported!`);
             return;
         }
 
         const parsedMessage = deserializeClientMessage(message);
+        // console.log(chalk.bgCyan('>> parsedMessage'), parsedMessage)
         if (!parsedMessage) {
-            connection.closeConnection(CloseReason.ProtocolError, `Cannot deserialize message!`);
+            connection.close(CloseReason.ProtocolError, `Cannot deserialize message!`);
             return;
         }
 
         if (parsedMessage.type === MessageType.PushToServer) {
             const {context: {maxPayloadSize}} = await getContextManager(contextId);
             if (maxPayloadSize && maxPayloadSize < Buffer.byteLength(parsedMessage.payload)) {
-                connection.closeConnection(CloseReason.MessageTooBig, `Payload size exceeded!`);
+                connection.close(CloseReason.MessageTooBig, `Payload size exceeded!`);
                 return;
             }
         }

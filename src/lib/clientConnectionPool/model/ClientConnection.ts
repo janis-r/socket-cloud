@@ -14,7 +14,7 @@ export interface ClientConnection {
     send(message: string): Promise<void>;
     send(message: Buffer): Promise<void>;
 
-    closeConnection(reason: CloseReason, message?: string): Promise<void>;
+    close(reason: CloseReason, message?: string): Promise<void>;
 
     addEventListener(event: "state-change", listener: EventListener<StateChangeEvent>, scope?: Object): EventMapping<StateChangeEvent>;
     addEventListener(event: "message", listener: EventListener<MessageEvent>, scope?: Object): EventMapping<MessageEvent>;

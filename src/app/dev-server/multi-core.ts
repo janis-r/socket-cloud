@@ -1,7 +1,8 @@
 import {Context, WebApplicationBundle} from "qft";
 import {Logger} from "../../lib/logger";
 import cluster from "cluster";
-import {DevServerModule} from "./devServerModule";
+import {devServerModule} from "./devServerModule";
+import {HttpServerRouter} from "../../lib/httpServer";
 
 if (cluster.isMaster) {
     const numCPUs = require('os').cpus().length;
@@ -17,8 +18,7 @@ if (cluster.isMaster) {
 } else {
     const {injector} = new Context()
         .install(...WebApplicationBundle)
-        .configure(DevServerModule)
+        .configure(devServerModule)
         .initialize();
-
     injector.get(Logger).console(`Multi core dev server context initialized`, cluster.worker.id);
 }

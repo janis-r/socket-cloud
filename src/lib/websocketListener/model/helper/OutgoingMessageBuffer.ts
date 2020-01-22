@@ -53,7 +53,7 @@ export class OutgoingMessageBuffer {
         }
 
         for (const extension of extensions) {
-            const transformation = extension.transformOutgoingData(data);
+            const transformation = extension.outgoingDataPipe(data);
             data = isPromise(transformation) ? await transformation : transformation;
         }
 

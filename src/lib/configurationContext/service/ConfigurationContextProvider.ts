@@ -2,7 +2,8 @@ import {Inject} from "qft";
 import {Logger} from "../../logger";
 import {ConfigurationContext} from "../data/ConfigurationContext";
 import {SocketDescriptor} from "../../websocketListener/data/SocketDescriptor";
-import {protocolName} from "../../deliveryProtocol";
+import {pocmddpProtocol} from "../../deliveryProtocol";
+import {toMilliseconds} from "ugd10a";
 
 export class ConfigurationContextProvider {
 
@@ -12,13 +13,13 @@ export class ConfigurationContextProvider {
     private readonly knownContexts = new Map<ConfigurationContext['id'], ConfigurationContext>([
         ['test', {
             id: 'test',
-            protocol: protocolName,
+            protocol: pocmddpProtocol,
             maxConnectionCount: 100,
             validationApi: {
                 url: 'http://localhost:8001/validationAPI',
                 validateNewConnections: true
             },
-            pingTimeout: 30000,
+            pingTimeout: toMilliseconds(30, "seconds"),
             outgoingMessageFragmentSize: 2 ** 14 // 16 kb
         }]
     ]);
@@ -26,10 +27,10 @@ export class ConfigurationContextProvider {
     readonly getSocketConfigurationContext = async (descriptor: SocketDescriptor): Promise<ConfigurationContext | null> => {
         const {knownContexts} = this;
 
-        const {origin} = descriptor;
+        /*const {origin} = descriptor;
         if (!origin) {
             return null;
-        }
+        }*/
 
         return knownContexts.get('test') ?? null;
     };

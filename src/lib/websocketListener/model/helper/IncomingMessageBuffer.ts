@@ -155,7 +155,7 @@ export class IncomingMessageBuffer {
         }
 
         for (const extension of extensions) {
-            const transformation = extension.transformIncomingData(data);
+            const transformation = extension.incomingDataPipe(data);
             data = isPromise(transformation) ? await transformation : transformation;
         }
         return data;

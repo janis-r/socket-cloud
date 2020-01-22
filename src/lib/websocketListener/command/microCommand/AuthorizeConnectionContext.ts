@@ -50,7 +50,7 @@ export class AuthorizeConnectionContext implements Command<boolean> {
             remoteAddress,
             ipAddress,
             host,
-            url: url && url.replace(/\/|\//g, '').length > 0 ? url : null,
+            url,
             websocketVersion: parseInt(websocketVersion)
         };
         if (forwardedFor) {

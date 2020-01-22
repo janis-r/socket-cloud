@@ -2,6 +2,7 @@ import {Command, Inject} from "qft";
 import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
 import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
 import {ClientConnection, ClientConnectionPool} from "../../clientConnectionPool";
+import {serializeServerMessage} from "../data";
 
 export class BroadcastOutgoingMessage implements Command {
 
@@ -25,6 +26,7 @@ export class BroadcastOutgoingMessage implements Command {
         const contextManager = await getContextManager(contextId);
         const connections = new Set<ClientConnection>(message.channels ? [].concat(...message.channels
             .map(channelId => contextManager.getChannelConnections(channelId))
+            .filter(value => !!value)
             .map(value => ([...value]))
         ) : []);
 
@@ -37,7 +39,7 @@ export class BroadcastOutgoingMessage implements Command {
                 );
         }
 
-        const msg = JSON.stringify(message);
+        const msg = serializeServerMessage(message);
         connections.forEach(value => value.send(msg));
 
         reportConnectionCount(connections.size);

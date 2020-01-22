@@ -6,13 +6,13 @@ import {
     ConnectionRemovedEvent,
     NewConnectionEvent
 } from "../clientConnectionPool";
-import {ConfigurationContextModule} from "../configurationContext";
+import {ConfigurationContextModule} from "../configurationContext/ConfigurationContextModule";
 import {HandleNewConnection} from "./command/HandleNewConnection";
 import {HandleClientMessage} from "./command/HandleClientMessage";
-import {DataContextManagerProvider} from "./service/DataContextManagerProvider";
 import {HandleRemovedConnection} from "./command/HandleRemovedConnection";
-import {protocolName} from "./protocolName";
+import {pocmddpProtocol} from "./data/pocmddpProtocol";
 import {HttpServerModule} from "../httpServer";
+import {DataContextManagerProvider} from "./service/DataContextManagerProvider";
 import {AccessTokenManager} from "./service/AccessTokenManager";
 import {DataPushApiListener} from "./service/DataPushApiListener";
 import {IncomingClientMessageEvent} from "./event/IncomingClientMessageEvent";
@@ -22,8 +22,9 @@ import {PrepareOutgoingClientMessage} from "./command/PrepareOutgoingClientMessa
 import {OutgoingMessageEvent} from "./event/OutgoingMessageEvent";
 import {BroadcastOutgoingMessage} from "./command/BroadcastOutgoingMessage";
 import {RestoreClientSubscription} from "./command/RestoreClientSubscription";
+import {MessageCache} from "./model/MessageCache";
 
-const protocolGuard = ({data: {context: {protocol}}}: Event<ClientConnection>) => protocol === protocolName;
+const protocolGuard = ({data: {context: {protocol}}}: Event<ClientConnection>) => protocol === pocmddpProtocol;
 
 export const DeliveryProtocolModule: ModuleConfig = {
     requires: [
@@ -32,9 +33,10 @@ export const DeliveryProtocolModule: ModuleConfig = {
         HttpServerModule
     ],
     mappings: [
-        DataContextManagerProvider,
         {map: DataPushApiListener, instantiate: true},
-        AccessTokenManager
+        DataContextManagerProvider,
+        AccessTokenManager,
+        MessageCache
     ],
     commands: [
         {event: NewConnectionEvent.TYPE, command: HandleNewConnection, guard: protocolGuard},

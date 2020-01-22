@@ -1,15 +1,22 @@
-import {InjectionConfig, Module} from "qft";
-import {SwaggerApiConfig, SwaggerApiDisplayModule} from "../../lib/swaggerApiDisplay";
-import {WebsocketListenerModule} from "../../lib/websocketListener";
-import {PermessageDeflateConfig, PermessageDeflateExtensionModule} from "../../lib/permessageDeflateExtension";
-import {Logger} from "../../lib/logger";
 import * as cluster from "cluster";
+import {InjectionConfig, ModuleConfig} from "qft";
+import {Logger} from "../../lib/logger";
+import {SwaggerApiConfig, SwaggerApiDisplayModule} from "../../lib/swaggerApiDisplay";
+import {PermessageDeflateConfig, PermessageDeflateExtensionModule} from "../../lib/permessageDeflateExtension";
+import {DeliveryProtocolModule} from "../../lib/deliveryProtocol";
+import {WebsocketListenerModule} from "../../lib/websocketListener";
+import {ConfigurationContextModule} from "../../lib/configurationContext/ConfigurationContextModule";
+import {HttpServerRouter} from "../../lib/httpServer";
+import url from "url";
+import {SocketDescriptor} from "../../lib/websocketListener/data/SocketDescriptor";
 
-@Module({
+export const devServerModule: ModuleConfig = {
     requires: [
+        ConfigurationContextModule,
         SwaggerApiDisplayModule,
-        WebsocketListenerModule,
-        PermessageDeflateExtensionModule
+        PermessageDeflateExtensionModule,
+        DeliveryProtocolModule,
+        WebsocketListenerModule
     ],
     mappings: [
         PermessageDeflateConfig,
@@ -26,10 +33,18 @@ import * as cluster from "cluster";
                 }]
             }
         } as InjectionConfig<SwaggerApiConfig>
-    ]
-})
-export class DevServerModule {
-    constructor(logger: Logger) {
-        logger.context = cluster?.worker?.id.toString();
+    ],
+    setup: injector => {
+        injector.get(Logger).context = cluster?.worker?.id.toString();
+
+        const router = injector.get(HttpServerRouter);
+        router.get('/', ({sendFile}) => sendFile(`${__dirname}/index.html`));
+
+        router.post('/validationAPI/validate-connection', ({body, sendJson}) => {
+            const {query: {externalId}} = url.parse((body as SocketDescriptor).url, true);
+            const response = {externalId: externalId ?? "externalId"};
+            // console.log('>> validate-connection', {body, response});
+            sendJson(response);
+        });
     }
-}
+};

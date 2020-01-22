@@ -14,7 +14,7 @@ export class PermessageDeflateAgent implements WebsocketExtensionAgent {
                 readonly configOfferResponse: string
     ) {}
 
-    async transformIncomingData(dataFrame: DataFrame) {
+    async incomingDataPipe(dataFrame: DataFrame) {
         const {type, rsv1, payload} = dataFrame;
         if (![TextFrame, BinaryFrame].includes(type) || !rsv1) {
             return dataFrame;
@@ -27,7 +27,7 @@ export class PermessageDeflateAgent implements WebsocketExtensionAgent {
         }
     }
 
-    async transformOutgoingData(dataFrame: DataFrame) {
+    async outgoingDataPipe(dataFrame: DataFrame) {
         const {type, rsv1, payload} = dataFrame;
         if (![TextFrame, BinaryFrame].includes(type)) {
             return dataFrame;
