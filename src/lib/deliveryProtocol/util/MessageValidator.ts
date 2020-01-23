@@ -94,7 +94,7 @@ export class MessageValidator<T> {
 
             if (Array.isArray(parsedValue) && configMap.get(field).unique) {
                 parsed[field] = uniqueValues(parsedValue);
-            } else {
+            } else if(parsedValue !== null || !configMap.get(field).optional) {
                 parsed[field] = parsedValue;
             }
         });

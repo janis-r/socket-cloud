@@ -1,8 +1,10 @@
-import {ConfigurationContextProvider} from "lib/configurationContext";
+import {Inject} from "qft";
+import {ConfigurationContextProvider} from "../../configurationContext";
 import {TokenInfo} from "../data/TokenInfo";
 
 export class AccessTokenManager {
 
+    @Inject()
     private readonly configurationContextProvider: ConfigurationContextProvider;
 
     readonly validateToken = async (token: string): Promise<null | TokenInfo> => {
@@ -11,7 +13,7 @@ export class AccessTokenManager {
             return null;
         }
 
-        const contextId = "test";
+        const contextId = "tests-runner";
         const accessRights: TokenInfo["accessRights"] = "all";
 
         const context = await getConfigurationContext(contextId);

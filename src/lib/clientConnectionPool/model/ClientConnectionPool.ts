@@ -106,7 +106,7 @@ export class ClientConnectionPool {
         const externalIdMap = byContextAndExternalId.get(contextId);
         const entry = externalIdMap.get(externalId);
         if (!(entry instanceof Set) || entry.size === 1) {
-            externalIdMap.get(externalId);
+            externalIdMap.delete(externalId);
         } else {
             entry.delete(connection);
         }

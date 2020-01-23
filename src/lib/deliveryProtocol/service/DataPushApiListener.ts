@@ -28,12 +28,13 @@ export class DataPushApiListener {
                 private readonly messageCache: MessageCache,
                 private readonly eventDispatcher: EventDispatcher) {
 
-        router.post("individual-message", this.individualMessageHandler);
-        router.post("channel-message", this.channelMessageHandler);
-        router.post("multi-channel-message", this.multiChannelMessageHandler);
+        router.post("/:contextId/individual-message/", this.individualMessageHandler);
+        router.post("/:contextId/channel-message/", this.channelMessageHandler);
+        router.post("/:contextId/multi-channel-message/", this.multiChannelMessageHandler);
     }
 
     private readonly individualMessageHandler: HttpRequestHandler = async request => {
+        console.log('>> individualMessageHandler', request.param("contextId").asString(), request.body);
         const {messageCache, eventDispatcher} = this;
         const config = await this.validateApiCall(request);
         if (!config) {
@@ -65,7 +66,6 @@ export class DataPushApiListener {
         const message: PushToClientMessage = {
             type: MessageType.PushToClient,
             messageId: nextMessageId(),
-            channels: [],
             payload
         };
 

@@ -9,11 +9,18 @@ info:
 tags:
   - name: Data push
 paths:
-  /individual-message/:
+  /{contexId}/individual-message/:
     post:
       summary: Post message to individual connection (or connections), identified by connection id provided upon initialization.
       tags:
         - Data push
+      parameters:
+        - in: path
+          name: contexId
+          required: true
+          schema:
+            type:
+              string
       requestBody:
         required: true
         description: Data to be transfered to one or multiple connections.
@@ -34,11 +41,18 @@ paths:
           $ref: "#/components/responses/PayloadTooLarge"
       security:
         - ApiAuthKey: []
-  /channel-message/:
+  /{contexId}/channel-message/:
     post:
       summary: Post message to data channel (or channels).
       tags:
         - Data push
+      parameters:
+        - in: path
+          name: contexId
+          required: true
+          schema:
+            type:
+              string
       requestBody:
         description: Message data object to be delivered to recipients.
         required: true
@@ -59,11 +73,18 @@ paths:
           $ref: "#/components/responses/PayloadTooLarge"
       security:
         - ApiAuthKey: []
-  /multi-channel-message/:
+  /{contexId}/multi-channel-message/:
     post:
       summary: Post list of messages to data channels.
       tags:
         - Data push
+      parameters:
+        - in: path
+          name: contexId
+          required: true
+          schema:
+            type:
+              string
       requestBody:
         description: List of message data objects to be delivered to recipients.
         required: true
@@ -92,7 +113,7 @@ components:
       description: Message data format to be delivered to data cahnnel.
       type: object
       properties:
-        channel:
+        channels:
           description: List of data channel names to which message should be delivered.
           type: array
           items:
