@@ -3,7 +3,7 @@
 
 module.exports = {
     automock: false,
-    roots: ['./src/'],
+    roots: ['./src'],
     preset: 'ts-jest',
     testMatch: ['**/?(*.)spec.ts']
 };

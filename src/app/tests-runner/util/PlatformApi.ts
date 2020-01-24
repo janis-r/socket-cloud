@@ -63,7 +63,7 @@ export class PlatformApi {
             statusText,
             response: await request.text()
         })}`);
-    }
+    };
 
     readonly multiChannelMessage = async (...messages: { payload: string, channels: ChannelId[] }[]): Promise<MessageDeliveryReport> => {
         const {serverUrl, contextId, apiAccessKey} = this;

@@ -1,23 +1,27 @@
 import {ChildProcess, exec} from "child_process";
 import psTree from "ps-tree";
 import {Timer} from "ugd10a";
+import chalk from "chalk";
 
 let serverProcess: ChildProcess;
 
-export const launchServer = (mode: "js" | "ts" = "ts") => new Promise<void>(async resolve => {
+export const launchServer = (showLogs = false, mode: "js" | "ts" = "ts") => new Promise<void>(async resolve => {
     stopServer();
 
-    const exePath = mode === "ts" ? `ts-node ${__dirname}/../../dev-server/single-core.ts` : `node ${__dirname}/../../dev-server/single-core.js`;
-    console.log('>> run:', exePath);
+    const isTs = __filename.match(/\.ts$/);
+    const executable = isTs ? 'ts-node' : 'node';
+    const path = `${__dirname}/../../dev-server/single-core.${isTs ? 't' : 'j'}s`;
+
+    const exePath = `${executable} ${path}`;
+    showLogs && logToConsole('>> run:', exePath);
+
     const time = new Timer();
     serverProcess = exec(exePath);
     serverProcess.stdout.on("data", async chunk => {
         const text = typeof chunk === "string" ? chunk : (chunk instanceof Buffer ? chunk.toString("utf8") : null);
-        if (text.includes("[error]")) {
-            console.log(`[server] ${text.match(/\[error\].*/)[0]}`);
-        }
+        showLogs && logToConsole(text);
         if (text && text.includes('Http server running on port')) {
-            console.log(text, `in ${time.elapsed} ms`);
+            showLogs && logToConsole(`in ${time.elapsed} ms`);
             resolve();
         }
     });
@@ -29,6 +33,8 @@ export const stopServer = () => {
     }
     serverProcess = null;
 };
+
+export const serverIsRunning = () => !!serverProcess;
 
 function killProcessTree(pid: number, signal = 'SIGKILL'): void {
     psTree(pid, (err, children) =>
@@ -42,3 +48,6 @@ function killProcessTree(pid: number, signal = 'SIGKILL'): void {
     );
 }
 
+function logToConsole(...entries: Array<any>): void {
+    console.log(...entries.map(value => chalk.white(chalk.bgBlack(value))));
+}
