@@ -3,7 +3,11 @@ import {DataContextManagerProvider} from "../service/DataContextManagerProvider"
 import {MessageType, RestoreChannelsRequestMessage} from "../data";
 import {ClientConnection} from "../../clientConnectionPool";
 import {MessageCache} from "../model/MessageCache";
-import {RestoredMessage, RestoreChannelsResponseMessage} from "../data/serverMessage/RestoreChannelsResponseMessage";
+import {
+    RestoreChannelsResponseMessage,
+    RestoredMessage,
+    restoreResponseUtil
+} from "../data/serverMessage/RestoreChannelsResponseMessage";
 
 export class RestoreClientSubscription implements Command {
 
@@ -29,8 +33,15 @@ export class RestoreClientSubscription implements Command {
 
         const contextManager = await getContextManager(contextId);
         const channelMessages: ReturnType<MessageCache['getMessageCache']> = [];
+
         for (const {channel, messageId} of channels) {
-            const {cacheTimeMs, maxCacheSize} = contextManager.getChannelCachingPolicy(channel);
+            const cachingPolicy = contextManager.getChannelCachingPolicy(channel);
+            if (!cachingPolicy) {
+                // Channel ain't got caching policy defined.
+                // TODO: Is it worth an error log that someone has requested chan with no cache to be restored?
+                return;
+            }
+            const {cacheTimeMs, maxCacheSize} = cachingPolicy;
             const messages = messageCache.getMessageCache(contextId, channel, {cacheTimeMs, maxCacheSize, messageId});
             if (messages) {
                 channelMessages.push(...messages);
@@ -49,9 +60,15 @@ export class RestoreClientSubscription implements Command {
                     }
                     return false;
                 })
-                .sort((a, b) => a.time - b.time)
+                .sort(({time: t1, message: {messageId: mId1}}, {time: t2, message: {messageId: mId2}}) => {
+                    if (t1 !== t2) {
+                        return t1 - t2;
+                    }
+                    // This works with assumption that message ids are unique and usable for sorting
+                    return mId1 > mId2 ? 1 : -1;
+                })
                 .map(({message}) => message)
         };
-        connection.send(JSON.stringify(preparedMessage));
+        connection.send(restoreResponseUtil.serialize(preparedMessage));
     }
 }

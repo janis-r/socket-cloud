@@ -17,12 +17,16 @@ export const launchServer = (showLogs = false, mode: "js" | "ts" = "ts") => new 
 
     const time = new Timer();
     serverProcess = exec(exePath);
+    serverProcess.stderr.on("data", err => {
+        throw err;
+    });
     serverProcess.stdout.on("data", async chunk => {
         const text = typeof chunk === "string" ? chunk : (chunk instanceof Buffer ? chunk.toString("utf8") : null);
-        showLogs && logToConsole(text);
         if (text && text.includes('Http server running on port')) {
-            showLogs && logToConsole(`in ${time.elapsed} ms`);
+            logToConsole(`${text.replace(/\s+$/, '')} [in ${time.elapsed} ms]`);
             resolve();
+        } else if (showLogs) {
+            logToConsole(text.replace(/\s+$/, ''));
         }
     });
 });

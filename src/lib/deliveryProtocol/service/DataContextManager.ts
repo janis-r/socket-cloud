@@ -97,7 +97,6 @@ export class DataContextManager {
         } = this;
 
         const channelPolicy = perChannelCachingPolicy && channelId in perChannelCachingPolicy ? perChannelCachingPolicy[channelId] : null;
-
         if (!generalPolicy && !channelPolicy) {
             return null;
         }

@@ -6,11 +6,15 @@ import {
     deserializeServerMessage,
     MessageType,
     pushToServerUtil,
+    RestoreChannelsRequestMessage,
+    restoreRequestUtil,
     ServerMessage,
     subscribeMessageUtil,
     unsubscribeMessageUtil
 } from "../../../lib/deliveryProtocol/data";
 import {ContextId} from "../../../lib/configurationContext";
+import {PushToClientMessage} from "../../../lib/deliveryProtocol/data/serverMessage/PushToClientMessage";
+import {RestoreChannelsResponseMessage} from "../../../lib/deliveryProtocol/data/serverMessage/RestoreChannelsResponseMessage";
 
 const protocol = pocmddpProtocol;
 
@@ -20,8 +24,10 @@ export class SocketClient {
     readonly connectionId = SocketClient.ID++;
     readonly initialized: Promise<this>;
 
-    private readonly onMessageCallback = new CallbackCollection<ServerMessage>();
+    private readonly onMessageCallback = new CallbackCollection<PushToClientMessage>();
+    private readonly onRestoreCallback = new CallbackCollection<RestoreChannelsResponseMessage>();
     readonly onMessage = this.onMessageCallback.polymorph;
+    readonly onRestore = this.onRestoreCallback.polymorph;
 
     private _connection: WebsocketConnection;
     private _authKey: string;
@@ -42,7 +48,15 @@ export class SocketClient {
             }
 
             const message = deserializeServerMessage(data);
-            this.onMessageCallback.execute(message);
+            switch (message.type) {
+                case MessageType.PushToClient:
+                    this.onMessageCallback.execute(message);
+                    break;
+                case MessageType.RestoreResponse:
+                    this.onRestoreCallback.execute(message);
+                    break;
+            }
+
         });
 
         return this;
@@ -57,13 +71,15 @@ export class SocketClient {
     }
 
     subscribe(...channels: string[]): void {
-        // console.log('>> subscribe', ...channels);
         this._connection.send(subscribeMessageUtil.serialize({type: MessageType.Subscribe, channels}));
     }
 
     unsubscribe(...channels: string[]): void {
-        // console.log('>> unsubscribe', ...channels);
         this._connection.send(unsubscribeMessageUtil.serialize({type: MessageType.Unsubscribe, channels}));
+    }
+
+    restore(...channels: RestoreChannelsRequestMessage['channels']): void {
+        this._connection.send(restoreRequestUtil.serialize({type: MessageType.RestoreRequest, channels}));
     }
 
     sendGlobalMessage(data: string): void {
@@ -71,7 +87,6 @@ export class SocketClient {
     }
 
     sendChannelMessage(data: string, ...channels: string[]): void {
-        // console.log('>> sendChannelMessage', channels, data);
         this._connection.send(pushToServerUtil.serialize({
             type: MessageType.PushToServer,
             channels,

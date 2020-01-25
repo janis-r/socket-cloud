@@ -22,10 +22,11 @@ const createConnections = (count: number = 10, cId = contextId) => done => spawn
             done()
         }
     );
-const resetConnections = () => {
+const resetConnections = done => {
     while (clientConnections.length) {
         clientConnections.shift().close();
     }
+    setTimeout(done, 100);
 };
 
 const createPlatformApi = (apiKey = 'x-api-key-value') => new PlatformApi(serverUrl, contextId, apiKey);
@@ -40,3 +41,5 @@ export const testUtils = {
     resetConnections,
     createPlatformApi
 };
+
+export const characterSequence = (length: number) => new Array(length).fill(0).map((_, index) => String.fromCharCode('a'.charCodeAt(0) + index));

@@ -57,7 +57,12 @@ export class MessageValidator<T> {
         }
         return JSON.stringify(allFields.map(field => {
             if (fieldSerializers.has(field)) {
-                return fieldSerializers.get(field)(value[field]);
+                const entrySerializer = fieldSerializers.get(field);
+                const {type} = this.configMap.get(field);
+                if (type === "array" || type === "string[]") {
+                    return value[field].map(entrySerializer);
+                }
+                return entrySerializer(value[field]);
             }
             return value[field];
         }));
@@ -87,14 +92,20 @@ export class MessageValidator<T> {
             const rawValue = data.shift();
             let parsedValue;
             if (fieldDeserializers.has(field)) {
-                parsedValue = fieldDeserializers.get(field)(rawValue);
+                const entryDeserializer = fieldDeserializers.get(field);
+                const {type} = this.configMap.get(field);
+                if (type === "array" || type === "string[]") {
+                    parsedValue = rawValue.map(entryDeserializer);
+                } else {
+                    parsedValue = entryDeserializer(rawValue);
+                }
             } else {
                 parsedValue = rawValue;
             }
 
             if (Array.isArray(parsedValue) && configMap.get(field).unique) {
                 parsed[field] = uniqueValues(parsedValue);
-            } else if(parsedValue !== null || !configMap.get(field).optional) {
+            } else if (parsedValue !== null || !configMap.get(field).optional) {
                 parsed[field] = parsedValue;
             }
         });

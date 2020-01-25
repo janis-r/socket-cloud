@@ -19,7 +19,7 @@ export const restoreResponseUtil = new MessageValidator<RestoreChannelsResponseM
     {
         field: "payload",
         type: "array",
-        itemValidator: value => restoreMessageUtil.validate(value),
+        itemValidator: restoreMessageUtil.validate,
         itemSerializer: restoreMessageUtil.serialize,
         itemDeserializer: restoreMessageUtil.deserialize,
     }

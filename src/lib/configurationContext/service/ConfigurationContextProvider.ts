@@ -20,7 +20,12 @@ export class ConfigurationContextProvider {
                 validateNewConnections: true
             },
             pingTimeout: toMilliseconds(30, "seconds"),
-            outgoingMessageFragmentSize: 2 ** 14 // 16 kb
+            outgoingMessageFragmentSize: 2 ** 14, // 16 kb,
+            perChannelCachingPolicy: {
+                "cached-channel": {
+                    maxCacheSize: 10
+                }
+            }
         }]
     ]);
 
@@ -34,7 +39,7 @@ export class ConfigurationContextProvider {
 
         const {pathname} = url.parse(descriptor.url, true);
         const match = pathname.match(/^\/?([^\/]+)/);
-        if (!match || match.length<2){
+        if (!match || match.length < 2) {
             return null;
         }
 
