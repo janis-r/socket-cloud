@@ -42,8 +42,12 @@ export class SocketClient {
         this._connection = new WebsocketConnection(socket, {id: contextId, protocol});
         this._authKey = authKey;
 
+        this._connection.onError(err => {
+            console.log('>> err', err);
+            throw new Error(err.message);
+        });
+
         this._connection.onMessage(data => {
-            console.log(">>>>>", data)
             if (typeof data !== "string") {
                 throw new Error('Binary data is not expected in here!');
             }

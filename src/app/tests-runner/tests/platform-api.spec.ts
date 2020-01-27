@@ -16,6 +16,18 @@ describe('Platform API', () => {
     beforeEach(createConnections(1));
     afterEach(resetConnections);
 
+    it('Post with unauthorized access token will produce error', async done => {
+        const platformApi = createPlatformApi('invlid-access-token');
+        try {
+            await platformApi.individualMessage(
+                "payload",
+                connections[0].connectionId.toString()
+            );
+        } catch (e) {
+            expect(e).toBeTruthy();
+            done();
+        }
+    });
     it('Can post single individual message to several clients', async done => {
 
         const platformApi = createPlatformApi();
@@ -113,7 +125,7 @@ describe('Platform API', () => {
         done();
     });
 
-    it.only('Can post several channel messages', async done => {
+    it('Can post several channel messages', async done => {
         const platformApi = createPlatformApi();
         const payloads = [
             Math.floor(Math.random() * 0xFFFFFFFF).toString(16),

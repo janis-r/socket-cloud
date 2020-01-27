@@ -26,6 +26,7 @@ import {MessageCache} from "./service/MessageCache";
 import {InMemoryMessageCache} from "./service/impl/InMemoryMessageCache";
 import {MessageIdProvider} from "./service/MessageIdProvider";
 import {InMemoryMessageIdProvider} from "./service/impl/InMemoryMessageIdProvider";
+import {DevAccessTokenManager} from "./service/impl/DevAccessTokenManager";
 
 const protocolGuard = ({data: {context: {protocol}}}: Event<ClientConnection>) => protocol === pocmddpProtocol;
 
@@ -38,7 +39,7 @@ export const DeliveryProtocolModule: ModuleConfig = {
     mappings: [
         {map: DataPushApiListener, instantiate: true},
         DataContextManagerProvider,
-        AccessTokenManager,
+        {map: AccessTokenManager, useType: DevAccessTokenManager},
         {map: MessageCache, useType: InMemoryMessageCache},
         {map: MessageIdProvider, useType: InMemoryMessageIdProvider}
     ],
