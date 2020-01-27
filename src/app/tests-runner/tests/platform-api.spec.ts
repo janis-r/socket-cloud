@@ -19,10 +19,7 @@ describe('Platform API', () => {
     it('Post with unauthorized access token will produce error', async done => {
         const platformApi = createPlatformApi('invlid-access-token');
         try {
-            await platformApi.individualMessage(
-                "payload",
-                connections[0].connectionId.toString()
-            );
+            await platformApi.individualMessage("payload", connections[0].connectionId.toString());
         } catch (e) {
             expect(e).toBeTruthy();
             done();
