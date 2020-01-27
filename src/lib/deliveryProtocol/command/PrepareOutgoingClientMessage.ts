@@ -2,8 +2,8 @@ import {Command, Event, EventDispatcher, Inject} from "qft";
 import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
 import {MessageType, PushToServerMessage} from "../data";
 import {ClientConnection} from "../../clientConnectionPool";
-import {MessageCache} from "../model/MessageCache";
-import {nextMessageId} from "../util/nextMessageId";
+import {MessageCache} from "../service/MessageCache";
+import {MessageIdProvider} from "../service/MessageIdProvider";
 import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
 import {PushToClientMessage} from "../data/serverMessage/PushToClientMessage";
 
@@ -15,6 +15,8 @@ export class PrepareOutgoingClientMessage implements Command {
     private dataContextManagerProvider: DataContextManagerProvider;
     @Inject()
     private messageCache: MessageCache;
+    @Inject()
+    private messageIdProvider: MessageIdProvider;
     @Inject()
     private eventDispatcher: EventDispatcher;
 
@@ -28,6 +30,7 @@ export class PrepareOutgoingClientMessage implements Command {
             },
             dataContextManagerProvider: {getContextManager},
             messageCache,
+            messageIdProvider: {nextMessageId},
             eventDispatcher
         } = this;
 
@@ -35,11 +38,13 @@ export class PrepareOutgoingClientMessage implements Command {
         const cachedChannels = channels.filter(channelId => !!contextManager.getChannelCachingPolicy(channelId));
 
         const messageId = nextMessageId();
+        const time = Date.now();
+        const message: PushToClientMessage = {type: MessageType.PushToClient, time, messageId, payload, channels};
+
         if (cachedChannels.length > 0) {
-            messageCache.write(contextId, {channels: cachedChannels, payload, messageId});
+            messageCache.write(contextId, {time, messageId, payload, channels: cachedChannels});
         }
 
-        const message: PushToClientMessage = {type: MessageType.PushToClient, messageId, payload, channels};
         eventDispatcher.dispatchEvent(new OutgoingMessageEvent(contextId, message))
     }
 }

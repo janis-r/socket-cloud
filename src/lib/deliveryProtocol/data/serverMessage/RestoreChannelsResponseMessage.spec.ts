@@ -10,18 +10,22 @@ describe('RestoreChannelsResponseMessage', () => {
                 {
                     channels: ["cached-channel"],
                     payload: "a",
+                    time: Date.now() - 10,
                     messageId: "0"
                 }, {
                     channels: ["cached-channel"],
                     payload: "c",
+                    time: Date.now() - 20,
                     messageId: "2"
                 }, {
                     channels: ["cached-channel"],
                     payload: "b",
+                    time: Date.now() - 30,
                     messageId: "1"
                 }, {
                     channels: ["cached-channel"],
                     payload: "d",
+                    time: Date.now() - 40,
                     messageId: "3"
                 }
             ]

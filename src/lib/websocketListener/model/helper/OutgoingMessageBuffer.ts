@@ -31,7 +31,7 @@ export class OutgoingMessageBuffer {
             debug && console.log('>> sendData', frame.payload.length, 'bytes', frame);
             const renderedFrame = composeWebsocketFrame(frame);
             const flushed = socket.write(renderedFrame, err => {
-                err && console.log('socket.write err', err)
+                err && debug && console.log('socket.write err', err)
             });
             if (!flushed) {
                 await new Promise(resolve => socket.once("drain", resolve));

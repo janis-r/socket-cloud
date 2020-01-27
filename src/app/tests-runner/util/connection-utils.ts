@@ -1,20 +1,20 @@
 import {connectWebsocket} from "./connectWebsocket";
-import {globalMessageChannel, pocmddpProtocol} from "../../../lib/deliveryProtocol";
-import {WebsocketConnection} from "../../../lib/websocketListener";
-import {CallbackCollection} from "../../../lib/utils/CallbackCollection";
 import {
     deserializeServerMessage,
+    globalMessageChannel,
     MessageType,
+    pocmddpProtocol,
+    PushToClientMessage,
     pushToServerUtil,
     RestoreChannelsRequestMessage,
+    RestoreChannelsResponseMessage,
     restoreRequestUtil,
-    ServerMessage,
     subscribeMessageUtil,
     unsubscribeMessageUtil
-} from "../../../lib/deliveryProtocol/data";
+} from "../../../lib/deliveryProtocol";
+import {WebsocketConnection} from "../../../lib/websocketListener";
+import {CallbackCollection} from "../../../lib/utils/CallbackCollection";
 import {ContextId} from "../../../lib/configurationContext";
-import {PushToClientMessage} from "../../../lib/deliveryProtocol/data/serverMessage/PushToClientMessage";
-import {RestoreChannelsResponseMessage} from "../../../lib/deliveryProtocol/data/serverMessage/RestoreChannelsResponseMessage";
 
 const protocol = pocmddpProtocol;
 
@@ -43,6 +43,7 @@ export class SocketClient {
         this._authKey = authKey;
 
         this._connection.onMessage(data => {
+            console.log(">>>>>", data)
             if (typeof data !== "string") {
                 throw new Error('Binary data is not expected in here!');
             }
@@ -55,6 +56,8 @@ export class SocketClient {
                 case MessageType.RestoreResponse:
                     this.onRestoreCallback.execute(message);
                     break;
+                default:
+                    throw new Error(`Message of unknown type received: ${message}`);
             }
 
         });

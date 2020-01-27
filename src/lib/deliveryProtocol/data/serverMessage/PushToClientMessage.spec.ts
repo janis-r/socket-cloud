@@ -5,6 +5,7 @@ describe('PushToClientMessage', () => {
     it('Can serialize and deserialize', () => {
         const data: PushToClientMessage = {
             type: MessageType.PushToClient,
+            time: Date.now(),
             messageId: "0",
             channels: ["/"],
             payload: "Hello!"
@@ -17,6 +18,7 @@ describe('PushToClientMessage', () => {
     it('Can serialize and deserialize message with empty channels', () => {
         const data: PushToClientMessage = {
             type: MessageType.PushToClient,
+            time: Date.now(),
             messageId: "0",
             payload: "Hello!"
         };

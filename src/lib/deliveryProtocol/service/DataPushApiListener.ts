@@ -3,14 +3,14 @@ import {HttpRequestHandler, HttpServerRouter} from "../../httpServer";
 import {AccessTokenManager} from "./AccessTokenManager";
 import {RequestContext} from "../../httpServer/data/RequestContext";
 import {TokenInfo} from "../data/TokenInfo";
-import {HttpStatusCode} from "../../types/HttpStatusCode";
+import {HttpStatusCode} from "../../httpServer/data/HttpStatusCode";
 import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
 import {channelMessageUtil} from "../data/apiMessage/ChannelMessage";
 import {individualMessageUtil} from "../data/apiMessage/IndividualMessage";
 import {MessageType} from "../data";
 import {PushToClientMessage} from "../data/serverMessage/PushToClientMessage";
-import {nextMessageId} from "../util/nextMessageId";
-import {MessageCache} from "../model/MessageCache";
+import {MessageIdProvider} from "./MessageIdProvider";
+import {MessageCache} from "./MessageCache";
 
 @Injectable()
 export class DataPushApiListener {
@@ -26,6 +26,7 @@ export class DataPushApiListener {
     constructor(router: HttpServerRouter,
                 private readonly tokenManager: AccessTokenManager,
                 private readonly messageCache: MessageCache,
+                private readonly messageIdProvider: MessageIdProvider,
                 private readonly eventDispatcher: EventDispatcher) {
 
         router.post("/:contextId/individual-message/", this.individualMessageHandler);
@@ -34,8 +35,7 @@ export class DataPushApiListener {
     }
 
     private readonly individualMessageHandler: HttpRequestHandler = async request => {
-        console.log('>> individualMessageHandler', request.param("contextId").asString(), request.body);
-        const {messageCache, eventDispatcher} = this;
+        const {messageCache, messageIdProvider: {nextMessageId}, eventDispatcher} = this;
         const config = await this.validateApiCall(request);
         if (!config) {
             return;
@@ -65,6 +65,7 @@ export class DataPushApiListener {
 
         const message: PushToClientMessage = {
             type: MessageType.PushToClient,
+            time: Date.now(),
             messageId: nextMessageId(),
             payload
         };
@@ -80,7 +81,7 @@ export class DataPushApiListener {
     };
 
     private readonly channelMessageHandler: HttpRequestHandler = async request => {
-        const {messageCache, eventDispatcher} = this;
+        const {messageCache, messageIdProvider: {nextMessageId}, eventDispatcher} = this;
         const config = await this.validateApiCall(request);
         if (!config) {
             return;
@@ -110,6 +111,7 @@ export class DataPushApiListener {
 
         const message: PushToClientMessage = {
             type: MessageType.PushToClient,
+            time: Date.now(),
             messageId: nextMessageId(),
             channels,
             payload
@@ -126,7 +128,7 @@ export class DataPushApiListener {
     };
 
     private readonly multiChannelMessageHandler: HttpRequestHandler = async request => {
-        const {messageCache, eventDispatcher} = this;
+        const {messageCache, messageIdProvider: {nextMessageId}, eventDispatcher} = this;
         const config = await this.validateApiCall(request);
         if (!config) {
             return;
@@ -169,6 +171,7 @@ export class DataPushApiListener {
             const {payload, channels} = data;
             const message: PushToClientMessage = {
                 type: MessageType.PushToClient,
+                time: Date.now(),
                 messageId: nextMessageId(),
                 channels,
                 payload

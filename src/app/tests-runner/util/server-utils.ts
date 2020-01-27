@@ -32,10 +32,12 @@ export const launchServer = (showLogs = false, mode: "js" | "ts" = "ts") => new 
 });
 
 export const stopServer = () => {
-    if (serverProcess) {
-        killProcessTree(serverProcess.pid);
+    if (!serverProcess) {
+        return false;
     }
+    killProcessTree(serverProcess.pid);
     serverProcess = null;
+    return true;
 };
 
 export const serverIsRunning = () => !!serverProcess;

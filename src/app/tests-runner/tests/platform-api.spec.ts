@@ -1,49 +1,52 @@
 import {MessageType} from "../../../lib/deliveryProtocol/data";
-import {testUtils} from "../util/test-utils";
-
-const {startServerIfNotStarted, stopServer, clientConnections, createConnections, resetConnections, createPlatformApi} = testUtils;
+import {
+    connections,
+    createConnections,
+    createPlatformApi,
+    resetConnections,
+    startSocketServer,
+    stopSocketServer
+} from "../util/test-utils";
 
 describe('Platform API', () => {
 
-    beforeAll(startServerIfNotStarted);
-    afterAll(stopServer);
+    beforeAll(startSocketServer);
+    afterAll(stopSocketServer);
 
-    beforeEach(createConnections());
+    beforeEach(createConnections(1));
     afterEach(resetConnections);
 
     it('Can post single individual message to several clients', async done => {
 
         const platformApi = createPlatformApi();
-
         const payload = Math.floor(Math.random() * 0xFFFFFFFF).toString(16);
 
         let messageCount = 0;
         let recipientCount = 0;
 
-        clientConnections.forEach(({onMessage, connectionId}) =>
+        connections.forEach(({onMessage, connectionId}) =>
             onMessage(message => {
                 if (message.type !== MessageType.PushToClient) {
-                    throw new Error(`Wrong message data`);
-                }
-                if (message.payload !== payload) {
-                    throw new Error(`Wrong payload`);
-                }
-                if (message.channels && message.channels.length > 0) {
-                    throw new Error(`Message channels must be empty or not set`);
-                }
-                messageCount++;
-                if (messageCount === clientConnections.length && recipientCount) {
-                    done();
+                    fail(`Wrong message data`);
+                } else if (message.payload !== payload) {
+                    fail(`Wrong payload`);
+                } else if (message.channels && message.channels.length > 0) {
+                    fail(`Message channels must be empty or not set`);
+                } else {
+                    messageCount++;
+                    if (messageCount === connections.length && recipientCount) {
+                        done();
+                    }
                 }
             })
         );
 
         const {recipients} = await platformApi.individualMessage(
             payload,
-            ...clientConnections.map(({connectionId}) => connectionId.toString())
+            ...connections.map(({connectionId}) => connectionId.toString())
         );
-        expect(recipients).toBe(clientConnections.length);
-        if (messageCount === clientConnections.length) {
+        expect(recipients).toBe(connections.length);
+        if (messageCount === connections.length) {
             done();
         }
 
@@ -52,28 +55,27 @@ describe('Platform API', () => {
 
     it('Can post unique individual message to several clients', async done => {
         const platformApi = createPlatformApi();
-        const messageCount = clientConnections.length;
+        const messageCount = connections.length;
         let receivedMessagesCount = 0;
         let sendToCount = 0;
 
-        clientConnections.forEach(({onMessage, connectionId}) =>
+        connections.forEach(({onMessage, connectionId}) =>
             onMessage(message => {
                 if (message.type !== MessageType.PushToClient) {
-                    throw new Error(`Wrong message data`);
-                }
-                if (message.payload !== connectionId.toString()) {
-                    throw new Error(`Wrong payload`);
-                }
-                if (message.channels && message.channels.length > 0) {
-                    throw new Error(`Message channels must be empty or not set`);
-                }
-                receivedMessagesCount++;
-                if (receivedMessagesCount === messageCount && sendToCount === messageCount) {
-                    done();
+                    fail(`Wrong message data`);
+                } else if (message.payload !== connectionId.toString()) {
+                    fail(`Wrong payload`);
+                } else if (message.channels && message.channels.length > 0) {
+                    fail(`Message channels must be empty or not set`);
+                } else {
+                    receivedMessagesCount++;
+                    if (receivedMessagesCount === messageCount && sendToCount === messageCount) {
+                        done();
+                    }
                 }
             })
         );
-        clientConnections
+        connections
             .map(({connectionId}) => connectionId.toString())
             .forEach(async id => {
                 const {recipients} = await platformApi.individualMessage(id, id);
@@ -83,6 +85,66 @@ describe('Platform API', () => {
                     done();
                 }
             });
+    });
+
+    it('Can post channel message', async done => {
+        const platformApi = createPlatformApi();
+        const payload = Math.floor(Math.random() * 0xFFFFFFFF).toString(16);
+        const channel = "channel-name";
+
+        const ready = new Promise<void>(resolve => {
+            let received = 0;
+            connections.forEach(connection => {
+                connection.subscribe(channel);
+                connection.onMessage(() => received++)
+                    .filter(({channels, payload: p}) => channels.includes(channel) && p === payload)
+                    .once()
+                    .onComplete(() => {
+                        if (received === connections.length) {
+                            resolve();
+                        }
+                    });
+            })
+        });
+
+        const {recipients} = await platformApi.channelMessage(payload, channel);
+        await ready;
+        expect(recipients).toBe(connections.length);
+        done();
+    });
+
+    it.only('Can post several channel messages', async done => {
+        const platformApi = createPlatformApi();
+        const payloads = [
+            Math.floor(Math.random() * 0xFFFFFFFF).toString(16),
+            Math.floor(Math.random() * 0xFFFFFFFF).toString(16)
+        ];
+        const channels = ["A", "B"];
+        const ready = new Promise<void>(resolve => {
+            let received = 0;
+            connections.forEach(connection => {
+                connection.subscribe(...channels);
+                connection.onMessage(message => received++)
+                    .filter(({channels: [c], payload: p}) =>
+                        channels.includes(c) && channels.indexOf(c) === payloads.indexOf(p)
+                    )
+                    .twice()
+                    .onComplete(() => {
+                        if (received === connections.length * 2) {
+                            console.log({received});
+                            resolve();
+                        }
+                    });
+            })
+        });
+
+        const {recipients} = await platformApi.multiChannelMessage(...payloads.map((payload, index) => ({
+            payload,
+            channels: [channels[index]]
+        })));
+        await ready;
+        expect(recipients).toBe(connections.length * 2);
+        done();
     });
 
 });

@@ -22,7 +22,10 @@ import {PrepareOutgoingClientMessage} from "./command/PrepareOutgoingClientMessa
 import {OutgoingMessageEvent} from "./event/OutgoingMessageEvent";
 import {BroadcastOutgoingMessage} from "./command/BroadcastOutgoingMessage";
 import {RestoreClientSubscription} from "./command/RestoreClientSubscription";
-import {MessageCache} from "./model/MessageCache";
+import {MessageCache} from "./service/MessageCache";
+import {InMemoryMessageCache} from "./service/impl/InMemoryMessageCache";
+import {MessageIdProvider} from "./service/MessageIdProvider";
+import {InMemoryMessageIdProvider} from "./service/impl/InMemoryMessageIdProvider";
 
 const protocolGuard = ({data: {context: {protocol}}}: Event<ClientConnection>) => protocol === pocmddpProtocol;
 
@@ -36,7 +39,8 @@ export const DeliveryProtocolModule: ModuleConfig = {
         {map: DataPushApiListener, instantiate: true},
         DataContextManagerProvider,
         AccessTokenManager,
-        MessageCache
+        {map: MessageCache, useType: InMemoryMessageCache},
+        {map: MessageIdProvider, useType: InMemoryMessageIdProvider}
     ],
     commands: [
         {event: NewConnectionEvent.TYPE, command: HandleNewConnection, guard: protocolGuard},

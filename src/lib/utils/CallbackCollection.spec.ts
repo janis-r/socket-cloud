@@ -42,4 +42,24 @@ describe('CallbackCollection', () => {
         new Array(10).fill(0).forEach(() => collection.execute());
         expect(counter).toBe(4);
     });
+    it(`Callback execution can be filtered`, () => {
+        const collection = new CallbackCollection<number>();
+        let counter = 0;
+        collection.add(() => counter++).filter(data => data > 0);
+        collection.execute(0);
+        collection.execute(1);
+        collection.execute(0);
+        collection.execute(1);
+        expect(counter).toBe(2);
+    });
+    it(`On complete will be triggered as execution count is reached`, done => {
+        const collection = new CallbackCollection<number>();
+        let counter = 0;
+        collection.add(() => counter++).filter(data => data > 0).times(2).onComplete(done);
+        collection.execute(0);
+        collection.execute(1);
+        collection.execute(0);
+        collection.execute(1);
+        expect(counter).toBe(2);
+    });
 });

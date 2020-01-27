@@ -40,7 +40,7 @@ export class BroadcastOutgoingMessage implements Command {
         }
 
         const msg = serializeServerMessage(message);
-        connections.forEach(value => value.send(msg));
+        connections.forEach(connection => connection.send(msg));
 
         reportConnectionCount(connections.size);
     }

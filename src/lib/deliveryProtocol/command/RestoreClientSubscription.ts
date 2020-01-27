@@ -2,10 +2,10 @@ import {Command, Event, Inject} from "qft";
 import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
 import {MessageType, RestoreChannelsRequestMessage} from "../data";
 import {ClientConnection} from "../../clientConnectionPool";
-import {MessageCache} from "../model/MessageCache";
+import {MessageCache} from "../service/MessageCache";
 import {
     RestoreChannelsResponseMessage,
-    RestoredMessage,
+    CachedMessage,
     restoreResponseUtil
 } from "../data/serverMessage/RestoreChannelsResponseMessage";
 
@@ -48,26 +48,25 @@ export class RestoreClientSubscription implements Command {
             }
         }
 
-        const messageIds = new Set<RestoredMessage['messageId']>();
+        const messageIds = new Set<CachedMessage['messageId']>();
 
         const preparedMessage: RestoreChannelsResponseMessage = {
             type: MessageType.RestoreResponse,
             payload: channelMessages
-                .filter(({message: {messageId}}) => {
+                .filter(({messageId}) => {
                     if (!messageIds.has(messageId)) {
                         messageIds.add(messageId);
                         return true;
                     }
                     return false;
                 })
-                .sort(({time: t1, message: {messageId: mId1}}, {time: t2, message: {messageId: mId2}}) => {
+                .sort(({time: t1, messageId: mId1}, {time: t2, messageId: mId2}) => {
                     if (t1 !== t2) {
                         return t1 - t2;
                     }
                     // This works with assumption that message ids are unique and usable for sorting
                     return mId1 > mId2 ? 1 : -1;
                 })
-                .map(({message}) => message)
         };
         connection.send(restoreResponseUtil.serialize(preparedMessage));
     }

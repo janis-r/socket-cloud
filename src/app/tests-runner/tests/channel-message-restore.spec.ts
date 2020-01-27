@@ -1,25 +1,26 @@
-import {characterSequence, testUtils} from "../util/test-utils";
-import {restoreResponseUtil} from "../../../lib/deliveryProtocol/data/serverMessage/RestoreChannelsResponseMessage";
 import {
-    PushToClientMessage,
-    pushToClientUtil
-} from "../../../lib/deliveryProtocol/data/serverMessage/PushToClientMessage";
-
-const {startServerIfNotStarted, stopServer, clientConnections, createConnections, resetConnections} = testUtils;
+    characterSequence,
+    connections,
+    createConnections,
+    resetConnections,
+    startSocketServer,
+    stopSocketServer
+} from "../util/test-utils";
+import {PushToClientMessage, pushToClientUtil, restoreResponseUtil} from "../../../lib/deliveryProtocol";
 
 describe('Channel message restoring', () => {
 
-    beforeAll(startServerIfNotStarted);
-    afterAll(stopServer);
+    beforeAll(startSocketServer);
+    afterAll(stopSocketServer);
 
-    beforeEach(createConnections());
+    beforeEach(createConnections(2));
     afterEach(resetConnections);
 
     it('Channel subscription can be restored', async (done) => {
         const channel = 'cached-channel';
         const messages = characterSequence(10);
-        await new Promise<void>(resolve => createConnections(2)(resolve));
-        const [firstConnection, secondConnection] = clientConnections;
+        const [firstConnection, secondConnection] = connections;
+
         messages.forEach(message => firstConnection.sendChannelMessage(message, channel));
 
         secondConnection.onRestore(message => {
@@ -45,9 +46,7 @@ describe('Channel message restoring', () => {
     it('Channel subscription can be restored from last received message', async (done) => {
         const channel = 'cached-channel';
         const messages = characterSequence(10);
-
-        await new Promise<void>(resolve => createConnections(2)(resolve));
-        const [firstConnection, secondConnection] = clientConnections;
+        const [firstConnection, secondConnection] = connections;
 
         const incomingMessages = new Array<PushToClientMessage>();
         firstConnection.subscribe(channel);
@@ -76,7 +75,11 @@ describe('Channel message restoring', () => {
                 }
             }
 
-            expect(incomingMessages.slice(restoreIndex + 1).map(({payload}) => payload)).toMatchObject(message.payload.map(({payload}) => payload));
+            expect(
+                incomingMessages.slice(restoreIndex + 1).map(({messageId, payload}) => ({messageId, payload}))
+            ).toMatchObject(
+                message.payload.map(({messageId, payload}) => ({messageId, payload}))
+            );
             done();
         });
 

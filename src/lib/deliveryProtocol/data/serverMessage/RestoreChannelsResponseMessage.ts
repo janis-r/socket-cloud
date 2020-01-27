@@ -4,11 +4,12 @@ import {MessageValidator} from "../../util/MessageValidator";
 
 export type RestoreChannelsResponseMessage = {
     type: MessageType.RestoreResponse,
-    payload: Array<RestoredMessage>,
+    payload: Array<CachedMessage>,
 }
 
-export type RestoredMessage = Omit<PushToClientMessage, "type">;
-const restoreMessageUtil = new MessageValidator<RestoredMessage>([
+export type CachedMessage = Omit<PushToClientMessage, "type">;
+const restoreMessageUtil = new MessageValidator<CachedMessage>([
+    {field: "time", type: "number"},
     {field: "messageId", type: "string"},
     {field: "channels", type: "string[]"},
     {field: "payload", type: "string"}
