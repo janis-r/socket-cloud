@@ -92,11 +92,11 @@ export class DataContextManager {
         const {
             context: {
                 cachingPolicy: generalPolicy,
-                perChannelCachingPolicy
+                channelConfig
             }
         } = this;
 
-        const channelPolicy = perChannelCachingPolicy && channelId in perChannelCachingPolicy ? perChannelCachingPolicy[channelId] : null;
+        const channelPolicy = channelConfig?.[channelId]?.cachingPolicy;
         if (!generalPolicy && !channelPolicy) {
             return null;
         }

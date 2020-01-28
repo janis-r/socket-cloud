@@ -1,7 +1,8 @@
 import {ContextId} from "../../../configurationContext";
 import {ChannelId} from "../../data/ChannelId";
-import {CachedMessage} from "../../data/serverMessage/RestoreChannelsResponseMessage";
+import {CachedMessage} from "../../data/cache/CachedMessage";
 import {MessageCache} from "../MessageCache";
+import {CacheFilter} from "../../data/cache/CacheFilter";
 
 /**
  * In memory implementation of message cache which will produce values unique only within single node, thus, it
@@ -37,12 +38,8 @@ export class InMemoryMessageCache implements MessageCache {
         }
     }
 
-    getMessageCache(context: ContextId, channelId: ChannelId, props: { cacheTimeMs?: number, maxCacheSize?: number, messageId?: string }): Array<CachedMessage> | null {
+    getCache(context: ContextId, channelId: ChannelId, filter: CacheFilter): Array<CachedMessage> | null {
         const {channelsByContext} = this;
-        const {cacheTimeMs, maxCacheSize, messageId} = props;
-        if (!cacheTimeMs && !maxCacheSize) {
-            return null;
-        }
 
         if (!channelsByContext.has(context)) {
             return null;
@@ -53,13 +50,15 @@ export class InMemoryMessageCache implements MessageCache {
             return null;
         }
 
-        const epoch = cacheTimeMs ? Date.now() - cacheTimeMs : null;
+        const {maxAge, maxLength, messageId} = filter || {};
+        const minEpoch = maxAge ? Date.now() - maxAge : null;
+
         const messages = new Array<CachedMessage>();
         for (const cachedMessage of [...channelMessages].reverse()) {
-            if (maxCacheSize && messages.length === maxCacheSize) {
+            if (maxLength && messages.length === maxLength) {
                 break;
             }
-            if (epoch && cachedMessage.time < epoch) {
+            if (minEpoch && cachedMessage.time < minEpoch) {
                 break;
             }
             if (messageId && cachedMessage.messageId === messageId) {

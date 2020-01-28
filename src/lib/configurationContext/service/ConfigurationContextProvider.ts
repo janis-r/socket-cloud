@@ -21,9 +21,11 @@ export class ConfigurationContextProvider {
             },
             pingTimeout: toMilliseconds(30, "seconds"),
             outgoingMessageFragmentSize: 2 ** 14, // 16 kb,
-            perChannelCachingPolicy: {
+            channelConfig: {
                 "cached-channel": {
-                    maxCacheSize: 10
+                    cachingPolicy: {
+                        maxCacheSize: 10
+                    }
                 }
             }
         }]

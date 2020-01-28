@@ -5,9 +5,9 @@ import {ClientConnection} from "../../clientConnectionPool";
 import {MessageCache} from "../service/MessageCache";
 import {
     RestoreChannelsResponseMessage,
-    CachedMessage,
     restoreResponseUtil
 } from "../data/serverMessage/RestoreChannelsResponseMessage";
+import {CachedMessage} from "../data/cache/CachedMessage";
 
 export class RestoreClientSubscription implements Command {
 
@@ -32,17 +32,17 @@ export class RestoreClientSubscription implements Command {
         } = this;
 
         const contextManager = await getContextManager(contextId);
-        const channelMessages: ReturnType<MessageCache['getMessageCache']> = [];
+        const channelMessages: ReturnType<MessageCache['getCache']> = [];
 
-        for (const {channel, messageId} of channels) {
+        for (const {channel, filter} of channels) {
             const cachingPolicy = contextManager.getChannelCachingPolicy(channel);
             if (!cachingPolicy) {
                 // Channel ain't got caching policy defined.
                 // TODO: Is it worth an error log that someone has requested chan with no cache to be restored?
                 return;
             }
-            const {cacheTimeMs, maxCacheSize} = cachingPolicy;
-            const messages = messageCache.getMessageCache(contextId, channel, {cacheTimeMs, maxCacheSize, messageId});
+
+            const messages = messageCache.getCache(contextId, channel, filter);
             if (messages) {
                 channelMessages.push(...messages);
             }

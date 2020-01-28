@@ -42,7 +42,10 @@ describe('RestoreRequest', () => {
     });
 
     it('Can serialize and deserialize simple message', () => {
-        const data: RestoreChannelsRequestMessage = {type: MessageType.RestoreRequest, channels: [{channel: 'restore-channels'}]};
+        const data: RestoreChannelsRequestMessage = {
+            type: MessageType.RestoreRequest,
+            channels: [{channel: 'restore-channels'}]
+        };
         expect(data).toMatchObject(restoreRequestUtil.deserialize(restoreRequestUtil.serialize(data)));
         expect(data).toMatchObject(restoreRequestUtil.deserialize(JSON.parse(restoreRequestUtil.serialize(data))));
     });
@@ -50,11 +53,11 @@ describe('RestoreRequest', () => {
         const data: RestoreChannelsRequestMessage = {
             type: MessageType.RestoreRequest,
             channels: [
-                {channel: 'restore-channels1', messageId: "A"},
-                {channel: 'restore-channels2', messageId: "B"},
-                {channel: 'restore-channels3', messageId: "C"},
-                {channel: 'restore-channels4', messageId: "D"},
-                {channel: 'restore-channels5', messageId: "E"},
+                {channel: 'restore-channels1', filter: {messageId: "A"}},
+                {channel: 'restore-channels2', filter: {messageId: "B"}},
+                {channel: 'restore-channels3', filter: {messageId: "C"}},
+                {channel: 'restore-channels4', filter: {messageId: "D"}},
+                {channel: 'restore-channels5', filter: {messageId: "E"}},
             ]
         };
         expect(data).toMatchObject(restoreRequestUtil.deserialize(restoreRequestUtil.serialize(data)));

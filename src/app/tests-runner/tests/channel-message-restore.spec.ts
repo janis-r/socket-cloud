@@ -50,16 +50,17 @@ describe('Channel message restoring', () => {
 
         const incomingMessages = new Array<PushToClientMessage>();
         firstConnection.subscribe(channel);
-        firstConnection.onMessage(message => {
-            if (!pushToClientUtil.validate(message)) {
-                fail('Incoming message must be valid PushToClientMessage');
-                return;
-            }
-            incomingMessages.push(message);
-        });
-
+        const ready = new Promise<void>(resolve =>
+            firstConnection.onMessage(message => {
+                if (!pushToClientUtil.validate(message)) {
+                    fail('Incoming message must be valid PushToClientMessage');
+                } else {
+                    incomingMessages.push(message);
+                }
+            }).times(messages.length).onComplete(resolve)
+        );
         messages.forEach(message => firstConnection.sendChannelMessage(message, channel));
-        await new Promise<void>(resolve => setTimeout(resolve, 100));
+        await ready;
 
         const restoreIndex = Math.floor(incomingMessages.length / 2);
         secondConnection.onRestore(message => {
@@ -83,7 +84,9 @@ describe('Channel message restoring', () => {
             done();
         });
 
-        secondConnection.restore({channel, messageId: incomingMessages[restoreIndex].messageId});
+        const {messageId} = incomingMessages[restoreIndex];
+        secondConnection.restore({channel, filter: {messageId}});
+        // TODO: Add restore by age and count here
     });
 
 });

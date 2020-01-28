@@ -1,10 +1,12 @@
 import {ContextId} from "../../configurationContext";
 import {ChannelId} from "../data/ChannelId";
-import {CachedMessage} from "../data/serverMessage/RestoreChannelsResponseMessage";
+import {CachedMessage} from "../data/cache/CachedMessage";
+import {CacheFilter} from "../data/cache/CacheFilter";
 
 export abstract class MessageCache {
 
     abstract write(context: ContextId, message: CachedMessage): void;
 
-    abstract getMessageCache(context: ContextId, channelId: ChannelId, props: { cacheTimeMs?: number, maxCacheSize?: number, messageId?: string }): Array<CachedMessage> | null;
+    abstract getCache(context: ContextId, channelId: ChannelId, filter: CacheFilter): Array<CachedMessage> | null;
 }
+
