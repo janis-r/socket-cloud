@@ -22,7 +22,8 @@ import {HttpServerConfig, HttpServerRouter} from "../../lib/httpServer";
             useValue: {
                 getSocketConfigurationContext: (descriptor: SocketDescriptor) => ({
                     id: 'echo-server',
-                    outgoingMessageFragmentSize: 2 ** 14
+                    outgoingMessageFragmentSize: 2 ** 14,
+                    compressData: true
                 })
             }
         },

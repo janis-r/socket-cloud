@@ -80,7 +80,7 @@ export class PermessageDeflateExtension implements WebsocketExtension {
 }
 
 const validateConfiguration = (config: WebsocketExtensionConfig): PermessageDeflateExtensionConfig | null => {
-    console.log('>> validateConfiguration', config);
+    // console.log('>> validateConfiguration', config);
     // permessage-deflate;client_no_context_takeover;client_max_window_bits=15
     if (!config.origin || typeof config.origin !== "string") {
         return null;

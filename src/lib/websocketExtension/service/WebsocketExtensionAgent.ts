@@ -1,4 +1,5 @@
-import {DataFrame} from "../../websocketListener/data/DataFrame";
+import {DataFrame} from "../../websocketConnection";
+
 
 export interface WebsocketExtensionAgent {
     /**

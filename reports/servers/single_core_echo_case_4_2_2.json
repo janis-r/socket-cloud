@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send frame with reserved control <b>Opcode = 12</b> and non-empty payload.",
    "droppedByMe": false,
-   "duration": 5,
+   "duration": 6,
    "expectation": "The connection is failed immediately.",
    "expected": {
       "OK": []
@@ -21,8 +21,8 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: d1eZ0iOiapG20Kzr6XoGyw==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: jTDZxEDrvnYWV23FKEUbhowt1rs=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: sf9rWwIU2Ww0Pck8OJX+rw==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: DT9inCw6RX6/4vUzZpTrHCp5/TA=\r\n\r\n",
    "id": "4.2.2",
    "isServer": false,
    "localCloseCode": null,
@@ -38,7 +38,7 @@
    "rxOctetStats": {
       "139": 1
    },
-   "started": "2020-01-02T11:21:07.325Z",
+   "started": "2020-01-28T11:42:08.692Z",
    "trafficStats": null,
    "txFrameStats": {
       "12": 1
@@ -77,7 +77,7 @@
          12,
          true,
          0,
-         "7a0da677",
+         "bc655124",
          null,
          null,
          false
@@ -86,7 +86,7 @@
          "TO",
          [
             29,
-            "8c977a0da6770868d512087bc3135a62d6141569c3570a6cdf1b156cc2"
+            "8c97bc655124ce002241ce1334409c0a2147d3013404cc042848d30435"
          ],
          false
       ],

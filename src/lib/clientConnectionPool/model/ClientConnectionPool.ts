@@ -102,13 +102,15 @@ export class ClientConnectionPool {
             byContextId.delete(contextId);
         }
 
-        // Clean byContextAndExternalId mapping
-        const externalIdMap = byContextAndExternalId.get(contextId);
-        const entry = externalIdMap.get(externalId);
-        if (!(entry instanceof Set) || entry.size === 1) {
-            externalIdMap.delete(externalId);
-        } else {
-            entry.delete(connection);
+        if (externalId) {
+            // Clean byContextAndExternalId mapping
+            const externalIdMap = byContextAndExternalId.get(contextId);
+            const entry = externalIdMap.get(externalId);
+            if (!(entry instanceof Set) || entry.size === 1) {
+                externalIdMap.delete(externalId);
+            } else {
+                entry.delete(connection);
+            }
         }
 
         eventDispatcher.dispatchEvent(new ConnectionRemovedEvent(connection));

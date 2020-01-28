@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send fragmented binary message message with message payload of length 4 * 2**20 (4M). Sent out in fragments of 256.",
    "droppedByMe": false,
-   "duration": 717,
+   "duration": 555,
    "expectation": "Receive echo'ed binary message (with payload as sent).",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: nE2SqCaj05ZbimCvhVz+MQ==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: RlfPwdJn6e4yVQdo5hGquG15JIg=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: IBjMlHUptw+wkE4cClzUow==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: yU/H1VpVYbTrHWHBP+QvN0Sd9W0=\r\n\r\n",
    "id": "9.4.2",
    "isServer": false,
    "localCloseCode": 1000,
@@ -40,16 +40,26 @@
    "rxOctetStats": {
       "4": 1,
       "139": 1,
-      "16388": 80,
-      "24580": 1,
-      "24584": 1,
-      "32776": 28,
-      "49164": 1,
+      "16388": 100,
+      "16392": 1,
+      "20484": 1,
+      "20488": 1,
+      "28676": 1,
+      "28680": 3,
+      "32772": 1,
+      "32776": 35,
+      "36876": 1,
+      "40968": 3,
+      "40972": 1,
+      "45064": 1,
+      "49160": 1,
+      "49164": 14,
+      "49168": 1,
       "49180": 1,
-      "49580": 1,
-      "65536": 27
+      "57360": 1,
+      "65536": 1
    },
-   "started": "2020-01-02T11:21:44.237Z",
+   "started": "2020-01-28T11:42:33.465Z",
    "trafficStats": null,
    "txFrameStats": {
       "0": 16384,
@@ -96,7 +106,7 @@
          8,
          true,
          0,
-         "57c77706",
+         "f3df7abf",
          null,
          null,
          false
@@ -105,7 +115,7 @@
          "TO",
          [
             8,
-            "888257c77706542f"
+            "8882f3df7abff037"
          ],
          false
       ],

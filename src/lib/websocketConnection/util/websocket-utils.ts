@@ -7,7 +7,7 @@ import {DataFrameType} from "../data/DataFrameType";
  * @param buffer
  */
 export function decomposeWebSocketFrame(buffer: Buffer): Readonly<DataFrame> {
-    let position: number = 0;
+    let position = 0;
     const read = (bytes: number): Buffer => {
         if (buffer.length < position + bytes) {
             throw new Error(`Missing data in decomposeWebSocketFrame - trying to read ${bytes} bytes, while there's only ${buffer.length - position} available`);

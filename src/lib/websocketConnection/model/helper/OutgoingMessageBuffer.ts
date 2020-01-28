@@ -1,10 +1,10 @@
 import {Socket} from "net";
+import {ExecutionQueue} from "ugd10a";
 import {composeWebsocketFrame, fragmentWebsocketFrame} from "../../util/websocket-utils";
 import {isPromise} from "../../../utils/is-promise";
 import {DataFrame} from "../../data/DataFrame";
-import {ExecutionQueue} from "ugd10a";
-import {debug} from "../WebsocketClientConnection";
 import {WebsocketExtensionAgent} from "../../../websocketExtension";
+import {debug} from "../WebsocketConnection";
 
 export class OutgoingMessageBuffer {
 

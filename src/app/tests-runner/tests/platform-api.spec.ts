@@ -140,7 +140,6 @@ describe('Platform API', () => {
                     .twice()
                     .onComplete(() => {
                         if (received === connections.length * 2) {
-                            console.log({received});
                             resolve();
                         }
                     });

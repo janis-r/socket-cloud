@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send fragmented text message message with message payload of length 4 * 2**20 (8M). Sent out in fragments of 4M.",
    "droppedByMe": false,
-   "duration": 262,
+   "duration": 222,
    "expectation": "Receive echo'ed text message (with payload as sent).",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: JDZ7QOHL4MV1a1GyWEOA4Q==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: mELdLlMOv/izPuj4sFJN8kMCTX4=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: xcBQuqreOoL32Jo59Mgd6w==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: JHTEDJAYv+Wvmuk+Xfwwuhysx6E=\r\n\r\n",
    "id": "9.3.9",
    "isServer": false,
    "localCloseCode": 1000,
@@ -40,12 +40,12 @@
    "rxOctetStats": {
       "4": 1,
       "139": 1,
+      "1008": 1,
       "16388": 2,
-      "49164": 1,
-      "50156": 1,
-      "65536": 62
+      "32776": 1,
+      "65536": 63
    },
-   "started": "2020-01-02T11:21:41.671Z",
+   "started": "2020-01-28T11:42:31.469Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 1,
@@ -90,7 +90,7 @@
          8,
          true,
          0,
-         "a451e172",
+         "752a065b",
          null,
          null,
          false
@@ -99,7 +99,7 @@
          "TO",
          [
             8,
-            "8882a451e172a7b9"
+            "8882752a065b76c2"
          ],
          false
       ],

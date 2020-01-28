@@ -1,9 +1,11 @@
-import {createConnections, startSocketServer, stopSocketServer} from "../util/test-utils";
+import {createConnections, resetConnections, startSocketServer, stopSocketServer} from "../util/test-utils";
 
 describe('Create connection', () => {
 
     beforeAll(startSocketServer);
     afterAll(stopSocketServer);
+
+    afterEach(resetConnections);
 
     it('Will fail connection with nonexistent context id', async done => {
         try {

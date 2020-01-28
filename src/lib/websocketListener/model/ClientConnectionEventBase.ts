@@ -1,7 +1,7 @@
 import {Event, EventDispatcher, EventListener, EventMapping} from "qft";
 import {ClientConnection} from "../../clientConnectionPool";
 import {ErrorEvent, MessageEvent, StateChangeEvent} from "../../clientConnectionPool/connectionEvent";
-import {DataFrame} from "../data/DataFrame";
+import {DataFrame} from "../../websocketConnection";
 
 type ClientConnectionBroadcastingNature = Pick<ClientConnection, "addEventListener" | "removeEventListener" | "removeAllEventListeners">;
 

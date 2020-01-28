@@ -7,8 +7,8 @@ import {
     read64BitPayloadLength
 } from "./websocket-utils";
 import chalk from "chalk";
-import {debug} from "../model/WebsocketClientConnection";
 import {CallbackCollection} from "../../utils/CallbackCollection";
+import {debug} from "..";
 
 /**
  * Utility class to buffer up websocket data until they make up full data frame.

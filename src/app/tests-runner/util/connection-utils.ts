@@ -12,9 +12,9 @@ import {
     subscribeMessageUtil,
     unsubscribeMessageUtil
 } from "../../../lib/deliveryProtocol";
-import {WebsocketConnection} from "../../../lib/websocketListener";
 import {CallbackCollection} from "../../../lib/utils/CallbackCollection";
 import {ContextId} from "../../../lib/configurationContext";
+import {WebsocketConnection} from "../../../lib/websocketConnection";
 
 const protocol = pocmddpProtocol;
 
@@ -43,7 +43,6 @@ export class SocketClient {
         this._authKey = authKey;
 
         this._connection.onError(err => {
-            console.log('>> err', err);
             throw new Error(err.message);
         });
 

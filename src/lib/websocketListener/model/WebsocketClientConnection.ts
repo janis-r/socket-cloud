@@ -4,11 +4,9 @@ import {WebsocketExtensionAgent} from "../../websocketExtension";
 import {ConfigurationContext} from "../../configurationContext";
 import {SocketDescriptor} from "../data/SocketDescriptor";
 import {OperatorData} from "../data/OperatorData";
-import {WebsocketConnection} from "./WebsocketConnection";
+import {WebsocketConnection} from "../../websocketConnection";
 import {ClientConnectionEventBase} from "./ClientConnectionEventBase";
 import {ErrorEvent, MessageEvent, StateChangeEvent} from "../../clientConnectionPool/connectionEvent";
-
-export const debug = false;
 
 export class WebsocketClientConnection extends ClientConnectionEventBase implements ClientConnection {
 
@@ -20,8 +18,6 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     constructor(socket: Socket, readonly context: ConfigurationContext, extensions: ReadonlyArray<WebsocketExtensionAgent>,
                 descriptor: SocketDescriptor, operatorData?: OperatorData) {
         super();
-
-        debug && console.log({descriptor, context});
 
         this.id = descriptor.connectionId;
         this.externalId = operatorData?.externalId;

@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send binary message message with payload of length 8 * 2**20 (16M).",
    "droppedByMe": false,
-   "duration": 972,
+   "duration": 559,
    "expectation": "Receive echo'ed binary message (with payload as sent).",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: Wl6hz5pEUQHnpgp7WFMOzw==\r\nSec-WebSocket-Version: 13\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: qzNALiSsOhQ7Slma924YupvFfhA=\r\n\r\n",
+   "httpRequest": "GET / HTTP/1.1\r\nUser-Agent: AutobahnTestSuite/0.8.1-0.10.9\r\nHost: 127.0.0.1:9001\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nSec-WebSocket-Key: 8SMyPoTIiHiF+047yAatBg==\r\nSec-WebSocket-Version: 13\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Web Socket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: FYFH/p01qrxlaAnjkKkL01gPLcA=\r\n\r\n",
    "id": "9.2.5",
    "isServer": false,
    "localCloseCode": 1000,
@@ -40,22 +40,20 @@
    "rxOctetStats": {
       "4": 2,
       "139": 1,
-      "4100": 1,
-      "12288": 1,
-      "16384": 1,
-      "16388": 375,
-      "16392": 2,
-      "20484": 3,
-      "24580": 3,
-      "24584": 3,
-      "28680": 3,
+      "16384": 2,
+      "16388": 447,
+      "16392": 3,
+      "16404": 1,
+      "20480": 1,
+      "24580": 1,
+      "24584": 1,
+      "28684": 1,
       "32772": 2,
-      "32776": 42,
-      "32792": 1,
-      "49164": 7,
+      "32776": 21,
+      "49164": 1,
       "65536": 1
    },
-   "started": "2020-01-02T11:21:32.504Z",
+   "started": "2020-01-28T11:42:25.557Z",
    "trafficStats": null,
    "txFrameStats": {
       "2": 1,
@@ -100,7 +98,7 @@
          8,
          true,
          0,
-         "496fa93c",
+         "bce32850",
          null,
          null,
          false
@@ -109,7 +107,7 @@
          "TO",
          [
             8,
-            "8882496fa93c4a87"
+            "8882bce32850bf0b"
          ],
          false
       ],

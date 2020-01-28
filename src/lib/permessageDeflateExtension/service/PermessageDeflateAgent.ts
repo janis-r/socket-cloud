@@ -1,7 +1,6 @@
 import {WebsocketExtensionAgent} from "../../websocketExtension";
-import {DataFrame} from "../../websocketListener/data/DataFrame";
 import {getDeflator, getInflator} from "../util/indeflate-utils";
-import {DataFrameType} from "../../websocketListener/data/DataFrameType";
+import {DataFrame, DataFrameType} from "../../websocketConnection";
 
 const {TextFrame, BinaryFrame} = DataFrameType;
 
