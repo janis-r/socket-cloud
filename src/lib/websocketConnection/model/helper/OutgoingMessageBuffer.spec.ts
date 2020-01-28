@@ -2,7 +2,6 @@ import {OutgoingMessageBuffer} from "./OutgoingMessageBuffer";
 import {Socket} from "net";
 import {decomposeWebSocketFrame, spawnFrameData} from "../../util/websocket-utils";
 import {DataFrameType} from "../../data/DataFrameType";
-import {DataFrame} from "../../data/DataFrame";
 
 describe("websocket outgoing data buffer", () => {
 
