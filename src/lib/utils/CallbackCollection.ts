@@ -41,6 +41,8 @@ export class CallbackCollection<T> {
         return false;
     };
 
+    readonly clear = () => this.callbacks.clear();
+
     /**
      * Add callback to collection
      * @param callback
@@ -49,13 +51,13 @@ export class CallbackCollection<T> {
     /**
      * If no callback is specified proceed to collection management methods
      */
-    polymorph(): Pick<this, "has" | "remove">;
+    polymorph(): Pick<this, "has" | "remove" | "clear">;
     polymorph(callback?: Callback<T>) {
         if (callback) {
             return this.add(callback);
         }
-        const {has, remove} = this;
-        return {has, remove};
+        const {has, remove, clear} = this;
+        return {has, remove, clear};
     }
 
     readonly execute = (data: T): number => {

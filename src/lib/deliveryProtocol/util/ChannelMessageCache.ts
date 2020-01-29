@@ -2,6 +2,7 @@ import {toMilliseconds} from "ugd10a";
 import {CachedMessage} from "../data/cache/CachedMessage";
 import {ConfigurationContext} from "../../configurationContext";
 import {CacheFilter} from "../data/cache/CacheFilter";
+import {CallbackCollection} from "../../utils/CallbackCollection";
 
 export class ChannelMessageCache {
 
@@ -10,8 +11,10 @@ export class ChannelMessageCache {
     private static readonly cleanupInterval = toMilliseconds(1, "minutes");
 
     private readonly messages = new Array<CachedMessage>();
-
     private cleanupIntervalId: ReturnType<typeof setInterval>;
+
+    private readonly onEmptyCallback = new CallbackCollection<void>();
+    readonly onEmpty = this.onEmptyCallback.polymorph;
 
     constructor(readonly context: ConfigurationContext,
                 readonly channelId: string) {
@@ -58,6 +61,10 @@ export class ChannelMessageCache {
         return output;
     }
 
+    get size() {
+        return this.messages.length;
+    }
+
     private readonly clearOutdatedMessages = () => {
         const {messages, cacheConfig: {cacheTimeMs}} = this;
         const minEpoch = Date.now() - cacheTimeMs;
@@ -69,8 +76,12 @@ export class ChannelMessageCache {
             messages.splice(-1, 1);
         }
 
-        if (!messages.length && this.cleanupIntervalId) {
-            clearInterval(this.cleanupIntervalId);
+        if (!messages.length) {
+            this.onEmptyCallback.execute();
+            if (this.cleanupIntervalId) {
+                clearInterval(this.cleanupIntervalId);
+                this.cleanupIntervalId = null;
+            }
         }
     };
 

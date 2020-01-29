@@ -42,7 +42,7 @@ export class PrepareOutgoingClientMessage implements Command {
         const message: PushToClientMessage = {type: MessageType.PushToClient, time, messageId, payload, channels};
 
         if (cachedChannels.length > 0) {
-            messageCache.write(contextId, {time, messageId, payload, channels: cachedChannels});
+            messageCache.writeMessage(contextId, {time, messageId, payload, channels: cachedChannels});
         }
 
         eventDispatcher.dispatchEvent(new OutgoingMessageEvent(contextId, message))

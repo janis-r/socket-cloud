@@ -71,7 +71,7 @@ export class DataPushApiListener {
         };
 
         const {type, ...typelessMessage} = message;
-        messageCache.write(contextId, typelessMessage);
+        messageCache.writeMessage(contextId, typelessMessage);
 
         const event = new OutgoingMessageEvent(contextId, message, connectionIds);
         eventDispatcher.dispatchEvent(event);
@@ -118,7 +118,7 @@ export class DataPushApiListener {
         };
 
         const {type, ...typelessMessage} = message;
-        messageCache.write(contextId, typelessMessage);
+        messageCache.writeMessage(contextId, typelessMessage);
 
         const event = new OutgoingMessageEvent(contextId, message);
         eventDispatcher.dispatchEvent(event);
@@ -178,7 +178,7 @@ export class DataPushApiListener {
             };
 
             const {type, ...typelessMessage} = message;
-            messageCache.write(contextId, typelessMessage);
+            messageCache.writeMessage(contextId, typelessMessage);
 
             const event = new OutgoingMessageEvent(contextId, message);
             eventDispatcher.dispatchEvent(event);

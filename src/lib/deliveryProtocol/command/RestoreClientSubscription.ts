@@ -42,7 +42,7 @@ export class RestoreClientSubscription implements Command {
                 return;
             }
 
-            const messages = await messageCache.getCache(contextId, channel, filter);
+            const messages = await messageCache.getCachedMessages(contextId, channel, filter);
             if (messages) {
                 channelMessages.push(...messages);
             }

@@ -25,7 +25,7 @@ export class ConfigurationContextProvider {
             channelConfig: {
                 "cached-channel": {
                     cachingPolicy: {
-                        maxCacheSize: 10
+                        maxCacheSize: 100
                     }
                 }
             }

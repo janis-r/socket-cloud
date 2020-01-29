@@ -18,7 +18,7 @@ export class InMemoryMessageCache implements MessageCache {
     // private readonly messagesByContext = new Map<ContextId, Set<CachedMessage>>();
     private readonly channelsByContext = new Map<ContextId, Map<ChannelId, ChannelMessageCache>>();
 
-    async write(contextId: ContextId, message: CachedMessage): Promise<void> {
+    async writeMessage(contextId: ContextId, message: CachedMessage): Promise<void> {
         const {channelsByContext, contextProvider: {getConfigurationContext}} = this;
 
         // if (!messagesByContext.has(context)) {
@@ -41,16 +41,27 @@ export class InMemoryMessageCache implements MessageCache {
 
             message.channels.forEach(channelId => {
                 if (!contextChannels.has(channelId)) {
-                    contextChannels.set(channelId, new ChannelMessageCache(configuration, channelId));
+                    const messageCache = new ChannelMessageCache(configuration, channelId);
+                    contextChannels.set(channelId, messageCache);
+                    messageCache.onEmpty(() => this.clearChannelCache(contextId, channelId));
                 }
                 contextChannels.get(channelId).addMessage(message);
             });
         }
     }
 
-    async getCache(contextId: ContextId, channelId: ChannelId, filter: CacheFilter): Promise<Array<CachedMessage> | null> {
+    async getCachedMessages(contextId: ContextId, channelId: ChannelId, filter: CacheFilter): Promise<Array<CachedMessage> | null> {
         const {channelsByContext} = this;
         return channelsByContext.get(contextId)?.get(channelId)?.getMessages(filter) || null;
+    }
+
+    clearChannelCache(contextId: ContextId, channelId: string): void {
+        const {channelsByContext} = this;
+        if (channelsByContext.get(contextId)?.get(channelId)) {
+            channelsByContext.get(contextId).get(channelId).onEmpty().clear();
+            channelsByContext.get(contextId).delete(channelId);
+        }
+
     }
 }
 
