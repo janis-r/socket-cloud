@@ -5,13 +5,14 @@ import {SocketDescriptor} from "../../websocketListener/data/SocketDescriptor";
 import {pocmddpProtocol} from "../../deliveryProtocol";
 import {toMilliseconds} from "ugd10a";
 import url from "url";
+import {ContextId} from "..";
 
 export class ConfigurationContextProvider {
 
     @Inject()
     private readonly logger: Logger;
 
-    private readonly knownContexts = new Map<ConfigurationContext['id'], ConfigurationContext>([
+    private readonly knownContexts = new Map<ContextId, ConfigurationContext>([
         ['tests-runner', {
             id: 'tests-runner',
             protocol: pocmddpProtocol,

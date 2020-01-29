@@ -5,8 +5,8 @@ import {CacheFilter} from "../data/cache/CacheFilter";
 
 export abstract class MessageCache {
 
-    abstract write(context: ContextId, message: CachedMessage): void;
+    abstract write(contextId: ContextId, message: CachedMessage): Promise<void>;
 
-    abstract getCache(context: ContextId, channelId: ChannelId, filter: CacheFilter): Array<CachedMessage> | null;
+    abstract getCache(contextId: ContextId, channelId: ChannelId, filter: CacheFilter): Promise<Array<CachedMessage> | null>;
 }
 

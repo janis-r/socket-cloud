@@ -32,7 +32,7 @@ export class RestoreClientSubscription implements Command {
         } = this;
 
         const contextManager = await getContextManager(contextId);
-        const channelMessages: ReturnType<MessageCache['getCache']> = [];
+        const channelMessages = new Array<CachedMessage>();
 
         for (const {channel, filter} of channels) {
             const cachingPolicy = contextManager.getChannelCachingPolicy(channel);
@@ -42,7 +42,7 @@ export class RestoreClientSubscription implements Command {
                 return;
             }
 
-            const messages = messageCache.getCache(contextId, channel, filter);
+            const messages = await messageCache.getCache(contextId, channel, filter);
             if (messages) {
                 channelMessages.push(...messages);
             }

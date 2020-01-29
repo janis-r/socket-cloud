@@ -6,7 +6,7 @@ import {
     startSocketServer,
     stopSocketServer
 } from "../util/test-utils";
-import {PushToClientMessage, pushToClientUtil, restoreResponseUtil} from "../../../lib/deliveryProtocol";
+import {PushToClientMessage, RestoreChannelsResponseMessage} from "../../../lib/deliveryProtocol";
 
 describe('Channel message restoring', () => {
 
@@ -20,27 +20,16 @@ describe('Channel message restoring', () => {
         const channel = 'cached-channel';
         const messages = characterSequence(10);
         const [firstConnection, secondConnection] = connections;
-
         messages.forEach(message => firstConnection.sendChannelMessage(message, channel));
 
-        secondConnection.onRestore(message => {
-            if (!restoreResponseUtil.validate(message)) {
-                fail('Incoming message must be valid RestoreResponse');
-                return;
-            }
-
-            for (const {channels} of message.payload) {
-                if (!channels.includes(channel)) {
-                    fail(`Restored message must include channel it was requested by`);
-                    return;
-                }
-            }
-
-            expect(messages).toMatchObject(message.payload.map(({payload}) => payload));
-            done();
-        });
-
+        const dataPromise = new Promise<RestoreChannelsResponseMessage>(resolve => secondConnection.onRestore(resolve).once());
         secondConnection.restore({channel});
+        const message = await dataPromise;
+        if (message.payload.some(({channels}) => !channels.includes(channel))) {
+            fail(`Restored message must include channel it was requested by`);
+        }
+        expect(messages).toMatchObject(message.payload.map(({payload}) => payload));
+        done();
     });
 
     it('Channel subscription can be restored from last received message', async (done) => {
@@ -51,42 +40,34 @@ describe('Channel message restoring', () => {
         const incomingMessages = new Array<PushToClientMessage>();
         firstConnection.subscribe(channel);
         const ready = new Promise<void>(resolve =>
-            firstConnection.onMessage(message => {
-                if (!pushToClientUtil.validate(message)) {
-                    fail('Incoming message must be valid PushToClientMessage');
-                } else {
-                    incomingMessages.push(message);
-                }
-            }).times(messages.length).onComplete(resolve)
+            firstConnection.onMessage(message => incomingMessages.push(message))
+                .times(messages.length)
+                .onComplete(resolve)
         );
         messages.forEach(message => firstConnection.sendChannelMessage(message, channel));
         await ready;
 
         const restoreIndex = Math.floor(incomingMessages.length / 2);
-        secondConnection.onRestore(message => {
-            if (!restoreResponseUtil.validate(message)) {
-                fail('Incoming message must be valid RestoreResponse');
-                return;
-            }
-
-            for (const {channels} of message.payload) {
-                if (!channels.includes(channel)) {
-                    fail(`Restored message must include channel it was requested by`);
-                    return;
-                }
-            }
-
-            expect(
-                incomingMessages.slice(restoreIndex + 1).map(({messageId, payload}) => ({messageId, payload}))
-            ).toMatchObject(
-                message.payload.map(({messageId, payload}) => ({messageId, payload}))
-            );
-            done();
+        const restorePromise = new Promise<RestoreChannelsResponseMessage>(resolve => {
+            secondConnection.onRestore(resolve)
+                .filter(message => {
+                    if (message.payload.some(({channels}) => !channels.includes(channel))) {
+                        fail(`Restored message must include channel it was requested by`);
+                    }
+                    return true;
+                }).once();
         });
 
         const {messageId} = incomingMessages[restoreIndex];
         secondConnection.restore({channel, filter: {messageId}});
-        // TODO: Add restore by age and count here
+
+        const restoredMessages = await restorePromise;
+        expect(
+            incomingMessages.slice(restoreIndex + 1).map(({messageId, payload}) => ({messageId, payload}))
+        ).toMatchObject(
+            restoredMessages.payload.map(({messageId, payload}) => ({messageId, payload}))
+        );
+        done();
     });
 
 });

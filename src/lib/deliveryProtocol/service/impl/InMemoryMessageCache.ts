@@ -1,71 +1,56 @@
-import {ContextId} from "../../../configurationContext";
+import {Inject} from "qft";
+import {ConfigurationContext, ConfigurationContextProvider, ContextId} from "../../../configurationContext";
 import {ChannelId} from "../../data/ChannelId";
 import {CachedMessage} from "../../data/cache/CachedMessage";
 import {MessageCache} from "../MessageCache";
 import {CacheFilter} from "../../data/cache/CacheFilter";
+import {ChannelMessageCache} from "../../util/ChannelMessageCache";
 
 /**
- * In memory implementation of message cache which will produce values unique only within single node, thus, it
- * should not be in use for a production env.
+ * In memory implementation of message cache service - it should not be in use for a production env.
  */
 export class InMemoryMessageCache implements MessageCache {
 
-    private readonly messagesByContext = new Map<ContextId, Set<CachedMessage>>();
-    private readonly channelsByContext = new Map<ContextId, Map<ChannelId, Set<CachedMessage>>>();
+    @Inject()
+    private readonly contextProvider: ConfigurationContextProvider;
 
-    write(context: ContextId, message: CachedMessage): void {
+    // TODO: Private messages by externalId should be cached as well
+    // private readonly messagesByContext = new Map<ContextId, Set<CachedMessage>>();
+    private readonly channelsByContext = new Map<ContextId, Map<ChannelId, ChannelMessageCache>>();
 
-        const {messagesByContext, channelsByContext} = this;
-        // TODO: Here messages will never be deleted - cannot stay that way when local testing is done
-        if (!messagesByContext.has(context)) {
-            messagesByContext.set(context, new Set<CachedMessage>([message]));
-        } else {
-            messagesByContext.get(context).add(message);
-        }
+    async write(contextId: ContextId, message: CachedMessage): Promise<void> {
+        const {channelsByContext, contextProvider: {getConfigurationContext}} = this;
+
+        // if (!messagesByContext.has(context)) {
+        //     messagesByContext.set(context, new Set<CachedMessage>([message]));
+        // } else {
+        //     messagesByContext.get(context).add(message);
+        // }
 
         if (message.channels && message.channels.length) {
-            if (!channelsByContext.has(context)) {
-                channelsByContext.set(context, new Map<ChannelId, Set<CachedMessage>>());
+
+            if (!channelsByContext.has(contextId)) {
+                channelsByContext.set(contextId, new Map<ChannelId, ChannelMessageCache>());
             }
-            const contextChannels = channelsByContext.get(context);
+
+            const contextChannels = channelsByContext.get(contextId);
+            let configuration: ConfigurationContext;
+            if (message.channels.some(channelId => !contextChannels.has(channelId))) {
+                configuration = await getConfigurationContext(contextId);
+            }
+
             message.channels.forEach(channelId => {
                 if (!contextChannels.has(channelId)) {
-                    contextChannels.set(channelId, new Set<CachedMessage>([message]));
-                } else {
-                    contextChannels.get(channelId).add(message);
+                    contextChannels.set(channelId, new ChannelMessageCache(configuration, channelId));
                 }
+                contextChannels.get(channelId).addMessage(message);
             });
         }
     }
 
-    getCache(context: ContextId, channelId: ChannelId, filter: CacheFilter): Array<CachedMessage> | null {
+    async getCache(contextId: ContextId, channelId: ChannelId, filter: CacheFilter): Promise<Array<CachedMessage> | null> {
         const {channelsByContext} = this;
-
-        if (!channelsByContext.has(context)) {
-            return null;
-        }
-
-        const channelMessages = channelsByContext.get(context).get(channelId);
-        if (!channelMessages || channelMessages.size === 0) {
-            return null;
-        }
-
-        const {maxAge, maxLength, messageId} = filter || {};
-        const minEpoch = maxAge ? Date.now() - maxAge : null;
-
-        const messages = new Array<CachedMessage>();
-        for (const cachedMessage of [...channelMessages].reverse()) {
-            if (maxLength && messages.length === maxLength) {
-                break;
-            }
-            if (minEpoch && cachedMessage.time < minEpoch) {
-                break;
-            }
-            if (messageId && cachedMessage.messageId === messageId) {
-                break;
-            }
-            messages.push(cachedMessage);
-        }
-        return messages;
+        return channelsByContext.get(contextId)?.get(channelId)?.getMessages(filter) || null;
     }
 }
+
