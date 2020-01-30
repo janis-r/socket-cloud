@@ -2,7 +2,7 @@
   "options": {
     "failByDrop": false
   },
-  "outdir": "./../reports/servers",
+  "outdir": "./report/servers",
   "servers": [
     {
       "agent": "Single core Echo",

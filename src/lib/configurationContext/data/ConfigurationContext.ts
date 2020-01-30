@@ -26,9 +26,9 @@ export abstract class ConfigurationContext {
     // specific instructions are provided
     cachingPolicy?: {
         // Number of milliseconds for which to keep outgoing messages in cache
-        cacheTimeMs?: number;
+        cacheTime?: number;
         // Max number of messages to store in cache
-        maxCacheSize?: number;
+        cacheSize?: number;
     };
     // Channel specific configurations that'll override values set in general configuration
     channelConfig?: {

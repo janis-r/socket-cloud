@@ -1,13 +1,13 @@
 import {toMilliseconds} from "ugd10a";
 import {CachedMessage} from "../data/cache/CachedMessage";
-import {ConfigurationContext} from "../../configurationContext";
+import {CachingPolicy, ConfigurationContext} from "../../configurationContext";
 import {CacheFilter} from "../data/cache/CacheFilter";
 import {CallbackCollection} from "../../utils/CallbackCollection";
 
 export class ChannelMessageCache {
 
-    private static readonly maxMessagesPerChannel = 1000;
-    private static readonly maxChannelCacheTime = toMilliseconds(24, "hours") * 7; // 1 week
+    private static readonly maxCacheSize = 1000;
+    private static readonly maxCacheTime = toMilliseconds(24, "hours") * 7;
     private static readonly cleanupInterval = toMilliseconds(1, "minutes");
 
     private readonly messages = new Array<CachedMessage>();
@@ -22,12 +22,12 @@ export class ChannelMessageCache {
 
     addMessage(message: CachedMessage): void {
         const {cleanupInterval} = ChannelMessageCache;
-        const {messages, cacheConfig: {maxCacheSize}, clearOutdatedMessages} = this;
+        const {messages, cacheConfig: {cacheSize}, clearOutdatedMessages} = this;
 
         // Add message to cache
         messages.push(message);
         // And check if max cache length is exceeded
-        while (messages.length > maxCacheSize) {
+        while (messages.length > cacheSize) {
             messages.shift();
         }
         // This is first message that's added - start cleanup interval now
@@ -66,8 +66,8 @@ export class ChannelMessageCache {
     }
 
     private readonly clearOutdatedMessages = () => {
-        const {messages, cacheConfig: {cacheTimeMs}} = this;
-        const minEpoch = Date.now() - cacheTimeMs;
+        const {messages, cacheConfig: {cacheTime}} = this;
+        const minEpoch = Date.now() - cacheTime;
 
         while (messages.length > 0) {
             if (messages[messages.length - 1].time > minEpoch) {
@@ -85,16 +85,16 @@ export class ChannelMessageCache {
         }
     };
 
-    get cacheConfig() {
+    get cacheConfig(): CachingPolicy {
         const {channelId, context: {cachingPolicy, channelConfig}} = this;
-        const {maxMessagesPerChannel, maxChannelCacheTime} = ChannelMessageCache;
+        const {maxCacheSize, maxCacheTime} = ChannelMessageCache;
 
-        const maxCacheSize = channelConfig?.[channelId]?.cachingPolicy?.maxCacheSize ?? cachingPolicy?.maxCacheSize;
-        const cacheTimeMs = channelConfig?.[channelId]?.cachingPolicy?.cacheTimeMs ?? cachingPolicy?.cacheTimeMs;
+        const cacheSize = channelConfig?.[channelId]?.cachingPolicy?.cacheSize ?? cachingPolicy?.cacheSize;
+        const cacheTime = channelConfig?.[channelId]?.cachingPolicy?.cacheTime ?? cachingPolicy?.cacheTime;
 
         return {
-            maxCacheSize: maxCacheSize && maxCacheSize < maxMessagesPerChannel ? maxCacheSize : maxMessagesPerChannel,
-            cacheTimeMs: cacheTimeMs && cacheTimeMs < maxChannelCacheTime ? cacheTimeMs : maxChannelCacheTime
+            cacheSize: cacheSize && cacheSize < maxCacheSize ? cacheSize : maxCacheSize,
+            cacheTime: cacheTime && cacheTime < maxCacheTime ? cacheTime : maxCacheTime
         }
     }
 

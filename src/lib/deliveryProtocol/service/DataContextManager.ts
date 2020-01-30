@@ -106,8 +106,8 @@ export class DataContextManager {
         }
 
         return {
-            cacheTimeMs: channelPolicy.cacheTimeMs ?? generalPolicy.cacheTimeMs,
-            maxCacheSize: channelPolicy.maxCacheSize ?? generalPolicy.maxCacheSize
+            cacheTime: channelPolicy.cacheTime ?? generalPolicy.cacheTime,
+            cacheSize: channelPolicy.cacheSize ?? generalPolicy.cacheSize
         }
     }
 
