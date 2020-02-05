@@ -22,17 +22,21 @@ export class ForwardMessageToOtherNodes implements Command {
             eventDispatcher
         } = this;
 
-        console.log('>> ForwardMessageToOtherNodes');
-
         const responses = new Array<IpcMessage<DataSyncMessage<number>>>();
-
+        // TODO: This event listener construction does not seem nice!
         eventDispatcher.addEventListener(WorkerMessageEvent.TYPE, (event: DataEvent) => {
             responses.push(event.data.message);
             if (responses.length === workers.length - 1) {
                 eventDispatcher.removeAllEventListeners(this);
-
-                console.log({responses});
-                process.exit();
+                const accumulated = responses.map(msg => msg.payload.data).reduce((prev, cur) => prev + cur);
+                workers.find(({id}) => id === workerId).send({
+                    id: (<IpcMessage>message).id,
+                    scope: (<IpcMessage>message).scope,
+                    payload: <DataSyncMessage>{
+                        type: DataSyncMessageType.ClientMessageDeliveryReport,
+                        data: accumulated
+                    }
+                });
             }
         }, this).withGuards(({data: {message: {id, payload: {type}}}}) =>
             id === message.id && type === DataSyncMessageType.ClientMessageDeliveryReport
@@ -40,7 +44,7 @@ export class ForwardMessageToOtherNodes implements Command {
 
         workers.filter(({id}) => id !== workerId).forEach(worker => {
             worker.send(message);
-        })
+        });
     }
 
 }

@@ -4,4 +4,4 @@ export * from "./data/serverMessage/PushToClientMessage";
 export * from "./data/serverMessage/RestoreChannelsResponseMessage";
 export * from "./data";
 export * from "./deliveryProtocolModule";
-export * from "./multicoreDeliveryProtocolModule";
+export * from "./deliveryProtocolModuleInWorker";

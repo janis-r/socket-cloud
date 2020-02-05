@@ -1,8 +1,7 @@
 import {Command, EventDispatcher, Inject} from "qft";
 import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
-import {IpcMessageEvent} from "../../ipcMessanger";
-import {pocmddpProtocol} from "..";
-import {DataSyncMessage, DataSyncMessageType} from "../data/ipc/DataSyncMessage";
+import {IpcMessage, IpcMessageEvent, ipcMessageUtil} from "../../ipcMessanger";
+import {DataSyncMessage, DataSyncMessageType, dataSyncMessageUtil} from "../data/ipc/DataSyncMessage";
 import {Logger} from "../../logger";
 
 export class HandleForwardedMessage implements Command {
@@ -15,16 +14,24 @@ export class HandleForwardedMessage implements Command {
     private readonly logger: Logger;
 
     async execute(): Promise<void> {
-        const {eventDispatcher, event: {message: {payload: {data}}, respond}, logger: {debug}} = this;
-        const outgoingEvent = OutgoingMessageEvent.unserialize(data);
+        const {eventDispatcher, event: {message, respond}, logger: {debug}} = this;
+
+        if (!ipcMessageUtil.validate(message)) {
+            throw new Error('Invalid IPC message');
+        }
+
+        const {id, scope, payload} = message;
+        if (!dataSyncMessageUtil.validate(payload)) {
+            throw new Error('Invalid IPC data sync message');
+        }
+
+        const outgoingEvent = OutgoingMessageEvent.unserialize(payload.data);
         outgoingEvent.forwarded();
 
-        debug(`>> HandleForwardedMessage`, data);
         eventDispatcher.dispatchEvent(outgoingEvent);
         const recipients = await outgoingEvent.getRecipientCount();
 
-        respond({
-            scope: pocmddpProtocol,
+        respond(<IpcMessage>{
             payload: <DataSyncMessage>{
                 type: DataSyncMessageType.ClientMessageDeliveryReport,
                 data: recipients

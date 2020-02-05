@@ -9,7 +9,7 @@ export class WorkerManager {
 
     constructor() {
 
-        console.log(`Starting worker manager. CPUS:`, cpus());
+        console.log(`Starting worker manager on ${cpus().length} CPUs`);
 
         cluster.on("message", (worker, message) => this.messageHandler(message, worker.id));
         cluster.on("exit", (worker, code, signal) => {

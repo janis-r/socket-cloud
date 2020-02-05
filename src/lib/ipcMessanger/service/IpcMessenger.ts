@@ -25,24 +25,22 @@ export class IpcMessenger {
         const {responseQueue, eventDispatcher} = this;
 
         if (!ipcMessageUtil.validate(message)) {
-            throw new Error(`Unknown IPC response format: ${JSON.stringify(message)}`);
+            throw new Error(`Unknown IPC response format: ${JSON.stringify(message)} - ${JSON.stringify(ipcMessageUtil.lastValidationError)}`);
         }
 
         const {id, payload} = message;
         if (responseQueue.has(id)) {
             responseQueue.get(id)(payload);
         } else {
-            eventDispatcher.dispatchEvent(new IpcMessageEvent(message, (response: Omit<IpcMessage, "id">) => {
-                const data = {...response, id: message.id};
+            eventDispatcher.dispatchEvent(new IpcMessageEvent(message, (response: Omit<IpcMessage, "id" | "scope">) => {
+                const data = {...response, id: message.id, scope: message.scope};
                 process.send(data);
             }));
         }
     };
 
-
     readonly send = async (message: Omit<IpcMessage, "id">): Promise<void> => {
         const data = {...message, id: getNextIpcMessageId()};
-        console.log('>> IpcMessengerInWorker send', data);
         process.send(data);
     };
 
@@ -59,7 +57,7 @@ export class IpcMessenger {
         responseQueue.set(data.id, msg => {
             clearTimeout(timedOutId);
             responseQueue.delete(data.id);
-            console.log('>> IPC resolve', msg);
+            console.log('>> IPC resolve', msg.data); // TODO: Message must be typed and validated in here!
             resolve(msg);
         });
 

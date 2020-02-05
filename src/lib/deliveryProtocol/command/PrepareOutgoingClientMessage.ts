@@ -45,6 +45,10 @@ export class PrepareOutgoingClientMessage implements Command {
             messageCache.writeMessage(contextId, {time, messageId, payload, channels: cachedChannels});
         }
 
-        eventDispatcher.dispatchEvent(new OutgoingMessageEvent(contextId, message))
+        const messageEvent = new OutgoingMessageEvent(contextId, message);
+        eventDispatcher.dispatchEvent(messageEvent);
+
+        const recipients = await messageEvent.getRecipientCount();
+        console.log('>> getRecipientCount:', recipients)
     }
 }

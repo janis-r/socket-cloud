@@ -6,7 +6,7 @@ import {ForwardOutgoingMessage} from "./command/ForwardOutgoingMessage";
 import {IpcMessageEvent} from "../ipcMessanger";
 import {HandleForwardedMessage} from "./command/HandleForwardedMessage";
 
-export const multicoreDeliveryProtocolModule: ModuleConfig = {
+export const deliveryProtocolModuleInWorker: ModuleConfig = {
     requires: [
         deliveryProtocolModule,
         ipcMessengerModule

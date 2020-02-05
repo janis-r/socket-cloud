@@ -90,9 +90,6 @@ export class ClientConnectionPool {
 
     private removeConnection(connection: ClientConnection): void {
         const {byConnectionId, byContextId, byContextAndExternalId, eventDispatcher, logger: {debug}} = this;
-
-        console.log(chalk.red('Remove connection'), connection.id);
-
         const {id: connectionId, externalId, context: {id: contextId, protocol}} = connection;
         debug(`Remove connection: #${byConnectionId.size}`, {contextId, connectionId, externalId});
 

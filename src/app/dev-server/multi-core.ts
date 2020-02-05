@@ -1,7 +1,7 @@
 import {Context, WebApplicationBundle} from "qft";
 import cluster from "cluster";
 import {devServerModule} from "./devServerModule";
-import {multicoreDeliveryProtocolModule} from "../../lib/deliveryProtocol";
+import {deliveryProtocolModuleInWorker} from "../../lib/deliveryProtocol";
 import {workerManagerModule} from "../../lib/workerManager";
 import {deliveryProtocolOnMasterModule} from "../../lib/deliveryProtocolOnMaster";
 
@@ -21,7 +21,7 @@ if (cluster.isMaster) {
         .install(...WebApplicationBundle)
         .configure(
             devServerModule,
-            multicoreDeliveryProtocolModule
+            deliveryProtocolModuleInWorker
         )
         .initialize();
     console.log(`   Worker context initialized`, cluster.worker.id);
