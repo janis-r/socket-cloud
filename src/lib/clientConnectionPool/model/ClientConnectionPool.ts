@@ -5,19 +5,24 @@ import {ClientMessageEvent} from "../event/ClientMessageEvent";
 import chalk from "chalk";
 import {ConnectionId} from "../data/ConnectionId";
 import {ContextId} from "../../configurationContext";
+import {Logger} from "../../logger";
 
 export class ClientConnectionPool {
 
     @Inject()
     private eventDispatcher: EventDispatcher;
+    @Inject()
+    private logger: Logger;
 
     private readonly byConnectionId = new Map<ConnectionId, ClientConnection>();
     private readonly byContextId = new Map<ContextId, Set<ClientConnection>>();
     private readonly byContextAndExternalId = new Map<ContextId, Map<ExternalId, ClientConnection | Set<ClientConnection>>>();
 
     registerConnection(connection: ClientConnection): void {
-        const {eventDispatcher, byConnectionId, byContextAndExternalId, byContextId} = this;
+        const {eventDispatcher, byConnectionId, byContextAndExternalId, byContextId, logger: {debug}} = this;
         const {id: connectionId, externalId, context: {id: contextId}} = connection;
+
+        debug(`New connection: #${byConnectionId.size}`, {contextId, connectionId, externalId});
 
         connection.addEventListener("error", ({data}) =>
                 // TODO: Error should be logged
@@ -84,11 +89,12 @@ export class ClientConnectionPool {
     };
 
     private removeConnection(connection: ClientConnection): void {
-        const {byConnectionId, byContextId, byContextAndExternalId, eventDispatcher} = this;
+        const {byConnectionId, byContextId, byContextAndExternalId, eventDispatcher, logger: {debug}} = this;
 
         console.log(chalk.red('Remove connection'), connection.id);
 
         const {id: connectionId, externalId, context: {id: contextId, protocol}} = connection;
+        debug(`Remove connection: #${byConnectionId.size}`, {contextId, connectionId, externalId});
 
         connection.removeAllEventListeners(this);
 

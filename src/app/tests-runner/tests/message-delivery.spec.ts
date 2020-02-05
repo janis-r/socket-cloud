@@ -9,13 +9,13 @@ import {
 
 describe('Message delivery', () => {
 
-    beforeAll(startSocketServer);
-    afterAll(stopSocketServer);
+    // beforeAll(startSocketServer);
+    // afterAll(stopSocketServer);
 
-    beforeEach(createConnections());
+    beforeEach(createConnections(100));
     afterEach(resetConnections);
 
-    it(`Can send global messages`, async done => {
+    it.only(`Can send global messages`, async done => {
         const payload = Math.floor(Math.random() * 0xFFFFFFFF).toString(16);
         let counter = connections.length;
         connections.forEach(({onMessage}) =>

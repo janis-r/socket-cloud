@@ -3,7 +3,7 @@ import {InjectionConfig, ModuleConfig} from "qft";
 import {Logger} from "../../lib/logger";
 import {SwaggerApiConfig, SwaggerApiDisplayModule} from "../../lib/swaggerApiDisplay";
 import {PermessageDeflateConfig, PermessageDeflateExtensionModule} from "../../lib/permessageDeflateExtension";
-import {DeliveryProtocolModule} from "../../lib/deliveryProtocol";
+import {deliveryProtocolModule} from "../../lib/deliveryProtocol";
 import {WebsocketListenerModule} from "../../lib/websocketListener";
 import {ConfigurationContextModule} from "../../lib/configurationContext/ConfigurationContextModule";
 import {HttpServerRouter} from "../../lib/httpServer";
@@ -15,7 +15,7 @@ export const devServerModule: ModuleConfig = {
         ConfigurationContextModule,
         SwaggerApiDisplayModule,
         PermessageDeflateExtensionModule,
-        DeliveryProtocolModule,
+        deliveryProtocolModule,
         WebsocketListenerModule
     ],
     mappings: [

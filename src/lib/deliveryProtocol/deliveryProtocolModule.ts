@@ -30,7 +30,7 @@ import {DevAccessTokenManager} from "./service/impl/DevAccessTokenManager";
 
 const protocolGuard = ({data: {context: {protocol}}}: Event<ClientConnection>) => protocol === pocmddpProtocol;
 
-export const DeliveryProtocolModule: ModuleConfig = {
+export const deliveryProtocolModule: ModuleConfig = {
     requires: [
         ClientConnectionPoolModule,
         ConfigurationContextModule,

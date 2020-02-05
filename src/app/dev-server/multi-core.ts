@@ -1,24 +1,28 @@
 import {Context, WebApplicationBundle} from "qft";
-import {Logger} from "../../lib/logger";
 import cluster from "cluster";
 import {devServerModule} from "./devServerModule";
-import {HttpServerRouter} from "../../lib/httpServer";
+import {multicoreDeliveryProtocolModule} from "../../lib/deliveryProtocol";
+import {workerManagerModule} from "../../lib/workerManager";
+import {deliveryProtocolOnMasterModule} from "../../lib/deliveryProtocolOnMaster";
 
 if (cluster.isMaster) {
-    const numCPUs = require('os').cpus().length;
 
-    for (let i = 0; i < numCPUs; i++) {
-        const worker = cluster.fork();
-        worker.on('message', (msg: any) => {
-            console.log('>> msg', msg);
-
-        });
-    }
+    const {injector} = new Context()
+        .install(...WebApplicationBundle)
+        .configure(
+            workerManagerModule,
+            deliveryProtocolOnMasterModule
+        )
+        .initialize();
+    console.log(`Multi core dev server master initialized`);
 
 } else {
     const {injector} = new Context()
         .install(...WebApplicationBundle)
-        .configure(devServerModule)
+        .configure(
+            devServerModule,
+            multicoreDeliveryProtocolModule
+        )
         .initialize();
-    injector.get(Logger).console(`Multi core dev server context initialized`, cluster.worker.id);
+    console.log(`   Worker context initialized`, cluster.worker.id);
 }
