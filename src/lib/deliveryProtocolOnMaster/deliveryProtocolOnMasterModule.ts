@@ -1,37 +1,15 @@
 import {ModuleConfig} from "qft";
-import {ForwardMessageToOtherNodes} from "./command/ForwardMessageToOtherNodes";
-import {workerManagerModule, WorkerMessageEvent} from "../workerManager";
-import {ipcMessageUtil} from "../ipcMessanger";
-import {pocmddpProtocol} from "../deliveryProtocol";
-import {DataSyncMessageType, dataSyncMessageUtil} from "../deliveryProtocol/data/ipc/DataSyncMessage";
+import {ForwardDataSyncMessageToNodes} from "./command/ForwardDataSyncMessageToNodes";
+import {IpcMessageEvent, ipcMessengerInMasterModule} from "../ipcMessanger";
 
 export const deliveryProtocolOnMasterModule: ModuleConfig = {
     requires: [
-        workerManagerModule
+        ipcMessengerInMasterModule
     ],
     commands: [
-        {
-            event: WorkerMessageEvent.TYPE,
-            command: ForwardMessageToOtherNodes,
-            guard: ({data: {message}}: WorkerMessageEvent) => {
-                if (!ipcMessageUtil.validate(message)) {
-                    return false;
-                }
-                const {scope, payload} = message;
-                if (scope !== pocmddpProtocol) {
-                    return false;
-                }
-
-                if (!dataSyncMessageUtil.validate(payload)) {
-                    return false;
-                }
-                if (payload.type !== DataSyncMessageType.ForwardClientMessage) {
-                    return false;
-                }
-                return true;
-            }
-        }
-    ]
+        {event: IpcMessageEvent.TYPE, command: ForwardDataSyncMessageToNodes}
+    ],
+    toString: () => "deliveryProtocolOnMasterModule"
 };
 
 

@@ -1,8 +1,8 @@
 import {Command, Inject} from "qft";
 import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
-import {IpcMessenger} from "../../ipcMessanger/service/IpcMessenger";
 import {DataSyncMessage, DataSyncMessageType} from "../data/ipc/DataSyncMessage";
 import {pocmddpProtocol} from "..";
+import {IpcMessenger} from "../../ipcMessanger";
 
 export class ForwardOutgoingMessage implements Command {
 
@@ -20,7 +20,7 @@ export class ForwardOutgoingMessage implements Command {
 
 
         addRecipientProvider(new Promise<number>(async resolve => {
-            const {data} = await sendAndReceive<DataSyncMessage>({
+            const {data} = await sendAndReceive<DataSyncMessage<number>>({
                 scope: pocmddpProtocol,
                 payload: <DataSyncMessage>{
                     type: DataSyncMessageType.ForwardClientMessage,

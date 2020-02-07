@@ -2,20 +2,14 @@ import {Context, WebApplicationBundle} from "qft";
 import cluster from "cluster";
 import {devServerModule} from "./devServerModule";
 import {deliveryProtocolModuleInWorker} from "../../lib/deliveryProtocol";
-import {workerManagerModule} from "../../lib/workerManager";
 import {deliveryProtocolOnMasterModule} from "../../lib/deliveryProtocolOnMaster";
 
 if (cluster.isMaster) {
-
     const {injector} = new Context()
         .install(...WebApplicationBundle)
-        .configure(
-            workerManagerModule,
-            deliveryProtocolOnMasterModule
-        )
+        .configure(deliveryProtocolOnMasterModule)
         .initialize();
     console.log(`Multi core dev server master initialized`);
-
 } else {
     const {injector} = new Context()
         .install(...WebApplicationBundle)

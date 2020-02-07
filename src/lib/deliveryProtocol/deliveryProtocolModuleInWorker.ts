@@ -1,7 +1,7 @@
 import {ModuleConfig} from "qft";
 import {OutgoingMessageEvent} from "./event/OutgoingMessageEvent";
 import {deliveryProtocolModule} from "./deliveryProtocolModule";
-import {ipcMessengerModule} from "../ipcMessanger/ipcMessengerModule";
+import {ipcMessengerInWorkerModule} from "../ipcMessanger/ipcMessengerInWorkerModule";
 import {ForwardOutgoingMessage} from "./command/ForwardOutgoingMessage";
 import {IpcMessageEvent} from "../ipcMessanger";
 import {HandleForwardedMessage} from "./command/HandleForwardedMessage";
@@ -9,7 +9,7 @@ import {HandleForwardedMessage} from "./command/HandleForwardedMessage";
 export const deliveryProtocolModuleInWorker: ModuleConfig = {
     requires: [
         deliveryProtocolModule,
-        ipcMessengerModule
+        ipcMessengerInWorkerModule
     ],
     commands: [
         {

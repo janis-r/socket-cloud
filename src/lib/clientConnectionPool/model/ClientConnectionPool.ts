@@ -1,33 +1,32 @@
 import {ClientConnection} from "./ClientConnection";
 import {ConnectionRemovedEvent, ConnectionState, ExternalId, NewConnectionEvent} from "..";
-import {EventDispatcher, Inject} from "qft";
+import {EventDispatcher, Injectable} from "qft";
 import {ClientMessageEvent} from "../event/ClientMessageEvent";
-import chalk from "chalk";
 import {ConnectionId} from "../data/ConnectionId";
 import {ContextId} from "../../configurationContext";
-import {Logger} from "../../logger";
+import {Logger, LoggerEntity} from "../../logger";
 
+@Injectable()
 export class ClientConnectionPool {
 
-    @Inject()
-    private eventDispatcher: EventDispatcher;
-    @Inject()
-    private logger: Logger;
+    readonly log: LoggerEntity['log'];
 
     private readonly byConnectionId = new Map<ConnectionId, ClientConnection>();
     private readonly byContextId = new Map<ContextId, Set<ClientConnection>>();
     private readonly byContextAndExternalId = new Map<ContextId, Map<ExternalId, ClientConnection | Set<ClientConnection>>>();
 
+    constructor(private readonly eventDispatcher: EventDispatcher, logger: Logger) {
+        this.log = logger.spawnEntity('client-connection').log;
+    }
+
     registerConnection(connection: ClientConnection): void {
-        const {eventDispatcher, byConnectionId, byContextAndExternalId, byContextId, logger: {debug}} = this;
+        const {eventDispatcher, byConnectionId, byContextAndExternalId, byContextId, log} = this;
         const {id: connectionId, externalId, context: {id: contextId}} = connection;
 
-        debug(`New connection: #${byConnectionId.size}`, {contextId, connectionId, externalId});
+        log(`New connection: #${byConnectionId.size}`, {contextId, connectionId, externalId});
 
-        connection.addEventListener("error", ({data}) =>
-                // TODO: Error should be logged
-                console.log(chalk.red('Connection error:'), connectionId, data)
-            ,
+        connection.addEventListener("error",
+            ({data}) => log('Connection error:', {connectionId, data}),
             this
         );
         connection.addEventListener("state-change", ({connection}) => this.removeConnection(connection), this)
@@ -89,9 +88,9 @@ export class ClientConnectionPool {
     };
 
     private removeConnection(connection: ClientConnection): void {
-        const {byConnectionId, byContextId, byContextAndExternalId, eventDispatcher, logger: {debug}} = this;
+        const {byConnectionId, byContextId, byContextAndExternalId, eventDispatcher, log} = this;
         const {id: connectionId, externalId, context: {id: contextId, protocol}} = connection;
-        debug(`Remove connection: #${byConnectionId.size}`, {contextId, connectionId, externalId});
+        log(`Remove connection: #${byConnectionId.size}`, {contextId, connectionId, externalId});
 
         connection.removeAllEventListeners(this);
 

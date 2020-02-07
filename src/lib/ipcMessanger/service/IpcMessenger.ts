@@ -1,82 +1,101 @@
-import * as cluster from "cluster";
+import cluster, {Worker} from "cluster";
 import {toMilliseconds} from "ugd10a";
-import {EventDispatcher, Inject} from "qft";
 import {IpcMessage, ipcMessageUtil} from "../data/IpcMessage";
-import {IpcMessageEvent} from "../event/IpcMessageEvent";
-import {Logger} from "../../logger";
+import {nextIpcMessageId} from "../util/nextIpcMessageId";
+import {CallbackCollection} from "../../utils/CallbackCollection";
 import MessageListener = NodeJS.MessageListener;
 
-/**
- * Ipc messenger worker process implementation, will send messages to parent process
- */
 export class IpcMessenger {
-    @Inject()
-    private readonly eventDispatcher: EventDispatcher;
-    @Inject()
-    private readonly logger: Logger;
+
+    static fromCurrentProcess = () => {
+        if (cluster.isMaster) {
+            throw new Error(`IpcMessenger.fromCurrentProcess can be used only within worker process`);
+        }
+        return new IpcMessenger({
+            onMessage: listener => process.on("message", listener),
+            sendMessage: message => process.send(message)
+        });
+    };
+
+    static fromWorker = (worker: Worker) => {
+        if (!cluster.isMaster) {
+            throw new Error(`IpcMessenger.fromWorker can be used only within master process`);
+        }
+        return new IpcMessenger({
+            onMessage: listener => worker.on("message", listener),
+            sendMessage: message => worker.send(message)
+        });
+    };
+
+    readonly iid = (cluster.isMaster ? "M" : "S") + "|" + Math.floor(Math.random() * 0xFFFF).toString(16);
 
     private readonly responseQueue = new Map<IpcMessage['id'], (data: any) => void>();
+    private readonly onMessageCallback = new CallbackCollection<IpcMessage>();
+    readonly onMessage = this.onMessageCallback.polymorph;
 
-    constructor() {
-        process.on("message", this.messageHandler);
+    private constructor(private readonly transport: {
+        onMessage: (listener: MessageListener) => void,
+        sendMessage: (message: any) => void
+    }) {
+        if (!transport) {
+            console.log(JSON.stringify(arguments));
+        }
+        transport.onMessage(this.messageHandler);
     }
 
-    private readonly messageHandler: MessageListener = message => {
-        const {responseQueue, eventDispatcher} = this;
+    private readonly messageHandler: MessageListener = (message): void => {
+        const {responseQueue, onMessageCallback} = this;
 
         if (!ipcMessageUtil.validate(message)) {
-            throw new Error(`Unknown IPC response format: ${JSON.stringify(message)} - ${JSON.stringify(ipcMessageUtil.lastValidationError)}`);
+            throw new Error(`Unknown IPC response: ${JSON.stringify(message)} - ${JSON.stringify(ipcMessageUtil.lastValidationError)}`);
         }
-
+        // console.log([this.iid], 'messageHandler', message);
         const {id, payload} = message;
         if (responseQueue.has(id)) {
             responseQueue.get(id)(payload);
         } else {
-            eventDispatcher.dispatchEvent(new IpcMessageEvent(message, (response: Omit<IpcMessage, "id" | "scope">) => {
-                const data = {...response, id: message.id, scope: message.scope};
-                process.send(data);
-            }));
+            onMessageCallback.execute(message);
         }
     };
 
-    readonly send = async (message: Omit<IpcMessage, "id">): Promise<void> => {
-        const data = {...message, id: getNextIpcMessageId()};
-        process.send(data);
+    readonly send = (message: IpcMessageWithOptionalId): void => {
+        const {transport: {sendMessage}} = this;
+        if (!message.id) {
+            message.id = nextIpcMessageId();
+        }
+        sendMessage(message);
     };
 
-    readonly sendAndReceive = <RT>(message: Omit<IpcMessage, "id">) => new Promise<RT>((resolve, reject) => {
-        const {responseQueue, logger: {debug}} = this;
-
-        const data = {...message, id: getNextIpcMessageId()};
-        if (!ipcMessageUtil.validate(data)) {
-            throw new Error('!messageUtil.validate(data) ' + data);
+    readonly sendAndReceive = <T>(message: IpcMessageWithOptionalId) => new Promise<T>((resolve, reject) => {
+        const {iid, responseQueue, transport: {sendMessage}} = this;
+        // const rid = Math.floor(Math.random() * 0xFFF).toString(16);
+        // console.log([iid, rid], 'message', message)
+        if (!message.id) {
+            message.id = nextIpcMessageId();
+            // console.log([iid, rid], `message.id`, message.id);
         }
-        debug(`>> worker#${cluster?.worker?.id} send&receive`, JSON.stringify(data, null, ' '));
+
+        if (!ipcMessageUtil.validate(message)) {
+            throw new Error(`Invalid message @ sendAndReceive [${JSON.stringify(message)}]`);
+        }
 
         let timedOutId: ReturnType<typeof setTimeout>;
-        responseQueue.set(data.id, msg => {
+        responseQueue.set(message.id, response => {
+            // console.log([iid, rid], `respond`, {response});
+
             clearTimeout(timedOutId);
-            responseQueue.delete(data.id);
-            console.log('>> IPC resolve', msg.data); // TODO: Message must be typed and validated in here!
-            resolve(msg);
+            responseQueue.delete(message.id);
+            resolve(response);
         });
 
         timedOutId = setTimeout(() => {
-            responseQueue.delete(data.id);
+            // console.log([iid, rid], `timedOutId`);
+            responseQueue.delete(message.id);
             reject('Timed out!');
         }, toMilliseconds(5, "seconds"));
 
-        process.send(data);
+        sendMessage(message);
     });
 }
 
-
-let mid = 0;
-
-const prefix = cluster?.worker?.id;
-
-function getNextIpcMessageId(): string {
-    const id = mid++;
-    mid %= 0xFFFF;
-    return `${prefix ?? ''}#${id}`;
-}
+type IpcMessageWithOptionalId = Partial<Pick<IpcMessage, "id">> & Omit<IpcMessage, "id">;

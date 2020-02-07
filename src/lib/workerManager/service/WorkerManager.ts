@@ -1,7 +1,7 @@
 import cluster, {Worker} from "cluster";
+import {cpus} from 'os';
 import {EventDispatcher, Inject} from "qft";
 import {WorkerMessageEvent} from "../event/WorkerMessageEvent";
-import {cpus} from 'os';
 
 export class WorkerManager {
     @Inject()
@@ -21,7 +21,8 @@ export class WorkerManager {
     }
 
     private spawnWorkers(): void {
-        while (Object.keys(cluster.workers).length < cpus().length) {
+        const maxWorkers = cpus().length;
+        while (Object.keys(cluster.workers).length < maxWorkers) {
             const worker = cluster.fork();
             worker.on("error", err => {
                 console.log(`worker ${worker.id} error:`, err);
@@ -39,5 +40,9 @@ export class WorkerManager {
 
     get workers(): Worker[] {
         return Object.values(cluster.workers);
+    }
+
+    get workerIds(): number[] {
+        return Object.keys(cluster.workers).map(v => parseInt(v));
     }
 }

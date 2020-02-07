@@ -12,7 +12,7 @@ export type IpcMessage<P = any> = {
     payload: P
 }
 export const ipcMessageUtil = new MessageValidator<IpcMessage>([
-    {field: "id", type: "string", optional: true},
+    {field: "id", type: "string"},
     {field: "scope", type: "string"},
     {field: "payload", type: "object"}
 ]);
