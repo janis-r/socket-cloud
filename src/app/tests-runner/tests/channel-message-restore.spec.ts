@@ -10,7 +10,7 @@ import {PushToClientMessage, RestoreChannelsResponseMessage} from "../../../lib/
 
 describe('Channel message restoring', () => {
 
-    beforeAll(startSocketServer);
+    beforeAll(startSocketServer());
     afterAll(stopSocketServer);
 
     beforeEach(createConnections(2));

@@ -7,9 +7,11 @@ export class WorkerManager {
     @Inject()
     private readonly eventDispatcher: EventDispatcher;
 
-    constructor() {
+    private readonly maxWorkers: number;
 
-        console.log(`Starting worker manager on ${cpus().length} CPUs`);
+    constructor() {
+        this.maxWorkers = cpus().length;
+        console.log(`Starting worker manager on ${this.maxWorkers}/${cpus().length} CPUs`);
 
         cluster.on("message", (worker, message) => this.messageHandler(message, worker.id));
         cluster.on("exit", (worker, code, signal) => {
@@ -21,14 +23,18 @@ export class WorkerManager {
     }
 
     private spawnWorkers(): void {
-        const maxWorkers = cpus().length;
+        const {maxWorkers} = this;
+        let startedWorkers = 0;
         while (Object.keys(cluster.workers).length < maxWorkers) {
             const worker = cluster.fork();
             worker.on("error", err => {
                 console.log(`worker ${worker.id} error:`, err);
             });
             worker.on("listening", address => {
-                console.log(`worker ${worker.id} listening on port:`, address.port);
+                startedWorkers++;
+                if (startedWorkers === maxWorkers) {
+                    console.log(`All workers started`);
+                }
             });
         }
     }

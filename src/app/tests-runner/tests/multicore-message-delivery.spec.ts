@@ -6,13 +6,14 @@ import {
     startSocketServer,
     stopSocketServer
 } from "../util/test-utils";
+import {toMilliseconds} from "ugd10a";
 
-describe('Message delivery', () => {
+describe('Multicore message delivery', () => {
 
-    beforeAll(startSocketServer());
+    beforeAll(startSocketServer(false));
     afterAll(stopSocketServer);
 
-    beforeEach(createConnections());
+    beforeEach(createConnections(100));
     afterEach(resetConnections);
 
     it(`Can send global messages`, async done => {
@@ -31,7 +32,7 @@ describe('Message delivery', () => {
             })
         );
         connections[0].sendGlobalMessage(payload);
-    });
+    }, 10000);
 
     it(`Can send messages to channel`, async done => {
         const channel = "foo";

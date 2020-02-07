@@ -9,7 +9,6 @@ if (cluster.isMaster) {
         .install(...WebApplicationBundle)
         .configure(deliveryProtocolOnMasterModule)
         .initialize();
-    console.log(`Multi core dev server master initialized`);
 } else {
     const {injector} = new Context()
         .install(...WebApplicationBundle)
@@ -18,5 +17,4 @@ if (cluster.isMaster) {
             deliveryProtocolModuleInWorker
         )
         .initialize();
-    console.log(`   Worker context initialized`, cluster.worker.id);
 }

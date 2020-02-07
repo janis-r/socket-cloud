@@ -5,12 +5,12 @@ import chalk from "chalk";
 
 let serverProcess: ChildProcess;
 
-export const launchServer = (showLogs = false, mode: "js" | "ts" = "ts") => new Promise<void>(async resolve => {
+export const launchServer = (singleCore: boolean = true, showLogs = false, mode: "js" | "ts" = "ts") => new Promise<void>(async resolve => {
     stopServer();
 
     const isTs = __filename.match(/\.ts$/);
     const executable = isTs ? 'ts-node' : 'node';
-    const path = `${__dirname}/../../dev-server/single-core.${isTs ? 't' : 'j'}s`;
+    const path = `${__dirname}/../../dev-server/${singleCore ? 'single' : 'multi'}-core.${isTs ? 't' : 'j'}s`;
 
     const exePath = `${executable} ${path}`;
     showLogs && logToConsole('>> run:', exePath);
@@ -22,7 +22,7 @@ export const launchServer = (showLogs = false, mode: "js" | "ts" = "ts") => new 
     });
     serverProcess.stdout.on("data", async chunk => {
         const text = typeof chunk === "string" ? chunk : (chunk instanceof Buffer ? chunk.toString("utf8") : null);
-        if (text && text.includes('Http server running on port')) {
+        if (text && text.includes(singleCore ? 'Http server running on port' : 'All workers started')) {
             logToConsole(`${text.replace(/\s+$/, '')} [in ${time.elapsed} ms]`);
             resolve();
         } else if (showLogs) {

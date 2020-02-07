@@ -2,7 +2,7 @@ import {createConnections, resetConnections, startSocketServer, stopSocketServer
 
 describe('Create connection', () => {
 
-    beforeAll(startSocketServer);
+    beforeAll(startSocketServer());
     afterAll(stopSocketServer);
 
     afterEach(resetConnections);
