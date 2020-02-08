@@ -6,7 +6,6 @@ import {
     startSocketServer,
     stopSocketServer
 } from "../util/test-utils";
-import {toMilliseconds} from "ugd10a";
 
 describe('Multicore message delivery', () => {
 

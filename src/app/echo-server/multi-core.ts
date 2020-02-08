@@ -1,4 +1,4 @@
-import {Context, Injectable, InjectionConfig, WebApplicationBundle} from "qft";
+import {AppContext, Injectable, InjectionConfig} from "qft";
 import {Logger, LoggerModule} from "../../lib/logger";
 import {EchoServerModule} from "./EchoServerModule";
 import cluster from "cluster";
@@ -23,8 +23,7 @@ if (cluster.isMaster) {
         });
     }
 } else {
-    const {injector} = new Context()
-        .install(...WebApplicationBundle)
+    const {injector} = new AppContext()
         .configure(
             LoggerModule,
             {
