@@ -26,13 +26,13 @@ export const devServerModule: ModuleConfig = {
                 basePath: "api",
                 docs: [
                     {
+                        name: "validation",
+                        configFile: `${__dirname}/../../../api/validation-api.yaml`
+                    },
+                    {
                         name: "platform",
                         configFile: `${__dirname}/../../../api/platform-api.yaml`
                     },
-                    /*{
-                        name: "validation",
-                        configFile: `${__dirname}/../../../api/validation-api.yaml`
-                    }*/
                 ]
             }
         } as InjectionConfig<SwaggerApiConfig>

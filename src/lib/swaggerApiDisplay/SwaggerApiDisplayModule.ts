@@ -20,9 +20,10 @@ export class SwaggerApiDisplayModule {
         expressApp.use(`/${basePath}`, swaggerUi.serve);
 
         docs.forEach(({name, configFile}) => {
+            const swaggerDocument = configFile.match(/\.yaml$/i) ? YAML.load(configFile) : require(configFile);
             expressApp.get(
                 `/${basePath}/${name}`,
-                swaggerUi.setup(configFile.match(/\.yaml$/i) ? YAML.load(configFile) : configFile)
+                (require,  res, next) => swaggerUi.setup(swaggerDocument)(require,  res, next) // This might look silly, although without this inline setup docs would get cached
             );
         });
 
