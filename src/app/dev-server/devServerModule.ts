@@ -26,12 +26,12 @@ export const devServerModule: ModuleConfig = {
                 basePath: "api",
                 docs: [
                     {
-                        name: "validation",
+                        name: "validation-api",
                         configFile: `${__dirname}/../../../api/validation-api.yaml`
                     },
                     {
-                        name: "platform",
-                        configFile: `${__dirname}/../../../api/platform-api.yaml`
+                        name: "publish-api",
+                        configFile: `${__dirname}/../../../api/publish-api.yaml`
                     },
                 ]
             }

@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
-  title: Platform API
-  description: An API designed to enable data context management via API calls.
+  title: Publish API
+  description: An API designed to enable data publishing via API calls.
   contact:
     name: Jānis Radiņš
     email: jr@janisradins.com
