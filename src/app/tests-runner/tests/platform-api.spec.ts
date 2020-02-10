@@ -106,7 +106,7 @@ describe('Platform API', () => {
             connections.forEach(connection => {
                 connection.subscribe(channel);
                 connection.onMessage(() => received++)
-                    .filter(({channels, payload: p}) => channels.includes(channel) && p === payload)
+                    .guard(({channels, payload: p}) => channels.includes(channel) && p === payload)
                     .once()
                     .onComplete(() => {
                         if (received === connections.length) {
@@ -134,7 +134,7 @@ describe('Platform API', () => {
             connections.forEach(connection => {
                 connection.subscribe(...channels);
                 connection.onMessage(message => received++)
-                    .filter(({channels: [c], payload: p}) =>
+                    .guard(({channels: [c], payload: p}) =>
                         channels.includes(c) && channels.indexOf(c) === payloads.indexOf(p)
                     )
                     .twice()

@@ -50,7 +50,7 @@ describe('Channel message restoring', () => {
         const restoreIndex = Math.floor(incomingMessages.length / 2);
         const restorePromise = new Promise<RestoreChannelsResponseMessage>(resolve => {
             secondConnection.onRestore(resolve)
-                .filter(message => {
+                .guard(message => {
                     if (message.payload.some(({channels}) => !channels.includes(channel))) {
                         fail(`Restored message must include channel it was requested by`);
                     }

@@ -6,6 +6,10 @@ export class CallbackCollection<T> {
         this.polymorph = this.polymorph.bind(this);
     }
 
+    /**
+     * Add callback to collection
+     * @param callback
+     */
     readonly add = (callback: Callback<T>): CallbackManager<T> => {
         const {callbacks} = this;
         if (callbacks.has(callback)) {
@@ -22,16 +26,22 @@ export class CallbackCollection<T> {
         };
         const once = () => times(1);
         const twice = () => times(2);
-        const filter = (func: FilterFunction<T>) => {
-            callbackProps.filter = func;
+        const guard = (func: GuardFunction<T>) => {
+            callbackProps.guard = func;
             return {once, twice, times};
         };
 
-        return {success: true, filter, once, twice, times};
+        return {success: true, guard, once, twice, times};
     };
-
+    /**
+     * Check if collection has registered callback
+     * @param callback
+     */
     readonly has = (callback: Callback<T>) => this.callbacks.has(callback);
-
+    /**
+     * Remove callback
+     * @param callback
+     */
     readonly remove = (callback: Callback<T>): boolean => {
         const {callbacks} = this;
         if (callbacks.has(callback)) {
@@ -40,11 +50,13 @@ export class CallbackCollection<T> {
         }
         return false;
     };
-
+    /**
+     * Remove all callbacks
+     */
     readonly clear = () => this.callbacks.clear();
 
     /**
-     * Add callback to collection
+     * Add callback to collection, if it's provided and return CallbackManager
      * @param callback
      */
     polymorph(callback: Callback<T>): CallbackManager<T>;
@@ -60,11 +72,15 @@ export class CallbackCollection<T> {
         return {has, remove, clear};
     }
 
+    /**
+     * Execute all callbacks
+     * @param data
+     */
     readonly execute = (data: T): number => {
         const {callbacks} = this;
         let executed = 0;
         for (const [callback, properties] of callbacks) {
-            if (properties.filter && !properties.filter(data)) {
+            if (properties.guard && !properties.guard(data)) {
                 continue;
             }
 
@@ -90,18 +106,36 @@ export class CallbackCollection<T> {
 }
 
 type Callback<T> = (data: T) => unknown;
-type FilterFunction<T> = (data: T) => boolean
+type GuardFunction<T> = (data: T) => boolean
 type OnCompleteCallback = () => void;
 type CallbackProperties<T> = {
     executionLimit?: number,
     executionCount?: number,
-    filter?: FilterFunction<T>,
+    guard?: GuardFunction<T>,
     onComplete?: OnCompleteCallback
 };
 export type CallbackManager<T> = {
+    /**
+     * Defines if callback adding was a success - one callback can be added only once and so this property will
+     * be true on first attempt and false on all following calls with same callback.
+     */
     success: boolean;
-    filter?: (func: FilterFunction<T>) => Pick<CallbackManager<T>, "once" | "twice" | "times">;
+    /**
+     * Limit callback execution times to 1
+     */
     once?: () => { onComplete: (callback: OnCompleteCallback) => void };
+    /**
+     * Limit callback execution times to 2
+     */
     twice?: () => { onComplete: (callback: OnCompleteCallback) => void };
+    /**
+     * Limit callback execution times to value defined in param
+     * @param count
+     */
     times?: (count: number) => { onComplete: (callback: OnCompleteCallback) => void };
+    /**
+     * Guard callback execution by interpreting executed callback data.
+     * @param func
+     */
+    guard?: (func: GuardFunction<T>) => Pick<CallbackManager<T>, "once" | "twice" | "times">;
 };
