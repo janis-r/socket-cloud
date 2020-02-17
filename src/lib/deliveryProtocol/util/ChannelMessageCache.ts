@@ -14,7 +14,7 @@ export class ChannelMessageCache {
     private cleanupIntervalId: ReturnType<typeof setInterval>;
 
     private readonly onEmptyCallback = new CallbackCollection<void>();
-    readonly onEmpty = this.onEmptyCallback.polymorph;
+    readonly onEmpty = this.onEmptyCallback.manage;
 
     constructor(readonly context: ConfigurationContext,
                 readonly channelId: string) {

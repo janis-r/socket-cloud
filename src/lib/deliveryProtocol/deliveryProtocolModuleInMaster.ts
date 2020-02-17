@@ -2,7 +2,7 @@ import {ModuleConfig} from "qft";
 import {ForwardDataSyncMessageToNodes} from "./command/ForwardDataSyncMessageToNodes";
 import {IpcMessageEvent, ipcMessengerInMasterModule} from "../ipcMessanger";
 
-export const deliveryProtocolOnMasterModule: ModuleConfig = {
+export const deliveryProtocolModuleInMaster: ModuleConfig = {
     requires: [
         ipcMessengerInMasterModule
     ],

@@ -1,7 +1,7 @@
 import {Command, Inject} from "qft";
 import {IpcMessage, IpcMessageEvent, WorkerMessengerProvider} from "../../ipcMessanger";
-import {DataSyncMessage, DataSyncMessageType, dataSyncMessageUtil, pocmddpProtocol} from "../../deliveryProtocol";
-import {WorkerManager} from "../../workerManager/service/WorkerManager";
+import {DataSyncMessage, DataSyncMessageType, dataSyncMessageUtil, pocmddpProtocol} from "../index";
+import {WorkerManager} from "../../workerManager";
 
 export class ForwardDataSyncMessageToNodes implements Command {
 

@@ -1,16 +1,16 @@
 export class CallbackCollection<T> {
 
-    private readonly callbacks = new Map<Callback<T>, CallbackProperties<T>>();
+    private readonly callbacks = new Map<CallbackFunction<T>, CallbackProperties<T>>();
 
     constructor() {
-        this.polymorph = this.polymorph.bind(this);
+        this.manage = this.manage.bind(this);
     }
 
     /**
      * Add callback to collection
      * @param callback
      */
-    readonly add = (callback: Callback<T>): CallbackManager<T> => {
+    readonly add = (callback: CallbackFunction<T>): CallbackManager<T> => {
         const {callbacks} = this;
         if (callbacks.has(callback)) {
             return {success: false};
@@ -37,12 +37,12 @@ export class CallbackCollection<T> {
      * Check if collection has registered callback
      * @param callback
      */
-    readonly has = (callback: Callback<T>) => this.callbacks.has(callback);
+    readonly has = (callback: CallbackFunction<T>) => this.callbacks.has(callback);
     /**
      * Remove callback
      * @param callback
      */
-    readonly remove = (callback: Callback<T>): boolean => {
+    readonly remove = (callback: CallbackFunction<T>): boolean => {
         const {callbacks} = this;
         if (callbacks.has(callback)) {
             callbacks.delete(callback);
@@ -59,12 +59,12 @@ export class CallbackCollection<T> {
      * Add callback to collection, if it's provided and return CallbackManager
      * @param callback
      */
-    polymorph(callback: Callback<T>): CallbackManager<T>;
+    manage(callback: CallbackFunction<T>): CallbackManager<T>;
     /**
      * If no callback is specified proceed to collection management methods
      */
-    polymorph(): Pick<this, "has" | "remove" | "clear">;
-    polymorph(callback?: Callback<T>) {
+    manage(): Pick<this, "has" | "remove" | "clear">;
+    manage(callback?: CallbackFunction<T>) {
         if (callback) {
             return this.add(callback);
         }
@@ -105,8 +105,8 @@ export class CallbackCollection<T> {
     };
 }
 
-type Callback<T> = (data: T) => unknown;
-type GuardFunction<T> = (data: T) => boolean
+type CallbackFunction<T> = (data: T) => unknown;
+type GuardFunction<T> = (data: T) => boolean;
 type OnCompleteCallback = () => void;
 type CallbackProperties<T> = {
     executionLimit?: number,
@@ -114,6 +114,7 @@ type CallbackProperties<T> = {
     guard?: GuardFunction<T>,
     onComplete?: OnCompleteCallback
 };
+
 export type CallbackManager<T> = {
     /**
      * Defines if callback adding was a success - one callback can be added only once and so this property will
@@ -139,3 +140,7 @@ export type CallbackManager<T> = {
      */
     guard?: (func: GuardFunction<T>) => Pick<CallbackManager<T>, "once" | "twice" | "times">;
 };
+
+type AddCallback<T> =  (callback: CallbackFunction<T>) => CallbackManager<T>;
+type ManageCallbacks<T> = () => Pick<CallbackCollection<T>, "has" | "remove" | "clear">;
+export type Callback<T> =  AddCallback<T> | ManageCallbacks<T>;

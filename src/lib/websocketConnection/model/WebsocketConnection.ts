@@ -27,10 +27,10 @@ export class WebsocketConnection {
     private readonly messageCallback = new CallbackCollection<string | Buffer>();
     private readonly stateChangeCallback = new CallbackCollection<{ state: ConnectionState, prevState: ConnectionState }>();
 
-    readonly onError = this.errorCallback.polymorph;
-    readonly onData = this.dataCallback.polymorph;
-    readonly onMessage = this.messageCallback.polymorph;
-    readonly onStateChange = this.stateChangeCallback.polymorph;
+    readonly onError = this.errorCallback.manage;
+    readonly onData = this.dataCallback.manage;
+    readonly onMessage = this.messageCallback.manage;
+    readonly onStateChange = this.stateChangeCallback.manage;
 
     constructor(private readonly socket: Socket,
                 readonly context: ConfigurationContext,

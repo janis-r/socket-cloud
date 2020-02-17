@@ -26,13 +26,13 @@ export const devServerModule: ModuleConfig = {
                 basePath: "api",
                 docs: [
                     {
-                        name: "validation-api",
-                        configFile: `${__dirname}/../../../api/validation-api.yaml`
-                    },
-                    {
                         name: "publish-api",
                         configFile: `${__dirname}/../../../api/publish-api.yaml`
                     },
+                    {
+                        name: "validation-api",
+                        configFile: `${__dirname}/../../../api/validation-api.yaml`
+                    }
                 ]
             }
         } as InjectionConfig<SwaggerApiConfig>
@@ -47,7 +47,6 @@ export const devServerModule: ModuleConfig = {
         router.post('/validationAPI/validate-connection', ({body, sendJson}) => {
             const {query: {externalId}} = url.parse((body as SocketDescriptor).url, true);
             const response = {externalId: externalId ?? "externalId"};
-            // console.log('>> validate-connection', {body, response});
             sendJson(response);
         });
     }

@@ -7,7 +7,7 @@ export type RestoreChannelsRequestMessage = {
     channels: RestoreTarget[]
 }
 
-type RestoreTarget = {
+export type RestoreTarget = {
     channel: string,
     filter?: CacheFilter
 }

@@ -14,6 +14,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
 
     readonly id: ClientConnection['id'];
     readonly externalId: string;
+    readonly remoteAddress;
 
     constructor(socket: Socket, readonly context: ConfigurationContext, extensions: ReadonlyArray<WebsocketExtensionAgent>,
                 descriptor: SocketDescriptor, operatorData?: OperatorData) {
@@ -21,6 +22,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
 
         this.id = descriptor.connectionId;
         this.externalId = operatorData?.externalId;
+        this.remoteAddress = descriptor.ipAddress;
 
         this.connection = new WebsocketConnection(socket, context, extensions);
         const {connection} = this;

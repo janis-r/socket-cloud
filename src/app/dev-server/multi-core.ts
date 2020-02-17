@@ -1,18 +1,14 @@
 import cluster from "cluster";
 import {AppContext} from "qft";
 import {devServerModule} from "./devServerModule";
-import {deliveryProtocolModuleInWorker} from "../../lib/deliveryProtocol";
-import {deliveryProtocolOnMasterModule} from "../../lib/deliveryProtocolOnMaster";
+import {deliveryProtocolModuleInMaster, deliveryProtocolModuleInWorker} from "../../lib/deliveryProtocol";
 
 if (cluster.isMaster) {
     const {injector} = new AppContext()
-        .configure(deliveryProtocolOnMasterModule)
+        .configure(deliveryProtocolModuleInMaster)
         .initialize();
 } else {
     const {injector} = new AppContext()
-        .configure(
-            devServerModule,
-            deliveryProtocolModuleInWorker
-        )
+        .configure(devServerModule, deliveryProtocolModuleInWorker)
         .initialize();
 }

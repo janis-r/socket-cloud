@@ -10,6 +10,7 @@ export interface ClientConnection {
     readonly externalId: string;
     readonly context: Readonly<ConfigurationContext>;
     readonly state: ConnectionState;
+    readonly remoteAddress: string;
 
     send(message: string): Promise<void>;
     send(message: Buffer): Promise<void>;

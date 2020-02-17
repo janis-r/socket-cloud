@@ -21,9 +21,9 @@ export class ClientConnectionPool {
 
     registerConnection(connection: ClientConnection): void {
         const {eventDispatcher, byConnectionId, byContextAndExternalId, byContextId, log} = this;
-        const {id: connectionId, externalId, context: {id: contextId}} = connection;
+        const {id: connectionId, externalId, context: {id: contextId}, remoteAddress} = connection;
 
-        log(`New connection: #${byConnectionId.size}`, {contextId, connectionId, externalId});
+        log(`New connection: #${byConnectionId.size}`, {contextId, connectionId, externalId, remoteAddress});
 
         connection.addEventListener("error",
             ({data}) => log('Connection error:', {connectionId, data}),
@@ -89,8 +89,8 @@ export class ClientConnectionPool {
 
     private removeConnection(connection: ClientConnection): void {
         const {byConnectionId, byContextId, byContextAndExternalId, eventDispatcher, log} = this;
-        const {id: connectionId, externalId, context: {id: contextId, protocol}} = connection;
-        log(`Remove connection: #${byConnectionId.size}`, {contextId, connectionId, externalId});
+        const {id: connectionId, externalId, context: {id: contextId}, remoteAddress} = connection;
+        log(`Remove connection: #${byConnectionId.size}`, {contextId, connectionId, externalId, remoteAddress});
 
         connection.removeAllEventListeners(this);
 

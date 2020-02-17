@@ -27,7 +27,7 @@ export class WebsocketDataBuffer {
     /**
      * Frame data ready callback
      */
-    readonly onData = this.dataCallback.polymorph;
+    readonly onData = this.dataCallback.manage;
 
     /**
      * Write chunk of binary data to websocket frame data buffer

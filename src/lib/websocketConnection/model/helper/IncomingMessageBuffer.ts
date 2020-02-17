@@ -18,8 +18,8 @@ export class IncomingMessageBuffer {
     private readonly dataCallback = new CallbackCollection<DataFrame>();
     private readonly errorCallback = new CallbackCollection<{ message: string, code: CloseCode }>();
 
-    readonly onData = this.dataCallback.polymorph;
-    readonly onError = this.errorCallback.polymorph;
+    readonly onData = this.dataCallback.manage;
+    readonly onError = this.errorCallback.manage;
 
     constructor(readonly extensions: Array<WebsocketExtensionAgent>) {
         this.dataBuffer.onData(this.validateDataFrame);

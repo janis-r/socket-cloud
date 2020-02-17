@@ -14,7 +14,8 @@
     "esModuleInterop": true,
     "strictPropertyInitialization": false,
     "lib": [
-      "es2015"
+      "es2015",
+      "dom"
     ],
     "baseUrl": "./src",
     "outDir": "dist"

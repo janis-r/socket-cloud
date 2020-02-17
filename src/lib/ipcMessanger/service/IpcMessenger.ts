@@ -31,7 +31,7 @@ export class IpcMessenger {
 
     private readonly responseQueue = new Map<IpcMessage['id'], (data: any) => void>();
     private readonly onMessageCallback = new CallbackCollection<IpcMessage>();
-    readonly onMessage = this.onMessageCallback.polymorph;
+    readonly onMessage = this.onMessageCallback.manage;
 
     private constructor(private readonly transport: {
         onMessage: (listener: MessageListener) => void,

@@ -26,8 +26,8 @@ export class SocketClient {
 
     private readonly onMessageCallback = new CallbackCollection<PushToClientMessage>();
     private readonly onRestoreCallback = new CallbackCollection<RestoreChannelsResponseMessage>();
-    readonly onMessage = this.onMessageCallback.polymorph;
-    readonly onRestore = this.onRestoreCallback.polymorph;
+    readonly onMessage = this.onMessageCallback.manage;
+    readonly onRestore = this.onRestoreCallback.manage;
 
     private _connection: WebsocketConnection;
     private _authKey: string;

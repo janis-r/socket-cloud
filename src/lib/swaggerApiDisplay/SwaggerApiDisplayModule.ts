@@ -1,5 +1,5 @@
 import {Module, Optional} from "qft"
-import {HttpServerModule, HttpServerRouter, HttpServerService} from "../httpServer";
+import {HttpServerModule, HttpServerService} from "../httpServer";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 import {SwaggerApiConfig} from "./config/SwaggerApiConfig";
@@ -8,10 +8,9 @@ import {SwaggerApiConfig} from "./config/SwaggerApiConfig";
     requires: [
         HttpServerModule
     ]
-
 })
 export class SwaggerApiDisplayModule {
-    constructor(@Optional() config: SwaggerApiConfig, {expressApp}: HttpServerService, router: HttpServerRouter) {
+    constructor(@Optional() config: SwaggerApiConfig, {expressApp}: HttpServerService) {
         if (!config) {
             return;
         }
