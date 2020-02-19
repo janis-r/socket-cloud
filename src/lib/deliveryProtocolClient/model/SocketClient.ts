@@ -1,19 +1,15 @@
-import {
-    deserializeServerMessage,
-    globalMessageChannel,
-    MessageType,
-    PushToClientMessage,
-    pushToServerUtil,
-    RestoreChannelsResponseMessage,
-    restoreRequestUtil,
-    RestoreTarget,
-    subscribeMessageUtil,
-    unsubscribeMessageUtil
-} from "../../deliveryProtocol";
 import {CallbackCollection} from "../../utils/CallbackCollection";
 import {Adapter} from "../data/Adapter";
 
-const {RestoreResponse, RestoreRequest, Unsubscribe, PushToClient, Subscribe, PushToServer} = MessageType;
+import {RestoreChannelsResponseMessage} from "../../deliveryProtocol/data/serverMessage/RestoreChannelsResponseMessage";
+import {deserializeServerMessage} from "../../deliveryProtocol/data/serverMessage/ServerMessage";
+import {MessageType} from "../../deliveryProtocol/data/MessageType";
+import {subscribeMessageUtil} from "../../deliveryProtocol/data/clientMessage/SubscribeMessage";
+import {unsubscribeMessageUtil} from "../../deliveryProtocol/data/clientMessage/UnsubscribeMessage";
+import {restoreRequestUtil, RestoreTarget} from "../../deliveryProtocol/data/clientMessage/RestoreChannelsRequestMessage";
+import {globalMessageChannel} from "../../deliveryProtocol/data/globalMessageChannel";
+import {pushToServerUtil} from "../../deliveryProtocol/data/clientMessage/PushToServerMessage";
+import {PushToClientMessage} from "../../deliveryProtocol/data/serverMessage/PushToClientMessage";
 
 export class SocketClient {
 
@@ -33,10 +29,10 @@ export class SocketClient {
         const {onMessageCallback, onRestoreCallback} = this;
         const message = deserializeServerMessage(data);
         switch (message.type) {
-            case PushToClient:
+            case MessageType.PushToClient:
                 onMessageCallback.execute(message);
                 break;
-            case RestoreResponse:
+            case MessageType.RestoreResponse:
                 onRestoreCallback.execute(message);
                 break;
             default:
@@ -59,7 +55,7 @@ export class SocketClient {
      * @param channels Channel or list of channels to subscribe to
      */
     subscribe(...channels: string[]): void {
-        this.connection.send(subscribeMessageUtil.serialize({type: Subscribe, channels}));
+        this.connection.send(subscribeMessageUtil.serialize({type: MessageType.Subscribe, channels}));
     }
 
     /**
@@ -67,7 +63,7 @@ export class SocketClient {
      * @param channels Channel or list of channels to unsubscribe from
      */
     unsubscribe(...channels: string[]): void {
-        this.connection.send(unsubscribeMessageUtil.serialize({type: Unsubscribe, channels}));
+        this.connection.send(unsubscribeMessageUtil.serialize({type: MessageType.Unsubscribe, channels}));
     }
 
     /**
@@ -76,7 +72,7 @@ export class SocketClient {
      * cache filter definitions.
      */
     restore(...channels: RestoreTarget[]): void {
-        this.connection.send(restoreRequestUtil.serialize({type: RestoreRequest, channels}));
+        this.connection.send(restoreRequestUtil.serialize({type: MessageType.RestoreRequest, channels}));
     }
 
     /**
@@ -94,7 +90,7 @@ export class SocketClient {
      */
     sendChannelMessage(data: string, ...channels: string[]): void {
         this.connection.send(pushToServerUtil.serialize({
-            type: PushToServer,
+            type: MessageType.PushToServer,
             channels,
             payload: data
         }));

@@ -2,7 +2,7 @@ import * as http from "http";
 import * as https from "https";
 import express, {Express, NextFunction, Request, Response} from "express";
 import fs from "fs";
-import {json} from "body-parser";
+import bodyParser from "body-parser";
 import compression from "compression";
 import {Socket} from "net";
 import {EventDispatcher, Injectable} from "qft";
@@ -27,7 +27,7 @@ export class HttpServerService implements HttpServerRouter {
         const {config: {port, httpsCredentials}} = this;
 
         this.expressApp = express();
-        this.expressApp.use(json());
+        this.expressApp.use(bodyParser.json());
         this.expressApp.use(compression());
 
         if (!httpsCredentials) {

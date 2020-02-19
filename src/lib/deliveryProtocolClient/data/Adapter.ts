@@ -1,4 +1,4 @@
-import {ConnectionState} from "../../clientConnectionPool";
+import {ConnectionState} from "../../clientConnectionPool/data/ConnectionState";
 import {Callback} from "../../utils/CallbackCollection";
 import {CloseCode} from "../../websocketConnection/data/CloseCode";
 

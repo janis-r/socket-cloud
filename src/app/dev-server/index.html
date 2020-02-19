@@ -11,8 +11,16 @@
     <textarea id="output" style="width: 100%; height: 300px;"></textarea>
 </h1>
 
+<script src="script/webClient.js"></script>
 <script type="application/javascript">
-    const output = document.getElementById("output");
+    const client = WebClient.createClient('ws://localhost:8001/tests-runner/?foo=1&bar=2&lee=3');
+    client.onMessage(message => console.log('onMessage', message));
+    client.onRestore(message => console.log('onRestore', message));
+    console.info(client);
+
+    setTimeout(() => client.sendGlobalMessage("Le global message!"), 1000)
+
+    /*const output = document.getElementById("output");
 
     const write = (message) => output.innerHTML += Array.isArray(message) ? "  " + message.join("\n  ") : message + "\n";
 
@@ -43,7 +51,7 @@
         console.log({onclose: event})
     };
 
-    write("extensions: " + JSON.stringify(socket.extensions));
+    write("extensions: " + JSON.stringify(socket.extensions));*/
 
 </script>
 </body>

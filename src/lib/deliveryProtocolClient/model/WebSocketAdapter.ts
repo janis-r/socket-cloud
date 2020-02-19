@@ -1,5 +1,5 @@
 import {CloseCode} from "../../websocketConnection/data/CloseCode";
-import {ConnectionState} from "../../clientConnectionPool";
+import {ConnectionState} from "../../clientConnectionPool/data/ConnectionState";
 import {CallbackCollection} from "../../utils/CallbackCollection";
 import {Adapter} from "../data/Adapter";
 
