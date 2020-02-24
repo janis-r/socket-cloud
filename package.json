@@ -8,7 +8,8 @@
     "test": "jest --colors --runInBand",
     "dev": "ts-node src/app/dev-server/single-core.ts",
     "echo-server": "ts-node src/app/echo-server/single-core.ts",
-    "build": "rimraf dist && tsc && copyfiles api/*.yaml dist"
+    "build": "rimraf dist && tsc && copyfiles api/*.yaml dist",
+    "build-web-client": "rimraf bundle && rollup -c rollup.config.ts"
   },
   "author": "",
   "license": "none",

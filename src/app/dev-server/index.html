@@ -17,42 +17,7 @@
     client.onMessage(message => console.log('onMessage', message));
     client.onRestore(message => console.log('onRestore', message));
     console.info(client);
-
     setTimeout(() => client.sendGlobalMessage("Le global message!"), 1000)
-
-    /*const output = document.getElementById("output");
-
-    const write = (message) => output.innerHTML += Array.isArray(message) ? "  " + message.join("\n  ") : message + "\n";
-
-    // const socket = new WebSocket('wss://echo.websocket.org');
-    const socket = new WebSocket('ws://localhost:8001?foo=1&bar=2&lee=3');
-    socket.onopen = event => {
-        write("onopen", JSON.stringify(event, null, ' '));
-        console.log({onopen: event});
-        const message = new Array(1).fill(null).map(x => "Hello server! This is client writing. How do you do?").join('\n');
-        write('len:' + message.length);
-        write('msg:' + message);
-        socket.send(message);
-    };
-    socket.onmessage = event => {
-        const {data} = event;
-
-        write("onmessage", event);
-        console.log({onmessage: data});
-        // socket.close();
-    };
-    socket.onerror = event => {
-        write("onerror", JSON.stringify(event, null, ' '));
-        console.log({onerror: event})
-    };
-
-    socket.onclose = event => {
-        write("onclose");
-        console.log({onclose: event})
-    };
-
-    write("extensions: " + JSON.stringify(socket.extensions));*/
-
 </script>
 </body>
 </html>

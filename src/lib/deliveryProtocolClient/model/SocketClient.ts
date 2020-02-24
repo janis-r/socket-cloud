@@ -1,15 +1,15 @@
 import {CallbackCollection} from "../../utils/CallbackCollection";
 import {Adapter} from "../data/Adapter";
 
-import {RestoreChannelsResponseMessage} from "../../deliveryProtocol/data/serverMessage/RestoreChannelsResponseMessage";
-import {deserializeServerMessage} from "../../deliveryProtocol/data/serverMessage/ServerMessage";
-import {MessageType} from "../../deliveryProtocol/data/MessageType";
-import {subscribeMessageUtil} from "../../deliveryProtocol/data/clientMessage/SubscribeMessage";
-import {unsubscribeMessageUtil} from "../../deliveryProtocol/data/clientMessage/UnsubscribeMessage";
-import {restoreRequestUtil, RestoreTarget} from "../../deliveryProtocol/data/clientMessage/RestoreChannelsRequestMessage";
-import {globalMessageChannel} from "../../deliveryProtocol/data/globalMessageChannel";
-import {pushToServerUtil} from "../../deliveryProtocol/data/clientMessage/PushToServerMessage";
-import {PushToClientMessage} from "../../deliveryProtocol/data/serverMessage/PushToClientMessage";
+import {RestoreChannelsResponseMessage} from "@deliveryProtocol/data/serverMessage/RestoreChannelsResponseMessage";
+import {deserializeServerMessage} from "@deliveryProtocol/data/serverMessage/ServerMessage";
+import {MessageType} from "@deliveryProtocol/data/MessageType";
+import {subscribeMessageUtil} from "@deliveryProtocol/data/clientMessage/SubscribeMessage";
+import {unsubscribeMessageUtil} from "@deliveryProtocol/data/clientMessage/UnsubscribeMessage";
+import {restoreRequestUtil, RestoreTarget} from "@deliveryProtocol/data/clientMessage/RestoreChannelsRequestMessage";
+import {globalMessageChannel} from "@deliveryProtocol/data/globalMessageChannel";
+import {pushToServerUtil} from "@deliveryProtocol/data/clientMessage/PushToServerMessage";
+import {PushToClientMessage} from "@deliveryProtocol/data/serverMessage/PushToClientMessage";
 
 export class SocketClient {
 
