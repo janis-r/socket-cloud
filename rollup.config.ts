@@ -6,8 +6,9 @@ import sourceMaps from 'rollup-plugin-sourcemaps';
 import {terser} from 'rollup-plugin-terser';
 import filesize from 'rollup-plugin-filesize';
 import progress from 'rollup-plugin-progress';
-// import babel from "rollup-plugin-babel";
+import replace from '@rollup/plugin-replace';
 
+const {version: __buildVersion__} = require("./package.json");
 export default {
     input: './src/app/web-client/webClient.ts',
     output: [
@@ -34,15 +35,13 @@ export default {
             mainFields: ['jsnext', 'jsnext:main', 'module'],
             preferBuiltins: true
         }),
-        // tsp({}),
         typescript2({
+            // verbosity: 3
             tsconfig: "./tsconfig.rollup.json",
             include: ["*.ts+(|x)", "**/*.ts+(|x)", "*.js"],
-            // verbosity: 3
         }),
-
-        // babel(),
         filesize(),
         progress(),
+        replace({__buildVersion__}),
     ]
 };

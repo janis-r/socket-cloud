@@ -1,6 +1,5 @@
 import {CallbackCollection} from "../../utils/CallbackCollection";
 import {Adapter} from "../data/Adapter";
-
 import {RestoreChannelsResponseMessage} from "@deliveryProtocol/data/serverMessage/RestoreChannelsResponseMessage";
 import {deserializeServerMessage} from "@deliveryProtocol/data/serverMessage/ServerMessage";
 import {MessageType} from "@deliveryProtocol/data/MessageType";
@@ -10,6 +9,7 @@ import {restoreRequestUtil, RestoreTarget} from "@deliveryProtocol/data/clientMe
 import {globalMessageChannel} from "@deliveryProtocol/data/globalMessageChannel";
 import {pushToServerUtil} from "@deliveryProtocol/data/clientMessage/PushToServerMessage";
 import {PushToClientMessage} from "@deliveryProtocol/data/serverMessage/PushToClientMessage";
+
 
 export class SocketClient {
 
@@ -104,5 +104,11 @@ export class SocketClient {
     }
 }
 
+["connection", "onMessageCallback", "onRestoreCallback", "errorHandler", "messageHandler"].forEach(prop =>
+    Object.defineProperty(SocketClient, prop, {
+        enumerable: false,
+        writable: false
+    })
+);
 
 
