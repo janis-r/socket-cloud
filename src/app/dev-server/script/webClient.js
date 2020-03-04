@@ -189,8 +189,7 @@ var webClient = (function (exports) {
 
     function findObjectKeyForValue(object, value) {
         const keys = Object.keys(object);
-        while (keys && keys.length > 0) {
-            const key = keys.shift();
+        for (const key of keys) {
             if (object.hasOwnProperty(key) && object[key] === value) {
                 return key;
             }
@@ -566,9 +565,6 @@ var webClient = (function (exports) {
     var SocketClient = (function () {
         function SocketClient(connection) {
             var _this = this;
-            /**
-             * @private
-             */
             this.connection = connection;
             this.onMessageCallback = new CallbackCollection();
             this.onRestoreCallback = new CallbackCollection();
