@@ -1,4 +1,4 @@
-import {Event} from "qft";
+import {Event} from "quiver-framework";
 import {IpcMessage} from "../data/IpcMessage";
 
 export class IpcMessageEvent extends Event {

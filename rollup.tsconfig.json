@@ -5,6 +5,7 @@
     "module": "es2015",
     "removeComments": true,
     "sourceMap": true,
+    "declaration": false,
     "allowSyntheticDefaultImports": true
   },
   "files": [

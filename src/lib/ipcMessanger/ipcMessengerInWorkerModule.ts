@@ -1,4 +1,4 @@
-import {EventDispatcher, ModuleConfig} from "qft";
+import {EventDispatcher, ModuleConfig} from "quiver-framework";
 import {IpcMessenger} from "./service/IpcMessenger";
 import {IpcMessageEvent} from "./event/IpcMessageEvent";
 import {LoggerModule} from "../logger";

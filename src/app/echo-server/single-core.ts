@@ -1,4 +1,4 @@
-import {AppContext} from "qft";
+import {AppContext} from "quiver-framework";
 import {Logger} from "../../lib/logger";
 import {EchoServerModule} from "./EchoServerModule";
 

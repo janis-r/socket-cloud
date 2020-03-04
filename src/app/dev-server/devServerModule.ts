@@ -1,6 +1,6 @@
 import * as cluster from "cluster";
 import * as express from "express";
-import {InjectionConfig, ModuleConfig} from "qft";
+import {InjectionConfig, ModuleConfig} from "quiver-framework";
 import {Logger} from "../../lib/logger";
 import {SwaggerApiConfig, SwaggerApiDisplayModule} from "../../lib/swaggerApiDisplay";
 import {PermessageDeflateConfig, PermessageDeflateExtensionModule} from "../../lib/permessageDeflateExtension";

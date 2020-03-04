@@ -1,4 +1,4 @@
-import {InjectionConfig, Injector, ModuleConfig} from "qft";
+import {InjectionConfig, Injector, ModuleConfig} from "quiver-framework";
 import {LoggerModule} from "../logger";
 import {PgConfig} from "./data/PgConfig";
 import {PgConnection} from "./service/PgConnection";

@@ -1,4 +1,4 @@
-import {Event, ModuleConfig} from "qft";
+import {Event, ModuleConfig} from "quiver-framework";
 import {
     ClientConnection,
     ClientConnectionPoolModule,

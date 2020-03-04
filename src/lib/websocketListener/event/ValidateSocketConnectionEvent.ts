@@ -1,4 +1,4 @@
-import {AsyncValidationEvent} from "qft";
+import {AsyncValidationEvent} from "quiver-framework";
 import {ConfigurationContext} from "../../configurationContext";
 import {SocketDescriptor} from "../data/SocketDescriptor";
 import {OperatorData} from "../data/OperatorData";

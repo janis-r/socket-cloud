@@ -1,4 +1,4 @@
-import {Command, Inject} from "qft";
+import {Command, Inject} from "quiver-framework";
 import {Logger} from "../../logger";
 import fetch from "node-fetch";
 import {HttpStatusCode} from "../../httpServer/data/HttpStatusCode";

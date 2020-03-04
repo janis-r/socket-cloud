@@ -1,4 +1,4 @@
-import {InjectionConfig, Module} from "qft";
+import {InjectionConfig, Module} from "quiver-framework";
 import {Logger} from "./service/Logger";
 import {LoggerImpl} from "./impl/LoggerImpl";
 import {LoggerConfig} from "./data/LoggerConfig";

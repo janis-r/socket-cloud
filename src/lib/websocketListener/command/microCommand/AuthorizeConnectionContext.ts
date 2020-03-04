@@ -1,4 +1,4 @@
-import {Command, EventDispatcher, Inject} from "qft";
+import {Command, EventDispatcher, Inject} from "quiver-framework";
 import {SocketDescriptor} from "../../data/SocketDescriptor";
 import {ValidateSocketConnectionEvent} from "../..";
 import {WebsocketConnectionValidationRequest} from "../../event/WebsocketConnectionValidationRequest";

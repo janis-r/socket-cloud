@@ -1,4 +1,4 @@
-import {EventListener, EventMapping} from "qft";
+import {EventListener, EventMapping} from "quiver-framework";
 import {ConnectionState} from "../data/ConnectionState";
 import {ConfigurationContext} from "../../configurationContext";
 import {ErrorEvent, MessageEvent, StateChangeEvent} from "../connectionEvent";

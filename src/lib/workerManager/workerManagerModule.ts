@@ -1,4 +1,4 @@
-import {ModuleConfig} from "qft";
+import {ModuleConfig} from "quiver-framework";
 import {WorkerManager} from "./service/WorkerManager";
 
 export const workerManagerModule: ModuleConfig = {

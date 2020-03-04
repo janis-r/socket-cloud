@@ -1,4 +1,4 @@
-import {Inject} from "qft";
+import {Inject} from "quiver-framework";
 import {valueBelongsToEnum} from "ugd10a";
 import {PermessageDeflateConfig} from "../config/PermessageDeflateConfig";
 import {WebsocketExtension, WebsocketExtensionAgent, WebsocketExtensionConfig} from "../../websocketExtension";

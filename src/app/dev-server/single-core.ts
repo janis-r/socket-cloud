@@ -1,4 +1,4 @@
-import {AppContext} from "qft";
+import {AppContext} from "quiver-framework";
 import {devServerModule} from "./devServerModule";
 
 const {injector} = new AppContext().configure(devServerModule).initialize();

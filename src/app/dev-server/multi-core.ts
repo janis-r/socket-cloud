@@ -1,5 +1,5 @@
 import cluster from "cluster";
-import {AppContext} from "qft";
+import {AppContext} from "quiver-framework";
 import {devServerModule} from "./devServerModule";
 import {deliveryProtocolModuleInMaster, deliveryProtocolModuleInWorker} from "../../lib/deliveryProtocol";
 

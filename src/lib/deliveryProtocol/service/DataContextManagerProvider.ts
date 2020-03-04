@@ -1,4 +1,4 @@
-import {Inject, Injector} from "qft";
+import {Inject, Injector} from "quiver-framework";
 import {ConfigurationContext, ConfigurationContextProvider, ContextId} from "../../configurationContext";
 import {DataContextManager} from "./DataContextManager";
 

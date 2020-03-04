@@ -1,4 +1,4 @@
-import {Inject} from "qft";
+import {Inject} from "quiver-framework";
 import {ConfigurationContext, ConfigurationContextProvider, ContextId} from "../../../configurationContext";
 import {ChannelId} from "../../data/ChannelId";
 import {CachedMessage} from "../../data/cache/CachedMessage";

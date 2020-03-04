@@ -1,4 +1,4 @@
-import {ModuleConfig} from "qft";
+import {ModuleConfig} from "quiver-framework";
 import {LoggerModule} from "../logger";
 import {ConfigurationContextProvider} from "./service/ConfigurationContextProvider";
 import {ValidateSocketConnectionEvent} from "../websocketListener";

@@ -1,4 +1,4 @@
-import {Event} from "qft";
+import {Event} from "quiver-framework";
 import {ClientConnection} from "../model/ClientConnection";
 
 export class ErrorEvent extends Event<{ message: string, code?: any }> {

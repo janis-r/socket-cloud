@@ -1,4 +1,4 @@
-import {Command, EventDispatcher, Inject} from "qft";
+import {Command, EventDispatcher, Inject} from "quiver-framework";
 import {HttpConnectionUpgradeEvent} from "../../httpServer";
 import {WebsocketConnectionValidationRequest} from "../event/WebsocketConnectionValidationRequest";
 import {Logger} from "../../logger";

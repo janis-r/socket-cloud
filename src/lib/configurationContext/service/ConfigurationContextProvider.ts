@@ -1,4 +1,4 @@
-import {Inject} from "qft";
+import {Inject} from "quiver-framework";
 import {Logger} from "../../logger";
 import {ConfigurationContext} from "../data/ConfigurationContext";
 import {SocketDescriptor} from "../../websocketListener/data/SocketDescriptor";

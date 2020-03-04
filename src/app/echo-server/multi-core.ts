@@ -1,4 +1,4 @@
-import {AppContext, Injectable, InjectionConfig} from "qft";
+import {AppContext, Injectable, InjectionConfig} from "quiver-framework";
 import {Logger, LoggerModule} from "../../lib/logger";
 import {EchoServerModule} from "./EchoServerModule";
 import cluster from "cluster";

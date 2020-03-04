@@ -1,4 +1,4 @@
-import {Event} from "qft";
+import {Event} from "quiver-framework";
 
 export class WorkerMessageEvent extends Event<{ message: any, workerId: number }> {
 

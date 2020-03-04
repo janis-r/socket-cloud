@@ -22,5 +22,8 @@
       "@deliveryProtocol/*": ["lib/deliveryProtocol/*"],
       "@deliveryProtocolClient/*": ["lib/deliveryProtocolClient/*"]
     }
-  }
+  },
+  "include": [
+    "./src/"
+  ]
 }

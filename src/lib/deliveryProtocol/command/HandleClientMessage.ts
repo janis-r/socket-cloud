@@ -1,4 +1,4 @@
-import {Command, EventDispatcher, Inject} from "qft";
+import {Command, EventDispatcher, Inject} from "quiver-framework";
 import {ClientMessageEvent, CloseReason} from "../../clientConnectionPool";
 import {deserializeClientMessage, MessageType} from "../data";
 import {IncomingClientMessageEvent} from "../event/IncomingClientMessageEvent";

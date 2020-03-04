@@ -1,4 +1,4 @@
-import {ModuleConfig} from "qft";
+import {ModuleConfig} from "quiver-framework";
 import {HttpServerConfig} from "./config/HttpServerConfig";
 import {HttpServerRouter} from "./service/HttpServerRouter";
 import {HttpServerService} from "./service/HttpServerService";

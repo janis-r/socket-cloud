@@ -1,4 +1,4 @@
-import {Inject, MacroCommand, referenceToString, SubCommand} from "qft";
+import {Inject, MacroCommand, referenceToString, SubCommand} from "quiver-framework";
 import {WebsocketConnectionValidationRequest} from "../event/WebsocketConnectionValidationRequest";
 import {Logger} from "../../logger";
 import {AuthorizeConnectionContext} from "./microCommand/AuthorizeConnectionContext";

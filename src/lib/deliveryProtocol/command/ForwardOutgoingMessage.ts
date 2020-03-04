@@ -1,4 +1,4 @@
-import {Command, Inject} from "qft";
+import {Command, Inject} from "quiver-framework";
 import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
 import {DataSyncMessage, DataSyncMessageType} from "../data/ipc/DataSyncMessage";
 import {pocmddpProtocol} from "..";
@@ -17,7 +17,6 @@ export class ForwardOutgoingMessage implements Command {
             event: {addRecipientProvider},
             messenger: {sendAndReceive}
         } = this;
-
 
         addRecipientProvider(new Promise<number>(async resolve => {
             const {data} = await sendAndReceive<DataSyncMessage<number>>({

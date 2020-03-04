@@ -1,6 +1,6 @@
 import cluster, {Worker} from "cluster";
 import {cpus} from 'os';
-import {EventDispatcher, Inject} from "qft";
+import {EventDispatcher, Inject} from "quiver-framework";
 import {WorkerMessageEvent} from "../event/WorkerMessageEvent";
 
 export class WorkerManager {

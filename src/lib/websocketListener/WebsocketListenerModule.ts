@@ -1,4 +1,4 @@
-import {ModuleConfig} from "qft";
+import {ModuleConfig} from "quiver-framework";
 import {WebsocketConnectionValidationRequest} from "./event/WebsocketConnectionValidationRequest";
 import {ValidateNewWebsocket} from "./command/ValidateNewWebsocket";
 import {LoggerModule} from "../logger";

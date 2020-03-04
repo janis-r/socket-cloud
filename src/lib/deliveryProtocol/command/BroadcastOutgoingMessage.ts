@@ -1,4 +1,4 @@
-import {Command, Inject} from "qft";
+import {Command, Inject} from "quiver-framework";
 import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
 import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
 import {ClientConnection, ClientConnectionPool} from "../../clientConnectionPool";

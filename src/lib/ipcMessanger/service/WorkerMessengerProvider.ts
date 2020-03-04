@@ -1,6 +1,6 @@
 import {IpcMessenger} from "./IpcMessenger";
 import {WorkerManager} from "../../workerManager/service/WorkerManager";
-import {Inject} from "qft";
+import {Inject} from "quiver-framework";
 import {Logger} from "../../logger";
 
 export class WorkerMessengerProvider {

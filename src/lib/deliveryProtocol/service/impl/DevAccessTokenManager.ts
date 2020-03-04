@@ -1,4 +1,4 @@
-import {Inject} from "qft";
+import {Inject} from "quiver-framework";
 import {AccessTokenManager} from "../AccessTokenManager";
 import {ConfigurationContextProvider} from "../../../configurationContext";
 import {TokenInfo} from "../../data/TokenInfo";

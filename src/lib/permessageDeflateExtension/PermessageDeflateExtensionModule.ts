@@ -1,4 +1,4 @@
-import {Module} from "qft";
+import {Module} from "quiver-framework";
 import {WebsocketExtensionModule, WebsocketExtensionRegistry} from "../websocketExtension";
 import {PermessageDeflateExtension} from "./service/PermessageDeflateExtension";
 

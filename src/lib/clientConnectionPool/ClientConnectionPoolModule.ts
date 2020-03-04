@@ -1,4 +1,4 @@
-import {ModuleConfig} from "qft";
+import {ModuleConfig} from "quiver-framework";
 import {ClientConnectionPool} from "./model/ClientConnectionPool";
 
 export const ClientConnectionPoolModule: ModuleConfig = {

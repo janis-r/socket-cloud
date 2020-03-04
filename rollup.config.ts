@@ -32,12 +32,11 @@ export default {
         json(),
         commonjs(),
         resolve({
-            mainFields: ['jsnext', 'jsnext:main', 'module'],
-            preferBuiltins: true
+            mainFields: ['jsnext', 'jsnext:main', 'module']
         }),
         typescript2({
             // verbosity: 3
-            tsconfig: "./tsconfig.rollup.json",
+            tsconfig: "./rollup.tsconfig.json",
             include: ["*.ts+(|x)", "**/*.ts+(|x)", "*.js"],
         }),
         filesize(),

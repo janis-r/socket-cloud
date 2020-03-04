@@ -1,4 +1,4 @@
-import {Command, Inject} from "qft";
+import {Command, Inject} from "quiver-framework";
 import {IpcMessage, IpcMessageEvent, WorkerMessengerProvider} from "../../ipcMessanger";
 import {DataSyncMessage, DataSyncMessageType, dataSyncMessageUtil, pocmddpProtocol} from "../index";
 import {WorkerManager} from "../../workerManager";

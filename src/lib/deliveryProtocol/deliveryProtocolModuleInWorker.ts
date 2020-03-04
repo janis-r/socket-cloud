@@ -1,4 +1,4 @@
-import {ModuleConfig} from "qft";
+import {ModuleConfig} from "quiver-framework";
 import {OutgoingMessageEvent} from "./event/OutgoingMessageEvent";
 import {deliveryProtocolModule} from "./deliveryProtocolModule";
 import {IpcMessageEvent, ipcMessengerInWorkerModule} from "../ipcMessanger";

@@ -1,4 +1,4 @@
-import {Command, EventDispatcher, Inject} from "qft";
+import {Command, EventDispatcher, Inject} from "quiver-framework";
 import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
 import {IpcMessage, IpcMessageEvent, ipcMessageUtil, IpcMessenger} from "../../ipcMessanger";
 import {DataSyncMessage, DataSyncMessageType, dataSyncMessageUtil} from "../data/ipc/DataSyncMessage";

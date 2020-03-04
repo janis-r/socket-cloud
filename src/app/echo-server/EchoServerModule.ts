@@ -1,4 +1,4 @@
-import {InjectionConfig, Injector, Module} from "qft";
+import {InjectionConfig, Injector, Module} from "quiver-framework";
 import {WebsocketListenerModule} from "../../lib/websocketListener";
 import {ConfigurationContextProvider} from "../../lib/configurationContext";
 import {SocketDescriptor} from "../../lib/websocketListener/data/SocketDescriptor";

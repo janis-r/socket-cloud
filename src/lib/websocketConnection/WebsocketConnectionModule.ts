@@ -1,4 +1,4 @@
-import {ModuleConfig} from "qft";
+import {ModuleConfig} from "quiver-framework";
 import {LoggerModule} from "../logger";
 
 export const WebsocketConnectionModule: ModuleConfig = {

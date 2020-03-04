@@ -1,4 +1,4 @@
-import {Injectable} from "qft";
+import {Injectable} from "quiver-framework";
 import {currentDateToObject} from "ugd10a";
 import * as fs from "fs";
 import chalk, {Chalk} from "chalk";

@@ -1,4 +1,4 @@
-import {Command, EventDispatcher, Inject} from "qft";
+import {Command, EventDispatcher, Inject} from "quiver-framework";
 import {WorkerMessageEvent} from "../../workerManager";
 import {IpcMessageEvent, ipcMessageUtil} from "..";
 

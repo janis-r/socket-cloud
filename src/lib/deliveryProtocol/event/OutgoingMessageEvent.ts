@@ -1,4 +1,4 @@
-import {Event} from "qft";
+import {Event} from "quiver-framework";
 import {ContextId} from "../../configurationContext";
 import {ExternalId} from "../../clientConnectionPool";
 import {PushToClientMessage} from "../data/serverMessage/PushToClientMessage";

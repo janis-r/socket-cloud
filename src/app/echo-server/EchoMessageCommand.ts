@@ -1,4 +1,4 @@
-import {Command, Inject} from "qft";
+import {Command, Inject} from "quiver-framework";
 import {ClientMessageEvent} from "../../lib/clientConnectionPool";
 
 export class EchoMessageCommand implements Command {

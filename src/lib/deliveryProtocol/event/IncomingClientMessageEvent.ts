@@ -1,4 +1,4 @@
-import {Event} from "qft";
+import {Event} from "quiver-framework";
 import {ClientMessage} from "../data";
 import {ClientConnection} from "../../clientConnectionPool";
 

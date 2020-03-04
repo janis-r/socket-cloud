@@ -1,4 +1,4 @@
-import {Module, Optional} from "qft"
+import {Module, Optional} from "quiver-framework"
 import {HttpServerModule, HttpServerService} from "../httpServer";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";

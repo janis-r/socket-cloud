@@ -1,4 +1,4 @@
-import {ModuleConfig} from "qft";
+import {ModuleConfig} from "quiver-framework";
 import {workerManagerModule, WorkerMessageEvent} from "../workerManager";
 import {WorkerMessengerProvider} from "./service/WorkerMessengerProvider";
 import {CreateIpcMessageEvent} from "./command/CreateIpcMessageEvent";

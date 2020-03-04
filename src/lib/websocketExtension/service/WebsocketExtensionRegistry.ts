@@ -1,4 +1,4 @@
-import {Inject} from "qft";
+import {Inject} from "quiver-framework";
 import {Logger} from "../../logger";
 import {WebsocketExtension} from "./WebsocketExtension";
 import {parseWebsocketExtensionOffers} from "../util/parse-websocket-extension-offers";

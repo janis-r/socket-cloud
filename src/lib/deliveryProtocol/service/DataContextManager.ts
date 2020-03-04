@@ -1,4 +1,4 @@
-import {Inject} from "qft";
+import {Inject} from "quiver-framework";
 import {CachingPolicy, ConfigurationContext} from "../../configurationContext";
 import {ClientConnection} from "../../clientConnectionPool";
 import {ChannelId} from "../data/ChannelId";

@@ -1,4 +1,4 @@
-import {Event, EventDispatcher, EventListener, EventMapping} from "qft";
+import {Event, EventDispatcher, EventListener, EventMapping} from "quiver-framework";
 import {ClientConnection} from "../../clientConnectionPool";
 import {ErrorEvent, MessageEvent, StateChangeEvent} from "../../clientConnectionPool/connectionEvent";
 import {DataFrame} from "../../websocketConnection";

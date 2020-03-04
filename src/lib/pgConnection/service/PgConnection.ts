@@ -1,4 +1,4 @@
-import {Inject} from "qft";
+import {Inject} from "quiver-framework";
 import {Timer} from "ugd10a";
 import {Logger} from "../../logger";
 import {Pool, PoolClient, PoolConfig, QueryConfig} from "pg";

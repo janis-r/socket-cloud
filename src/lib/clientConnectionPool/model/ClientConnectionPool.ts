@@ -1,6 +1,6 @@
 import {ClientConnection} from "./ClientConnection";
 import {ConnectionRemovedEvent, ConnectionState, ExternalId, NewConnectionEvent} from "..";
-import {EventDispatcher, Injectable} from "qft";
+import {EventDispatcher, Injectable} from "quiver-framework";
 import {ClientMessageEvent} from "../event/ClientMessageEvent";
 import {ConnectionId} from "../data/ConnectionId";
 import {ContextId} from "../../configurationContext";
