@@ -5,7 +5,7 @@ import {AuthorizeConnectionContext} from "./microCommand/AuthorizeConnectionCont
 import {ValidateConnectionHeaders} from "./microCommand/ValidateConnectionHeaders";
 import {WebsocketClientConnection} from "../model/WebsocketClientConnection";
 import {PrepareWebsocketExtensions} from "./microCommand/PrepareWebsocketExtensions";
-import {isPromise} from "../../utils/is-promise";
+import {isPromise} from "../../utils/validator";
 import {RespondToHandshake} from "./microCommand/RespondToHandshake";
 import {ClientConnectionPool} from "../../clientConnectionPool";
 

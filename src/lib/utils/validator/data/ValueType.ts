@@ -1,4 +1,4 @@
-export type SupportedType =
+export type ValueType =
     "undefined"
     | "object"
     | "boolean"

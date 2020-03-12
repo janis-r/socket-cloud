@@ -96,7 +96,7 @@ export class DataPushApiListener {
         }
         // Check data format
         if (!channelMessageUtil.validate(body)) {
-            sendJson(channelMessageUtil.lastValidationError(), {status: HttpStatusCode.BadRequest});
+            sendJson(channelMessageUtil.lastValidationError, {status: HttpStatusCode.BadRequest});
             return;
         }
 

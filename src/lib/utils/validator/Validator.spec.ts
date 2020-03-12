@@ -1,8 +1,8 @@
-import {SupportedType} from "./data/SupportedType";
+import {ValueType} from "./data/ValueType";
 import {Validator} from "./Validator";
 
 
-const builtInTypeMap = new Map<SupportedType, any>([
+const builtInTypeMap = new Map<ValueType, any>([
     ["undefined", undefined],
     ["object", {}],
     ["boolean", true],
@@ -18,7 +18,7 @@ const builtInTypeMap = new Map<SupportedType, any>([
  * @param property Value
  * @param validTypes list of types that should be matched and all other should not
  */
-const validateProperty = (property: any, ...validTypes: SupportedType[]) => {
+const validateProperty = (property: any, ...validTypes: ValueType[]) => {
     for (const type of builtInTypeMap.keys()) {
         const result = new Validator([{field: "property", type: type}]).validate({property});
         if (validTypes.includes(type) && result === true) {
@@ -74,5 +74,10 @@ describe("Object validation", () => {
         const validator = new Validator([{field: "property", type: "array", itemValidator: v => v > 0}]);
         expect(validator.validate({property: [1, 2, 3, 4, 5]})).toBe(true);
         expect(validator.validate({property: [1, 2, 0, 4, 5]})).toBe(false);
+    });
+    it("Can handle optional fields", () => {
+        const validator = new Validator([{field: "property", optional: true}]);
+        expect(validator.validate({property: 1})).toBe(true);
+        expect(validator.validate({})).toBe(true);
     });
 });

@@ -1,4 +1,4 @@
-import {FieldConfiguration, validateObject} from "../../utils/validator";
+import {Validator} from "../../utils/validator";
 
 /**
  * Connection data provided by Operator upon connection authorization
@@ -6,9 +6,7 @@ import {FieldConfiguration, validateObject} from "../../utils/validator";
 export type OperatorData = {
     externalId: string
 };
-export const isOperatorData = (value: unknown): value is OperatorData => validateObject(
-    value,
-    [
-        {field: "externalId", type: "string", notEmpty: true}
-    ] as FieldConfiguration<OperatorData>[]
-) === true;
+
+const {validate} = new Validator([{field: "externalId", type: "string", notEmpty: true}]);
+
+export const isOperatorData = (value: unknown): value is OperatorData => validate(value);

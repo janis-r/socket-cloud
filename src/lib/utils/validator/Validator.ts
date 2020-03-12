@@ -1,25 +1,26 @@
 import {FieldConfiguration} from "./data/FieldConfiguration";
-import {SupportedType} from "./data/SupportedType";
-import {isArrayOfNumbers, isArrayOfStrings} from "../is-array-of";
+import {ValueType} from "./data/ValueType";
+import {isArrayOfNumbers, isArrayOfStrings} from "./is-array-of";
 import {uniqueValues} from "ugd10a";
 
 export class Validator<T extends Record<string | number, any>> {
-    readonly arrayTypes = new Set<SupportedType>(["array", "string[]", "number[]"]);
-    private _lastError: { error: string, field?: string | number | symbol };
+
+    readonly arrayTypes = new Set<ValueType>(["array", "string[]", "number[]"]);
+    private _lastError: { error: string, field?: string | number };
 
     constructor(readonly configuration: ReadonlyArray<FieldConfiguration<T>>,
                 readonly allowExtraFields = false) {
     }
 
-    get lastError(): { error: string; field?: string | number | symbol } {
+    get lastError() {
         return this._lastError;
     }
 
-    validate(value: unknown): value is T {
+    readonly validate = (value: unknown): value is T => {
         const {validateType, validateFieldList, validateValues} = this;
         this._lastError = undefined;
         return ![validateType, validateFieldList, validateValues].some(func => !func(value));
-    }
+    };
 
     /**
      * Only objects are accepted in this validation class - check it here
@@ -94,6 +95,10 @@ export class Validator<T extends Record<string | number, any>> {
         const {arrayTypes} = this;
         const {type, field, notEmpty, validator, itemValidator, exactValue} = config;
 
+        if (typeof field !== "number" && typeof field !== "string") {
+            throw new Error(`Field type (${field}) mystery encountered - call the detective!`)
+        }
+
         if (isArrayOfStrings(type)) {
             const result = uniqueValues(type).some(type => this.validateEntryValue(value, {...config, type}));
             if (result || this._lastError) {
@@ -136,7 +141,6 @@ export class Validator<T extends Record<string | number, any>> {
         }
 
         if (notEmpty && value === undefined || (typeof value === "string" && !value.length)) {
-            // TODO: Some other scalar types might use special treatment in here as well
             this._lastError = {field, error: `String length mismatch - is empty. Value: ${value}`};
             return false;
         }
@@ -149,6 +153,10 @@ export class Validator<T extends Record<string | number, any>> {
         const {field, type} = config;
         if (!type) {
             return true;
+        }
+
+        if (typeof field !== "number" && typeof field !== "string") {
+            throw new Error(`Field type (${field}) mystery encountered - call the detective!`)
         }
 
         if (isArrayOfStrings(type)) {

@@ -1,2 +1,4 @@
 export * from "./data/FieldConfiguration";
-export * from "./validate-object";
+export * from "./is-array-of";
+export * from "./is-promise";
+export * from "./Validator";

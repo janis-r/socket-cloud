@@ -1,16 +1,17 @@
-import {FieldConfiguration, validateObject} from "../../utils/validator";
+import {FieldConfiguration, Validator} from "../../utils/validator";
 import {uniqueValues} from "ugd10a";
 
 export class MessageValidator<T> {
 
+    private readonly validator: Validator<T>;
     private readonly allFields: string[];
     private readonly requiredFields: string[];
     private readonly configMap: Map<string, Configuration<T>>;
     private readonly fieldSerializers: Map<string, Configuration<T>['itemSerializer']>;
     private readonly fieldDeserializers: Map<string, Configuration<T>['itemDeserializer']>;
-    private _lastValidationError;
 
     constructor(readonly config: ReadonlyArray<Configuration<T>>) {
+        this.validator = new Validator(config);
         const allFields = [];
         const requiredFields = [];
         const configMap = new Map<string, Configuration<T>>();
@@ -41,14 +42,10 @@ export class MessageValidator<T> {
     }
 
     get lastValidationError() {
-        return this._lastValidationError;
+        return this.validator.lastError;
     }
 
-    readonly validate = (value: unknown): value is T => {
-        const result = validateObject(value, this.config as any);
-        this._lastValidationError = result === true ? null : result;
-        return result === true;
-    };
+    readonly validate = (value: unknown): value is T => this.validator.validate(value);
 
     readonly serialize = (value: T): string | null => {
         const {validate, allFields, fieldSerializers} = this;

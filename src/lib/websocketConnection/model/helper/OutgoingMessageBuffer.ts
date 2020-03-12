@@ -1,7 +1,7 @@
 import {Socket} from "net";
 import {ExecutionQueue} from "ugd10a";
 import {composeWebsocketFrame, fragmentWebsocketFrame} from "../../util/websocket-utils";
-import {isPromise} from "../../../utils/is-promise";
+import {isPromise} from "../../../utils/validator";
 import {DataFrame} from "../../data/DataFrame";
 import {WebsocketExtensionAgent} from "../../../websocketExtension";
 import {debug} from "../WebsocketConnection";

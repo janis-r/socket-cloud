@@ -3,7 +3,7 @@ import {DataFrameType} from "../../data/DataFrameType";
 import {CallbackCollection} from "../../../utils/CallbackCollection";
 import {WebsocketDataBuffer} from "../../util/WebsocketDataBuffer";
 import {WebsocketExtensionAgent} from "../../../websocketExtension";
-import {isPromise} from "../../../utils/is-promise";
+import {isPromise} from "../../../utils/validator";
 import {ExecutionQueue} from "ugd10a";
 import {CloseCode} from "../../data/CloseCode";
 
