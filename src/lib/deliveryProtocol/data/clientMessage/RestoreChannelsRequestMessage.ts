@@ -14,7 +14,7 @@ export type RestoreTarget = {
 const restoreTargetUtil = new MessageValidator<RestoreTarget>([
     {field: "channel", type: "string"},
     {field: "filter", optional: true, type: "object",
-        itemValidator: cacheFilterUtil.validate,
+        validator: cacheFilterUtil.validate,
         itemSerializer: cacheFilterUtil.serialize,
         itemDeserializer: cacheFilterUtil.deserialize,
     },

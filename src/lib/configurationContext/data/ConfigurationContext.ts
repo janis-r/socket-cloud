@@ -36,5 +36,5 @@ export abstract class ConfigurationContext {
             cachingPolicy?: ConfigurationContext['cachingPolicy']
         }
     };
-
 }
+

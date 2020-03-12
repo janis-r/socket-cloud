@@ -1,4 +1,4 @@
-import {FieldConfiguration, validateObject} from "../../utils/validate-object";
+import {FieldConfiguration, validateObject} from "../../utils/validator";
 
 /**
  * Connection data provided by Operator upon connection authorization

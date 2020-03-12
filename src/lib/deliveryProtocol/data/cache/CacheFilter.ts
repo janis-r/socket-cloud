@@ -12,7 +12,7 @@ export type CacheFilter = {
     messageId?: string
 };
 export const cacheFilterUtil = new MessageValidator<CacheFilter>([
-    {field: "maxAge", type: "number", optional: true, itemValidator: value => value > 0},
-    {field: "maxLength", type: "number", optional: true, itemValidator: value => value > 0},
+    {field: "maxAge", type: "number", optional: true, validator: value => value > 0},
+    {field: "maxLength", type: "number", optional: true, validator: value => value > 0},
     {field: "messageId", type: "string", optional: true, notEmpty: true},
 ]);

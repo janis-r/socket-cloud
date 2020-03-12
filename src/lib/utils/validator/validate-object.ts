@@ -1,56 +1,72 @@
-import {isArrayOfStrings} from "./is-array-of";
+import {isArrayOfStrings} from "../is-array-of";
 import {uniqueValues} from "ugd10a";
+import {ObjectValidationError} from "./data/ObjectValidationError";
+import {FieldConfiguration} from "./data/FieldConfiguration";
 
+/**
+ * Validate object against its configuration
+ * @param value Object to validate
+ * @param configuration List of object field configurations
+ * @param allowExtraFields Whether to allow fields not listed in configuration
+ * @return true in case validation was a success or ObjectValidationError instance explaining reasons of failure.
+ */
 export function validateObject(value: unknown, configuration: FieldConfiguration[], allowExtraFields = false): true | ObjectValidationError {
+    // Check if object to validate type
     if (typeof value !== "object") {
         return {error: `Value is not an object: ${value}`};
     }
 
-    const valueKeys = Object.keys(value);
+    const keys = Object.keys(value);
     for (const config of configuration) {
-        const {field: f, optional, exactValue, type, validator, notEmpty, itemValidator} = config;
-        const field = f as string;
-
-        const index = valueKeys.indexOf(field as string);
+        const {field, optional, exactValue, type, validator, notEmpty} = config;
+        const index = keys.indexOf(field.toString());
         if (index === -1) {
             if (optional) {
                 continue;
             }
-            return {field, error: `Field is missing`};
+            return {field, error: "Field is missing"};
         }
 
         const entryValue = value[field];
 
-        if ('exactValue' in config && entryValue !== exactValue) {
+        if ("exactValue" in config && entryValue !== exactValue) {
             return {field, error: `Exact value mismatch. Expected: ${exactValue}, actual: ${entryValue}`};
         }
+
         if (type) {
             if (isArrayOfStrings(type)) {
                 const uniqueTypes = uniqueValues(type);
-                if (!uniqueTypes.some(t => checkType(entryValue, t, notEmpty, itemValidator) === true)) {
+                if (!uniqueTypes.some(t => validateType(entryValue, {...config, type: t}) === true)) {
                     return {field, error: `Type mismatch. Value didn't match any of [${uniqueTypes}] types allowed`};
                 }
             } else {
-                const typeResult = checkType(entryValue, type, notEmpty, itemValidator);
+                const typeResult = validateType(entryValue, config);
                 if (typeResult !== true) {
                     return {field, ...typeResult};
                 }
             }
         }
+
         if (validator && !validator(entryValue, field)) {
             return {field, error: `Value ${entryValue} disallowed by validator`};
         }
-        valueKeys.splice(index, 1);
+
+        // Check if value is not empty - 0 is taken as defined value, everything else that turns into false in
+        // boolean context is taken to be empty too
+        if (notEmpty && entryValue !== 0 && entryValue !== false && !entryValue) {
+            return {field, error: `Value ${entryValue} is empty`};
+        }
+        keys.splice(index, 1);
     }
 
-    if (valueKeys.length > 0 && !allowExtraFields) {
-        return {error: `Extra, disallowed fields [${valueKeys}] encountered`};
+    if (keys.length > 0 && !allowExtraFields) {
+        return {error: `Extra, disallowed fields [${keys}] encountered`};
     }
-
     return true;
 }
 
-function checkType(value: unknown, type: SupportedType, notEmpty: boolean, itemValidator: FieldConfiguration['itemValidator']): true | { error: string } {
+function validateType(value: unknown, config: FieldConfiguration): true | { error: string } {
+    const {type, notEmpty, itemValidator} = config;
     if (type === "array") {
         if (!Array.isArray(value)) {
             return {error: `Type mismatch. Type is expected to be an array`};
@@ -87,26 +103,6 @@ function checkType(value: unknown, type: SupportedType, notEmpty: boolean, itemV
     return true;
 }
 
-type SupportedType =
-    "undefined"
-    | "object"
-    | "boolean"
-    | "number"
-    | "bigint"
-    | "string"
-    | "string[]"
-    | "symbol"
-    | "function"
-    | "array";
 
-export type FieldConfiguration<T extends Record<string, any> = any> = {
-    field: keyof T,
-    optional?: true,
-    exactValue?: any,
-    type?: SupportedType | SupportedType[],
-    validator?: (value: any, field?: keyof T) => boolean,
-    notEmpty?: boolean,
-    itemValidator?: (value: any) => boolean
-}
 
-export type ObjectValidationError = { field?: string, error: string };
+
