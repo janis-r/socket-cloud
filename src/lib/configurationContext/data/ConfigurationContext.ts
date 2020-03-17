@@ -1,3 +1,5 @@
+import {Validator} from "../../utils/validator";
+
 export abstract class ConfigurationContext {
     // Unique id of configuration context
     id: string;
@@ -38,3 +40,15 @@ export abstract class ConfigurationContext {
     };
 }
 
+export const configurationContextValidator = new Validator<ConfigurationContext>([
+    {field: "id", type: "string", validator: ({length}: string) => length >= 2 && length <= 50},
+    {field: "protocol", type: "string", notEmpty: true},
+    {field: "maxConnectionCount", type: "number", optional: true},
+    {field: "validationApi", type: "object", optional: true}, // TODO: Add object content validation
+    {field: "pingTimeout", type: "number", optional: true},
+    {field: "outgoingMessageFragmentSize", type: "number", optional: true},
+    {field: "maxPayloadSize", type: "number", optional: true},
+    {field: "compressData", type: "boolean", optional: true},
+    {field: "cachingPolicy", type: "object", optional: true},
+    {field: "channelConfig", type: "object", optional: true},
+]);
