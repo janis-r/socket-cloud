@@ -11,20 +11,28 @@ describe('RestoreRequest', () => {
             type: MessageType.RestoreRequest,
             channels: [{
                 channel: "restore-channels",
-                messageId: "mid"
+                filter: {
+                    messageId: "mid"
+                }
             }]
         })).toBe(true);
         expect(restoreRequestUtil.validate({
             type: MessageType.RestoreRequest,
             channels: [{
                 channel: "restore-channels1",
-                messageId: "mid"
+                filter: {
+                    messageId: "mid"
+                }
             }, {
                 channel: "restore-channels2",
-                messageId: "mid"
+                filter: {
+                    messageId: "mid"
+                }
             }, {
                 channel: "restore-channels3",
-                messageId: "mid"
+                filter: {
+                    messageId: "mid"
+                }
             }]
         })).toBe(true);
         expect(restoreRequestUtil.validate({type: 'jiberish'} as any)).toBe(false);

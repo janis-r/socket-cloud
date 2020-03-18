@@ -44,11 +44,25 @@ export const configurationContextValidator = new Validator<ConfigurationContext>
     {field: "id", type: "string", validator: ({length}: string) => length >= 2 && length <= 50},
     {field: "protocol", type: "string", notEmpty: true},
     {field: "maxConnectionCount", type: "number", optional: true},
-    {field: "validationApi", type: "object", optional: true}, // TODO: Add object content validation
+    {
+        field: "validationApi",
+        validator: new Validator<ConfigurationContext["validationApi"]>([
+            {field: "url", type: "string"},
+            {field: "validateNewConnections", type: "boolean", optional: true}
+        ]).validate,
+        optional: true
+    },
     {field: "pingTimeout", type: "number", optional: true},
     {field: "outgoingMessageFragmentSize", type: "number", optional: true},
     {field: "maxPayloadSize", type: "number", optional: true},
     {field: "compressData", type: "boolean", optional: true},
-    {field: "cachingPolicy", type: "object", optional: true},
+    {
+        field: "cachingPolicy",
+        validator: new Validator<ConfigurationContext["cachingPolicy"]>([
+            {field: "cacheTime", type: "number", optional: true},
+            {field: "cacheSize", type: "number", optional: true}
+        ]).validate,
+        optional: true
+    },
     {field: "channelConfig", type: "object", optional: true},
 ]);

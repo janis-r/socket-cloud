@@ -58,7 +58,7 @@ export class Validator<T extends Record<string | number, any>> {
             error += ` missingKeys: ${missingKeys}`;
         }
         if (definedKeys.size) {
-            error += ` unknownKeys: ${definedKeys}`;
+            error += ` unknownKeys: ${[...definedKeys]}`;
         }
 
         this._lastError = {error};
@@ -124,7 +124,7 @@ export class Validator<T extends Record<string | number, any>> {
             if (itemValidator) {
                 for (const entry of value) {
                     if (!itemValidator(entry)) {
-                        this._lastError = {field, error: `Array entry: ${entry} is not valid.`};
+                        this._lastError = {field, error: `Array entry: ${JSON.stringify(entry)} is not valid as declared by item validator.`};
                         return false;
                     }
                 }
