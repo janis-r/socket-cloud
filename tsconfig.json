@@ -19,8 +19,8 @@
     "outDir": "dist",
     "baseUrl": "./src",
     "paths": {
-      "@deliveryProtocol/*": ["lib/deliveryProtocol/*"],
-      "@deliveryProtocolClient/*": ["lib/deliveryProtocolClient/*"]
+      "@defaultProtocol/*": ["lib/defaultProtocol/*"],
+      "@defaultProtocolClient/*": ["lib/defaultProtocolClient/*"]
     }
   },
   "include": [

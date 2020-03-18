@@ -1,13 +1,13 @@
 import {ModuleConfig} from "quiver-framework";
 import {OutgoingMessageEvent} from "./event/OutgoingMessageEvent";
-import {deliveryProtocolModule} from "./deliveryProtocolModule";
+import {defaultProtocolModule} from "./defaultProtocolModule";
 import {IpcMessageEvent, ipcMessengerInWorkerModule} from "../ipcMessanger";
 import {ForwardOutgoingMessage} from "./command/ForwardOutgoingMessage";
 import {HandleForwardedMessage} from "./command/HandleForwardedMessage";
 
-export const deliveryProtocolModuleInWorker: ModuleConfig = {
+export const defaultProtocolModuleInWorker: ModuleConfig = {
     requires: [
-        deliveryProtocolModule,
+        defaultProtocolModule,
         ipcMessengerInWorkerModule
     ],
     commands: [

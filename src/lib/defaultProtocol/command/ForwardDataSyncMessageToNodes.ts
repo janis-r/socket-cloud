@@ -1,6 +1,6 @@
 import {Command, Inject} from "quiver-framework";
 import {IpcMessage, IpcMessageEvent, WorkerMessengerProvider} from "../../ipcMessanger";
-import {DataSyncMessage, DataSyncMessageType, dataSyncMessageUtil, pocmddpProtocol} from "../index";
+import {DataSyncMessage, DataSyncMessageType, dataSyncMessageUtil, defaultProtocolId} from "../index";
 import {WorkerManager} from "../../workerManager";
 
 export class ForwardDataSyncMessageToNodes implements Command {
@@ -23,7 +23,7 @@ export class ForwardDataSyncMessageToNodes implements Command {
         } = this;
 
         const {scope, payload} = message;
-        if (scope !== pocmddpProtocol) {
+        if (scope !== defaultProtocolId) {
             return;
         }
         if (!dataSyncMessageUtil.validate(payload)) {

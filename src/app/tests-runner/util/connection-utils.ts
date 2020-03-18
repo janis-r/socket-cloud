@@ -3,7 +3,7 @@ import {
     deserializeServerMessage,
     globalMessageChannel,
     MessageType,
-    pocmddpProtocol,
+    defaultProtocolId,
     PushToClientMessage,
     pushToServerUtil,
     RestoreChannelsRequestMessage,
@@ -11,12 +11,12 @@ import {
     restoreRequestUtil,
     subscribeMessageUtil,
     unsubscribeMessageUtil
-} from "../../../lib/deliveryProtocol";
+} from "../../../lib/defaultProtocol";
 import {CallbackCollection} from "../../../lib/utils/CallbackCollection";
 import {ContextId} from "../../../lib/configurationContext";
 import {WebsocketConnection} from "../../../lib/websocketConnection";
 
-const protocol = pocmddpProtocol;
+const protocol = defaultProtocolId;
 
 export class SocketClient {
     private static ID = 0;

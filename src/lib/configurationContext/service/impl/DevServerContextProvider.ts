@@ -2,18 +2,18 @@ import {toMilliseconds} from "ugd10a";
 import url from "url";
 import {ConfigurationContextProvider} from "../ConfigurationContextProvider";
 import {ConfigurationContext, ContextId} from "../..";
-import {pocmddpProtocol} from "../../../deliveryProtocol/data/pocmddpProtocol";
+import {defaultProtocolId} from "@defaultProtocol/data/defaultProtocolId";
 import {SocketDescriptor} from "../../../websocketListener/data/SocketDescriptor";
 
 const defaultContext: ConfigurationContext = {
     id: "default-dev-context",
-    protocol: pocmddpProtocol
+    protocol: defaultProtocolId
 };
 
 const customContext: Record<string, ConfigurationContext> = {
     "tests-runner": {
         id: "tests-runner",
-        protocol: pocmddpProtocol,
+        protocol: defaultProtocolId,
         validationApi: {
             url: "http://localhost:8001/validationAPI",
             validateNewConnections: true

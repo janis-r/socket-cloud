@@ -4,7 +4,7 @@ import {InjectionConfig, ModuleConfig} from "quiver-framework";
 import {Logger} from "../../lib/logger";
 import {SwaggerApiConfig, SwaggerApiDisplayModule} from "../../lib/swaggerApiDisplay";
 import {PermessageDeflateConfig, PermessageDeflateExtensionModule} from "../../lib/permessageDeflateExtension";
-import {deliveryProtocolModule} from "../../lib/deliveryProtocol";
+import {defaultProtocolModule} from "../../lib/defaultProtocol";
 import {WebsocketListenerModule} from "../../lib/websocketListener";
 import {ConfigurationContextModule} from "../../lib/configurationContext/ConfigurationContextModule";
 import {HttpServerRouter, HttpServerService} from "../../lib/httpServer";
@@ -16,7 +16,7 @@ export const devServerModule: ModuleConfig = {
         ConfigurationContextModule,
         SwaggerApiDisplayModule,
         PermessageDeflateExtensionModule,
-        deliveryProtocolModule,
+        defaultProtocolModule,
         WebsocketListenerModule
     ],
     mappings: [

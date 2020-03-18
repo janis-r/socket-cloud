@@ -10,7 +10,7 @@ import {ConfigurationContextModule} from "../configurationContext/ConfigurationC
 import {HandleNewConnection} from "./command/HandleNewConnection";
 import {HandleClientMessage} from "./command/HandleClientMessage";
 import {HandleRemovedConnection} from "./command/HandleRemovedConnection";
-import {pocmddpProtocol} from "./data/pocmddpProtocol";
+import {defaultProtocolId} from "./data/defaultProtocolId";
 import {HttpServerModule} from "../httpServer";
 import {DataContextManagerProvider} from "./service/DataContextManagerProvider";
 import {AccessTokenManager} from "./service/AccessTokenManager";
@@ -28,9 +28,9 @@ import {MessageIdProvider} from "./service/MessageIdProvider";
 import {InMemoryMessageIdProvider} from "./service/impl/InMemoryMessageIdProvider";
 import {DevAccessTokenManager} from "./service/impl/DevAccessTokenManager";
 
-const protocolGuard = ({data: {context: {protocol}}}: Event<ClientConnection>) => protocol === pocmddpProtocol;
+const protocolGuard = ({data: {context: {protocol}}}: Event<ClientConnection>) => protocol === defaultProtocolId;
 
-export const deliveryProtocolModule: ModuleConfig = {
+export const defaultProtocolModule: ModuleConfig = {
     requires: [
         ClientConnectionPoolModule,
         ConfigurationContextModule,

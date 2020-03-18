@@ -1,4 +1,4 @@
-import {MessageValidator} from "../../deliveryProtocol/util/MessageValidator";
+import {MessageValidator} from "../../defaultProtocol/util/MessageValidator";
 
 /**
  * Message data format which is delivered between processes

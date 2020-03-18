@@ -27,12 +27,10 @@ export interface Adapter {
      * Connection close callback
      */
     readonly onClose: Callback<{ code?: CloseCode, reason?: string }>;
-
     /**
      * Send message to server
      */
     send(message: string): void;
-
     /**
      * Close connection.
      * @param code

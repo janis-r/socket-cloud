@@ -6,7 +6,7 @@ import {
     startSocketServer,
     stopSocketServer
 } from "../util/test-utils";
-import {PushToClientMessage, RestoreChannelsResponseMessage} from "../../../lib/deliveryProtocol";
+import {PushToClientMessage, RestoreChannelsResponseMessage} from "../../../lib/defaultProtocol";
 
 describe('Channel message restoring', () => {
 
