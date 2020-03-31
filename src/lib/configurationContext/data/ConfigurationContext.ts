@@ -35,21 +35,21 @@ export abstract class ConfigurationContext {
     // Channel specific configurations that'll override values set in general configuration
     channelConfig?: {
         [channel: string]: {
-            cachingPolicy?: ConfigurationContext['cachingPolicy']
+            cachingPolicy?: ConfigurationContext["cachingPolicy"]
         }
     };
 }
 
 export const configurationContextValidator = new Validator<ConfigurationContext>([
-    {field: "id", type: "string", validator: ({length}: string) => length >= 2 && length <= 50},
+    {field: "id", type: "string", notEmpty: true, validator: ({length}: string) => length >= 2 && length <= 50},
     {field: "protocol", type: "string", notEmpty: true},
     {field: "maxConnectionCount", type: "number", optional: true},
     {
         field: "validationApi",
-        validator: new Validator<ConfigurationContext["validationApi"]>([
-            {field: "url", type: "string"},
-            {field: "validateNewConnections", type: "boolean", optional: true}
-        ]).validate,
+        validator: new Validator<ConfigurationContext["validationApi"]>({
+            url: {type: "string"},
+            validateNewConnections: {type: "boolean", optional: true}
+        }).validate,
         optional: true
     },
     {field: "pingTimeout", type: "number", optional: true},
@@ -58,10 +58,10 @@ export const configurationContextValidator = new Validator<ConfigurationContext>
     {field: "compressData", type: "boolean", optional: true},
     {
         field: "cachingPolicy",
-        validator: new Validator<ConfigurationContext["cachingPolicy"]>([
-            {field: "cacheTime", type: "number", optional: true},
-            {field: "cacheSize", type: "number", optional: true}
-        ]).validate,
+        validator: new Validator<ConfigurationContext["cachingPolicy"]>({
+            cacheTime: {type: "number", optional: true},
+            cacheSize: {type: "number", optional: true}
+        }).validate,
         optional: true
     },
     {field: "channelConfig", type: "object", optional: true},

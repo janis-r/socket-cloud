@@ -7,6 +7,6 @@ export type OperatorData = {
     externalId: string
 };
 
-const {validate} = new Validator([{field: "externalId", type: "string", notEmpty: true}]);
+const {validate} = new Validator<OperatorData>([{field: "externalId", type: "string", notEmpty: true}]);
 
 export const isOperatorData = (value: unknown): value is OperatorData => validate(value);

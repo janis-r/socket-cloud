@@ -10,7 +10,7 @@ export class MessageValidator<T> {
     private readonly fieldSerializers: Map<string, Configuration<T>['itemSerializer']>;
     private readonly fieldDeserializers: Map<string, Configuration<T>['itemDeserializer']>;
 
-    constructor(readonly config: ReadonlyArray<Configuration<T>>) {
+    constructor(private readonly config: Array<Configuration<T>>) {
         this.validator = new Validator(config);
         const allFields = [];
         const requiredFields = [];

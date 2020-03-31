@@ -3,42 +3,70 @@ import {ValueType} from "./data/ValueType";
 import {isArrayOfNumbers, isArrayOfStrings} from "./is-array-of";
 import {uniqueValues} from "ugd10a";
 
+/**
+ * Object shape validator utility
+ */
 export class Validator<T extends Record<string | number, any>> {
 
     readonly arrayTypes = new Set<ValueType>(["array", "string[]", "number[]"]);
-    private _lastError: { error: string, field?: string | number };
+    private _lastError: { error: string, field?: string | number } | null = null;
 
-    constructor(readonly configuration: ReadonlyArray<FieldConfiguration<T>>,
+    readonly configuration: ReadonlyArray<FieldConfiguration<T>>;
+
+    /**
+     * Create new instance
+     * @param configuration Definition of object fields to be validate values against - an array where each
+     * entry represents single field or key/value map where key represents field name and value is its configuration.
+     * @param allowExtraFields Defines if fields unlisted in configuration are permitted.
+     */
+    constructor(configuration: Array<FieldConfiguration<T>> | Record<FieldConfiguration<T>["field"], Omit<FieldConfiguration<T>, "field">>,
                 readonly allowExtraFields = false) {
+        if (Array.isArray(configuration)) {
+            this.configuration = configuration;
+        } else {
+            this.configuration = Object.keys(configuration).map(field => ({...configuration[field], field}));
+        }
     }
 
+    /**
+     * Get last validation error
+     */
     get lastError() {
         return this._lastError;
     }
 
+    /**
+     * Check if object contents can be validated to match field configuration set up within this validator.
+     * @param value
+     */
     readonly validate = (value: unknown): value is T => {
         const {validateType, validateFieldList, validateValues} = this;
-        this._lastError = undefined;
-        return ![validateType, validateFieldList, validateValues].some(func => !func(value));
+        this._lastError = null;
+
+        if (!validateType(value) || !validateFieldList(value) || !validateValues(value)) {
+            return false;
+        }
+        return true;
     };
 
     /**
      * Only objects are accepted in this validation class - check it here
      * @param value
      */
-    private readonly validateType = (value: unknown): boolean => {
-        if (typeof value !== "object") {
+    private readonly validateType = (value: unknown): value is object => {
+        if (value === null || typeof value !== "object") {
             this._lastError = {error: `Value is not an object: ${value}`};
             return false;
         }
         return true;
     };
+
     /**
      * Check if all fields listed in configuration as obligatory are present and extra fields if encountered
      * are allowed.
      * @param value
      */
-    private readonly validateFieldList = (value: unknown): boolean => {
+    private readonly validateFieldList = (value: object): value is Record<string | number, any> => {
         const {configuration, allowExtraFields} = this;
         const definedKeys = new Set(Object.keys(value));
         const missingKeys = configuration.filter(({field, optional}) => {
@@ -64,6 +92,7 @@ export class Validator<T extends Record<string | number, any>> {
         this._lastError = {error};
         return false;
     };
+
     /**
      * Validate object values by invoking per entry value checks
      * @param value
@@ -102,7 +131,7 @@ export class Validator<T extends Record<string | number, any>> {
         if (isArrayOfStrings(type)) {
             const result = uniqueValues(type).some(type => this.validateEntryValue(value, {...config, type}));
             if (result || this._lastError) {
-                this._lastError = undefined;
+                this._lastError = null;
             }
             return result;
         }
@@ -112,7 +141,7 @@ export class Validator<T extends Record<string | number, any>> {
             return false;
         }
 
-        if (arrayTypes.has(type)) {
+        if (arrayTypes.has(type as ValueType)) {
             if (!Array.isArray(value)) {
                 this._lastError = {field, error: `Array typed value (${value}) is not an array.`};
                 return false;
@@ -124,7 +153,10 @@ export class Validator<T extends Record<string | number, any>> {
             if (itemValidator) {
                 for (const entry of value) {
                     if (!itemValidator(entry)) {
-                        this._lastError = {field, error: `Array entry: ${JSON.stringify(entry)} is not valid as declared by item validator.`};
+                        this._lastError = {
+                            field,
+                            error: `Array entry: ${JSON.stringify(entry)} is not valid as declared by item validator.`
+                        };
                         return false;
                     }
                 }
@@ -165,7 +197,7 @@ export class Validator<T extends Record<string | number, any>> {
             // Some of values listed could return false and produce error record.
             // Although if any of types returned true, we're fine and error should not be accessible
             if (result || this._lastError) {
-                this._lastError = undefined;
+                this._lastError = null;
             }
             return result;
         }
