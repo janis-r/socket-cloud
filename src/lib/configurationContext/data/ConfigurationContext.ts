@@ -1,4 +1,4 @@
-import {Validator} from "../../utils/validator";
+import {Validator} from "ugd10a/validator";
 
 export abstract class ConfigurationContext {
     // Unique id of configuration context
@@ -40,29 +40,29 @@ export abstract class ConfigurationContext {
     };
 }
 
-export const configurationContextValidator = new Validator<ConfigurationContext>([
-    {field: "id", type: "string", notEmpty: true, validator: ({length}: string) => length >= 2 && length <= 50},
-    {field: "protocol", type: "string", notEmpty: true},
-    {field: "maxConnectionCount", type: "number", optional: true},
-    {
-        field: "validationApi",
+export const configurationContextValidator = new Validator<ConfigurationContext>({
+    id: {type: "string", notEmpty: true, validator: ({length}: string) => length >= 2 && length <= 50},
+    protocol: {type: "string", notEmpty: true},
+    maxConnectionCount: {type: "number", optional: true},
+    validationApi: {
         validator: new Validator<ConfigurationContext["validationApi"]>({
             url: {type: "string"},
             validateNewConnections: {type: "boolean", optional: true}
         }).validate,
         optional: true
     },
-    {field: "pingTimeout", type: "number", optional: true},
-    {field: "outgoingMessageFragmentSize", type: "number", optional: true},
-    {field: "maxPayloadSize", type: "number", optional: true},
-    {field: "compressData", type: "boolean", optional: true},
-    {
-        field: "cachingPolicy",
+    pingTimeout: {type: "number", optional: true},
+    outgoingMessageFragmentSize: {type: "number", optional: true},
+    maxPayloadSize: {type: "number", optional: true},
+    compressData: {type: "boolean", optional: true},
+    cachingPolicy: {
         validator: new Validator<ConfigurationContext["cachingPolicy"]>({
             cacheTime: {type: "number", optional: true},
             cacheSize: {type: "number", optional: true}
         }).validate,
         optional: true
     },
-    {field: "channelConfig", type: "object", optional: true},
-]);
+    channelConfig: {
+        type: "object", optional: true
+    },
+});

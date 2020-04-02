@@ -3,8 +3,8 @@ import {DataFrameType} from "../../data/DataFrameType";
 import {CallbackCollection} from "../../../utils/CallbackCollection";
 import {WebsocketDataBuffer} from "../../util/WebsocketDataBuffer";
 import {WebsocketExtensionAgent} from "../../../websocketExtension";
-import {isPromise} from "../../../utils/validator";
 import {ExecutionQueue} from "ugd10a";
+import {isPromise} from "ugd10a/validator";
 import {CloseCode} from "../../data/CloseCode";
 
 const isValidUTF8: (data: Buffer) => boolean = require('utf-8-validate');

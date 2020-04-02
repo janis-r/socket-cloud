@@ -1,5 +1,5 @@
-import {FieldConfiguration, Validator} from "../../utils/validator";
 import {uniqueValues} from "ugd10a";
+import {FieldConfiguration, Validator} from "ugd10a/validator";
 
 export class MessageValidator<T> {
 

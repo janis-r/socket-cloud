@@ -1,4 +1,4 @@
-import {Validator} from "../../utils/validator";
+import {Validator} from "ugd10a/validator";
 
 /**
  * Connection data provided by Operator upon connection authorization
@@ -10,3 +10,4 @@ export type OperatorData = {
 const {validate} = new Validator<OperatorData>([{field: "externalId", type: "string", notEmpty: true}]);
 
 export const isOperatorData = (value: unknown): value is OperatorData => validate(value);
+

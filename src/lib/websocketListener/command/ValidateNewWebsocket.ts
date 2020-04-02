@@ -1,11 +1,11 @@
 import {Inject, MacroCommand, referenceToString, SubCommand} from "quiver-framework";
+import {isPromise} from "ugd10a/validator";
 import {WebsocketConnectionValidationRequest} from "../event/WebsocketConnectionValidationRequest";
 import {Logger} from "../../logger";
 import {AuthorizeConnectionContext} from "./microCommand/AuthorizeConnectionContext";
 import {ValidateConnectionHeaders} from "./microCommand/ValidateConnectionHeaders";
 import {WebsocketClientConnection} from "../model/WebsocketClientConnection";
 import {PrepareWebsocketExtensions} from "./microCommand/PrepareWebsocketExtensions";
-import {isPromise} from "../../utils/validator";
 import {RespondToHandshake} from "./microCommand/RespondToHandshake";
 import {ClientConnectionPool} from "../../clientConnectionPool";
 
