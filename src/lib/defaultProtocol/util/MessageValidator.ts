@@ -7,27 +7,27 @@ export class MessageValidator<T> {
     private readonly allFields: string[];
     private readonly requiredFields: string[];
     private readonly configMap: Map<string, Configuration<T>>;
-    private readonly fieldSerializers: Map<string, Configuration<T>['itemSerializer']>;
-    private readonly fieldDeserializers: Map<string, Configuration<T>['itemDeserializer']>;
+    private readonly fieldSerializers: Map<string, Configuration<T>["itemSerializer"]>;
+    private readonly fieldDeserializers: Map<string, Configuration<T>["itemDeserializer"]>;
 
     constructor(private readonly config: Array<Configuration<T>>) {
         this.validator = new Validator(config);
         const allFields = [];
         const requiredFields = [];
         const configMap = new Map<string, Configuration<T>>();
-        const fieldSerializers = new Map<string, Configuration<T>['itemSerializer']>();
-        const fieldDeserializers = new Map<string, Configuration<T>['itemDeserializer']>();
+        const fieldSerializers = new Map<string, Configuration<T>["itemSerializer"]>();
+        const fieldDeserializers = new Map<string, Configuration<T>["itemDeserializer"]>();
 
         config.map(value => {
             const {field, optional} = value;
-            configMap.set(field as string, value);
+            configMap.set(field.toString(), value);
             if (value.itemSerializer) {
-                fieldSerializers.set(field as string, value.itemSerializer);
+                fieldSerializers.set(field.toString(), value.itemSerializer);
             }
             if (value.itemDeserializer) {
-                fieldDeserializers.set(field as string, value.itemDeserializer);
+                fieldDeserializers.set(field.toString(), value.itemDeserializer);
             }
-            return {field: field as string, optional};
+            return {field: field.toString(), optional};
         }).forEach(({field, optional}) => {
             allFields.push(field);
             if (optional) {
@@ -41,7 +41,7 @@ export class MessageValidator<T> {
         this.fieldDeserializers = fieldDeserializers;
     }
 
-    get lastValidationError() {
+    get lastError() {
         return this.validator.lastError;
     }
 

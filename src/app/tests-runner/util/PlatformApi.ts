@@ -27,7 +27,7 @@ export class PlatformApi {
             if (messageDeliveryReportUtil.validate(data)) {
                 return data;
             }
-            throw new Error(`Invalid response: ${messageDeliveryReportUtil.lastValidationError}`);
+            throw new Error(`Invalid response: ${messageDeliveryReportUtil.lastError}`);
         }
 
         throw new Error(`Platform API individual message request produced error: ${JSON.stringify({
@@ -55,7 +55,7 @@ export class PlatformApi {
             if (messageDeliveryReportUtil.validate(data)) {
                 return data;
             }
-            throw new Error(`Invalid response: ${messageDeliveryReportUtil.lastValidationError}`);
+            throw new Error(`Invalid response: ${messageDeliveryReportUtil.lastError}`);
         }
 
         throw new Error(`Platform API channel message request produced error: ${JSON.stringify({
@@ -83,7 +83,7 @@ export class PlatformApi {
             if (messageDeliveryReportUtil.validate(data)) {
                 return data;
             }
-            throw new Error(`Invalid response: ` + messageDeliveryReportUtil.lastValidationError);
+            throw new Error(`Invalid response: ` + messageDeliveryReportUtil.lastError);
         }
 
         throw new Error(`Platform API channel message request produced error: ${JSON.stringify({

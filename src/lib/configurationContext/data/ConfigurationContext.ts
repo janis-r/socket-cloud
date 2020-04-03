@@ -62,7 +62,7 @@ export const configurationContextValidator = new Validator<ConfigurationContext>
         }).validate,
         optional: true
     },
-    channelConfig: {
+    channelConfig: { // TODO: Elaborate
         type: "object", optional: true
     },
 });

@@ -50,7 +50,7 @@ export class DataPushApiListener {
         }
         // Check data format
         if (!individualMessageUtil.validate(body)) {
-            sendJson(individualMessageUtil.lastValidationError, {status: HttpStatusCode.BadRequest});
+            sendJson(individualMessageUtil.lastError, {status: HttpStatusCode.BadRequest});
             return;
         }
 
@@ -96,7 +96,7 @@ export class DataPushApiListener {
         }
         // Check data format
         if (!channelMessageUtil.validate(body)) {
-            sendJson(channelMessageUtil.lastValidationError, {status: HttpStatusCode.BadRequest});
+            sendJson(channelMessageUtil.lastError, {status: HttpStatusCode.BadRequest});
             return;
         }
 
@@ -149,7 +149,7 @@ export class DataPushApiListener {
         for (const message of body) {
             if (!channelMessageUtil.validate(message)) {
                 sendJson(`Some message is faulty: ${JSON.stringify(
-                    {message, error: channelMessageUtil.lastValidationError}
+                    {message, error: channelMessageUtil.lastError}
                 )}`, {status: HttpStatusCode.BadRequest});
                 return;
             }

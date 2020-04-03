@@ -13,9 +13,9 @@ export class WorkerMessengerProvider {
     private readonly messengerCache = new Map<number, IpcMessenger>();
 
     readonly getMessenger = (workerId: number) => {
-        const {messengerCache, workerManager, logger: {error}} = this;
+        const {messengerCache, workerManager: {workers}, logger: {error}} = this;
         if (!messengerCache.has(workerId)) {
-            const worker = workerManager.workers.find(({id}) => id === workerId);
+            const worker = workers.find(({id}) => id === workerId);
             if (!worker) {
                 error(`WorkerMessengerProvider:getMessenger - worker with id ${JSON.stringify(workerId)} not found`);
                 return null;

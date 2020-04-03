@@ -23,7 +23,7 @@ export class ForwardDataSyncMessageToNodes implements Command {
         } = this;
 
         const {scope, payload} = message;
-        if (scope !== defaultProtocolId) {
+        /*if (scope !== defaultProtocolId) {
             return;
         }
         if (!dataSyncMessageUtil.validate(payload)) {
@@ -31,7 +31,7 @@ export class ForwardDataSyncMessageToNodes implements Command {
         }
         if (payload.type !== DataSyncMessageType.ForwardClientMessage) {
             return;
-        }
+        }*/
 
         workerIds.filter(id => id !== workerId).map(id => getMessenger(id)).forEach(async ({sendAndReceive}) => {
             const {data} = await sendAndReceive<DataSyncMessage<number>>(message);

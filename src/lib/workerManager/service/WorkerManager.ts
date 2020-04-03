@@ -15,7 +15,7 @@ export class WorkerManager {
 
         cluster.on("message", (worker, message) => this.messageHandler(message, worker.id));
         cluster.on("exit", (worker, code, signal) => {
-            console.log(`worker ${worker.id} died`);
+            console.log(`worker ${worker.id} died ${{code, signal}}`);
             // TODO: Should we respawn worker here or this could be due to some serious problem which will be only reiterated on respawn?
         });
 

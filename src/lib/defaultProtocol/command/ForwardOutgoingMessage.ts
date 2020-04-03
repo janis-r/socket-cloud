@@ -4,6 +4,9 @@ import {DataSyncMessage, DataSyncMessageType} from "../data/ipc/DataSyncMessage"
 import {defaultProtocolId} from "..";
 import {IpcMessenger} from "../../ipcMessanger";
 
+/**
+ * Forward outgoing message to other IPC communication parties.
+ */
 export class ForwardOutgoingMessage implements Command {
 
     @Inject()
@@ -21,7 +24,7 @@ export class ForwardOutgoingMessage implements Command {
         addRecipientProvider(new Promise<number>(async resolve => {
             const {data} = await sendAndReceive<DataSyncMessage<number>>({
                 scope: defaultProtocolId,
-                payload: <DataSyncMessage>{
+                payload: {
                     type: DataSyncMessageType.ForwardClientMessage,
                     data: OutgoingMessageEvent.serialize(event)
                 }
