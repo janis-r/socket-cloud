@@ -1,0 +1,121 @@
+openapi: 3.0.1
+info:
+  title: Internal API
+  description: Internal API of the service to communicate within layers of service
+  contact:
+    name: Jānis Radiņš
+    email: jr@janisradins.com
+  version: 1.0.0
+tags:
+  - name: Context config API
+paths:
+  /context-config/{contextId}/:
+    get:
+      summary: Retrieve context config by id
+      tags:
+        - Context config API
+      parameters:
+        - in: path
+          name: contextId
+          required: true
+          schema:
+            type: string
+            pattern: "^[\\w\\d-]+$"
+      responses:
+        200:
+          $ref: "#/components/schemas/ContextConfig"
+        404:
+          description: Context config with requested id is not found.
+      security:
+        - ApiAuthKey: []
+    delete:
+      summary: Delete context config by id.
+      tags:
+        - Context config API
+      parameters:
+        - $ref: "#/components/parameters/contextId"
+      responses:
+        200:
+          description: Success!
+        404:
+          description: Context config with requested id is not found.
+      security:
+        - ApiAuthKey: []
+  /context-config/:
+    post:
+      summary: Create or update context config
+      tags:
+        - Context config API
+      parameters:
+        - $ref: "#/components/parameters/contextId"
+      requestBody:
+        required: true
+        description: Context config data to be saved.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContextConfig"
+      responses:
+        200:
+          description: Success!
+        400:
+          description: Input data is not valid - either not set or not getting through validation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Validation error message.
+                  field:
+                    type: string
+                    description: Field id which caused error, if error is produced by specific field.
+      security:
+        - ApiAuthKey: []
+components:
+  schemas:
+    ContextConfig:
+      description: Context configuration data
+      type: object
+      properties:
+        id:
+          type: string
+          description: Context id.
+        protocol:
+          type: string
+          description: Data exchange protocol used by this context.
+      required:
+        - id
+        - protocol
+  #        TODO: Full list of context config properties might follow once ConfigurationContext shape is stable
+  parameters:
+    contextId:
+      in: path
+      name: contextId
+      required: true
+      schema:
+        type: string
+        pattern: "^[\\w\\d-]+$"
+      description: Configuration context path param
+  responses:
+    Unauthorized:
+      description: API key is missing, invalid or data context is disabled.
+      headers:
+        WWW_Authenticate:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+            required:
+              - error
+  securitySchemes:
+    ApiAuthKey:
+      type: apiKey
+      in: header
+      name: X-API-KEY

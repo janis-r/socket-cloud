@@ -1,4 +1,4 @@
 /**
  * Postponed or cached message delivery protocol id
  */
-export const defaultProtocolId = "default";
+export const defaultProtocolId = "default-protocol";

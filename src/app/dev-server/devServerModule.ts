@@ -6,14 +6,14 @@ import {SwaggerApiConfig, SwaggerApiDisplayModule} from "../../lib/swaggerApiDis
 import {PermessageDeflateConfig, PermessageDeflateExtensionModule} from "../../lib/permessageDeflateExtension";
 import {defaultProtocolModule} from "../../lib/defaultProtocol";
 import {WebsocketListenerModule} from "../../lib/websocketListener";
-import {ConfigurationContextModule} from "../../lib/configurationContext/ConfigurationContextModule";
+import {configurationContextModule} from "../../lib/configurationContext/configurationContextModule";
 import {HttpServerRouter, HttpServerService} from "../../lib/httpServer";
 import url from "url";
 import {SocketDescriptor} from "../../lib/websocketListener/data/SocketDescriptor";
 
 export const devServerModule: ModuleConfig = {
     requires: [
-        ConfigurationContextModule,
+        configurationContextModule,
         SwaggerApiDisplayModule,
         PermessageDeflateExtensionModule,
         defaultProtocolModule,

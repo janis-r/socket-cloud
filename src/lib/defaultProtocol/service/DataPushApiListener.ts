@@ -10,6 +10,7 @@ import {MessageType} from "../data";
 import {PushToClientMessage} from "../data/serverMessage/PushToClientMessage";
 import {MessageIdProvider} from "./MessageIdProvider";
 import {MessageCache} from "./MessageCache";
+import {contextIdMatchRegexp} from "../../configurationContext";
 
 @Injectable()
 export class DataPushApiListener {
@@ -28,12 +29,13 @@ export class DataPushApiListener {
                 private readonly messageIdProvider: MessageIdProvider,
                 private readonly eventDispatcher: EventDispatcher) {
 
-        router.post("/:contextId/individual-message/", this.individualMessageHandler);
-        router.post("/:contextId/channel-message/", this.channelMessageHandler);
-        router.post("/:contextId/multi-channel-message/", this.multiChannelMessageHandler);
+        router.post(`/:contextId(${contextIdMatchRegexp})/individual-message/`, this.individualMessageHandler);
+        router.post(`/:contextId(${contextIdMatchRegexp})/channel-message/`, this.channelMessageHandler);
+        router.post(`/:contextId(${contextIdMatchRegexp})/multi-channel-message/`, this.multiChannelMessageHandler);
     }
 
     private readonly individualMessageHandler: HttpRequestHandler = async request => {
+        const {BadRequest, MethodNotAllowed, PayloadTooLarge} = HttpStatusCode;
         const {messageCache, messageIdProvider: {nextMessageId}, eventDispatcher} = this;
         const config = await this.validateApiCall(request);
         if (!config) {
@@ -45,12 +47,12 @@ export class DataPushApiListener {
 
         // Check permissions
         if (accessRights !== "all" && !accessRights.postIndividualMessages) {
-            sendJson({error: "Action is not allowed"}, {status: HttpStatusCode.MethodNotAllowed});
+            sendJson({error: "Action is not allowed"}, {status: MethodNotAllowed});
             return;
         }
         // Check data format
         if (!individualMessageUtil.validate(body)) {
-            sendJson(individualMessageUtil.lastError, {status: HttpStatusCode.BadRequest});
+            sendJson(individualMessageUtil.lastError, {status: BadRequest});
             return;
         }
 
@@ -58,7 +60,7 @@ export class DataPushApiListener {
 
         // Check payload
         if (maxPayloadSize && maxPayloadSize < Buffer.byteLength(body.payload)) {
-            sendJson({error: "Max payload exceeded"}, {status: HttpStatusCode.PayloadTooLarge});
+            sendJson({error: "Max payload exceeded"}, {status: PayloadTooLarge});
             return;
         }
 
@@ -80,6 +82,7 @@ export class DataPushApiListener {
     };
 
     private readonly channelMessageHandler: HttpRequestHandler = async request => {
+        const {BadRequest, MethodNotAllowed, PayloadTooLarge} = HttpStatusCode;
         const {messageCache, messageIdProvider: {nextMessageId}, eventDispatcher} = this;
         const config = await this.validateApiCall(request);
         if (!config) {
@@ -91,12 +94,12 @@ export class DataPushApiListener {
 
         // Check permissions
         if (accessRights !== "all" && !accessRights.postChannelMessages) {
-            sendJson({error: "Action is not allowed"}, {status: HttpStatusCode.MethodNotAllowed});
+            sendJson({error: "Action is not allowed"}, {status: MethodNotAllowed});
             return;
         }
         // Check data format
         if (!channelMessageUtil.validate(body)) {
-            sendJson(channelMessageUtil.lastError, {status: HttpStatusCode.BadRequest});
+            sendJson(channelMessageUtil.lastError, {status: BadRequest});
             return;
         }
 
@@ -104,7 +107,7 @@ export class DataPushApiListener {
 
         // Check payload
         if (maxPayloadSize && maxPayloadSize < Buffer.byteLength(body.payload)) {
-            sendJson({error: "Max payload exceeded"}, {status: HttpStatusCode.PayloadTooLarge});
+            sendJson({error: "Max payload exceeded"}, {status: PayloadTooLarge});
             return;
         }
 
@@ -127,6 +130,7 @@ export class DataPushApiListener {
     };
 
     private readonly multiChannelMessageHandler: HttpRequestHandler = async request => {
+        const {BadRequest, MethodNotAllowed, PayloadTooLarge} = HttpStatusCode;
         const {messageCache, messageIdProvider: {nextMessageId}, eventDispatcher} = this;
         const config = await this.validateApiCall(request);
         if (!config) {
@@ -138,24 +142,24 @@ export class DataPushApiListener {
 
         // Check permissions
         if (accessRights !== "all" && !accessRights.postMultiChannelMessages) {
-            sendJson({error: "Action is not allowed"}, {status: HttpStatusCode.MethodNotAllowed});
+            sendJson({error: "Action is not allowed"}, {status: MethodNotAllowed});
             return;
         }
         // Check data format
         if (!Array.isArray(body)) {
-            sendJson('Message body should be an array', {status: HttpStatusCode.BadRequest});
+            sendJson('Message body should be an array', {status: BadRequest});
             return;
         }
         for (const message of body) {
             if (!channelMessageUtil.validate(message)) {
                 sendJson(`Some message is faulty: ${JSON.stringify(
                     {message, error: channelMessageUtil.lastError}
-                )}`, {status: HttpStatusCode.BadRequest});
+                )}`, {status: BadRequest});
                 return;
             }
             // Check payload
             if (maxPayloadSize && maxPayloadSize < Buffer.byteLength(message.payload)) {
-                sendJson({error: `Max payload exceeded - message:${JSON.stringify(message)}`}, {status: HttpStatusCode.PayloadTooLarge});
+                sendJson({error: `Max payload exceeded - message:${JSON.stringify(message)}`}, {status: PayloadTooLarge});
                 return;
             }
         }

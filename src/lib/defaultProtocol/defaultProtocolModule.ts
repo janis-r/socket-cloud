@@ -6,7 +6,7 @@ import {
     ConnectionRemovedEvent,
     NewConnectionEvent
 } from "../clientConnectionPool";
-import {ConfigurationContextModule} from "../configurationContext/ConfigurationContextModule";
+import {configurationContextModule} from "../configurationContext/configurationContextModule";
 import {HandleNewConnection} from "./command/HandleNewConnection";
 import {HandleClientMessage} from "./command/HandleClientMessage";
 import {HandleRemovedConnection} from "./command/HandleRemovedConnection";
@@ -33,7 +33,7 @@ const protocolGuard = ({data: {context: {protocol}}}: Event<ClientConnection>) =
 export const defaultProtocolModule: ModuleConfig = {
     requires: [
         ClientConnectionPoolModule,
-        ConfigurationContextModule,
+        configurationContextModule,
         HttpServerModule
     ],
     mappings: [

@@ -1,8 +1,8 @@
 import {ModuleConfig} from "quiver-framework";
 import {ForwardDataSyncMessageToNodes} from "./command/ForwardDataSyncMessageToNodes";
 import {IpcMessageEvent, ipcMessengerInMasterModule} from "../ipcMessanger";
-import {defaultProtocolId} from "@defaultProtocol/data/defaultProtocolId";
-import {DataSyncMessageType, dataSyncMessageUtil} from "@defaultProtocol/data";
+import {defaultProtocolId} from "./data/defaultProtocolId";
+import {DataSyncMessageType, dataSyncMessageUtil} from "./data";
 
 export const defaultProtocolModuleInMaster: ModuleConfig = {
     requires: [

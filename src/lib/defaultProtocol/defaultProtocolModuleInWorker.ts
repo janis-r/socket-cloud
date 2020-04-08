@@ -4,6 +4,7 @@ import {defaultProtocolModule} from "./defaultProtocolModule";
 import {IpcMessageEvent, ipcMessengerInWorkerModule} from "../ipcMessanger";
 import {ForwardOutgoingMessage} from "./command/ForwardOutgoingMessage";
 import {HandleForwardedMessage} from "./command/HandleForwardedMessage";
+import {defaultProtocolId} from "./data/defaultProtocolId";
 
 export const defaultProtocolModuleInWorker: ModuleConfig = {
     requires: [
@@ -16,7 +17,11 @@ export const defaultProtocolModuleInWorker: ModuleConfig = {
             command: ForwardOutgoingMessage,
             guard: ({isForwarded}: OutgoingMessageEvent) => !isForwarded
         },
-        {event: IpcMessageEvent.TYPE, command: HandleForwardedMessage}
+        {
+            event: IpcMessageEvent.TYPE,
+            command: HandleForwardedMessage,
+            guard: ({message: {scope}}: IpcMessageEvent) => scope === defaultProtocolId
+        }
     ]
 };
 

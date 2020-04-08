@@ -2,4 +2,8 @@ export * from "./data/ConfigurationContext";
 export * from "./data/ConnectionValidationError";
 export * from "./data/ContextId";
 export * from "./data/CachingPolicy";
+export * from "./data/contextIdMatchRegexp";
+export * from "./event/UpdateConfigurationContextEvent";
+export * from "./event/DeleteConfigurationContextEvent";
 export * from "./service/ConfigurationContextProvider";
+export * from "./model/ConfigurationContextModel";

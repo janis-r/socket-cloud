@@ -4,6 +4,7 @@ import {ValidateSocketConnectionEvent} from "../..";
 import {WebsocketConnectionValidationRequest} from "../../event/WebsocketConnectionValidationRequest";
 import {Logger} from "../../../logger";
 import {ConfigurationContextProvider} from "../../../configurationContext";
+import url from "url";
 
 export class AuthorizeConnectionContext implements Command<boolean> {
 
@@ -38,7 +39,7 @@ export class AuthorizeConnectionContext implements Command<boolean> {
             },
             logger: {error, debug},
             eventDispatcher,
-            configurationContextProvider: {getSocketConfigurationContext}
+            configurationContextProvider: {getConfigurationContext}
         } = this;
 
         const forwardedFor = xForwardedForHeader ? xForwardedForHeader.split(",") : null;
@@ -60,7 +61,15 @@ export class AuthorizeConnectionContext implements Command<boolean> {
             socketDescriptor.origin = origin;
         }
 
-        const configuration = await getSocketConfigurationContext(socketDescriptor);
+        const contextId = extractContextIdFromUrl(socketDescriptor.url);
+        if (!contextId) {
+            // TODO: Fallback to default configuration context could be in use here
+            error(`WebsocketListener err - configuration context id not found in url`, requestInfo);
+            socket.end("HTTP/1.1 403 Forbidden");
+            return false;
+        }
+
+        const configuration = await getConfigurationContext(contextId);
         if (configuration === null) {
             error(`WebsocketListener err - configuration context cannot not be found`, requestInfo);
             socket.end("HTTP/1.1 403 Forbidden");
@@ -79,7 +88,7 @@ export class AuthorizeConnectionContext implements Command<boolean> {
 
         event.socketDescriptor = socketDescriptor;
         event.configurationContext = configuration;
-        if(validationEvent.operatorData) {
+        if (validationEvent.operatorData) {
             event.operatorData = validationEvent.operatorData;
         }
 
@@ -87,4 +96,12 @@ export class AuthorizeConnectionContext implements Command<boolean> {
     }
 }
 
+function extractContextIdFromUrl(connectionUrl: string): string | null {
+    const {pathname} = url.parse(connectionUrl, true);
+    const contextId = pathname.replace("/", "");
+    if (!contextId) {
+        return null;
+    }
+    return contextId;
+}
 

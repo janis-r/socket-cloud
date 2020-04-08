@@ -2,7 +2,7 @@ import {ModuleConfig} from "quiver-framework";
 import {WebsocketConnectionValidationRequest} from "./event/WebsocketConnectionValidationRequest";
 import {ValidateNewWebsocket} from "./command/ValidateNewWebsocket";
 import {LoggerModule} from "../logger";
-import {ConfigurationContextModule} from "../configurationContext/ConfigurationContextModule";
+import {configurationContextModule} from "../configurationContext/configurationContextModule";
 import {ClientConnectionPoolModule} from "../clientConnectionPool";
 import {HttpConnectionUpgradeEvent, HttpServerModule} from "../httpServer";
 import {HandleConnectionUpgradeRequest} from "./command/HandleConnectionUpgradeRequest";

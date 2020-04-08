@@ -59,6 +59,12 @@ export class RequestContext {
     readonly header = (name: string) => this.request.header(name);
 
     /**
+     * Respond with html status
+     * @param code
+     */
+    readonly sendStatus = (code: number) => this.response.sendStatus(code);
+
+    /**
      * Respond with HTML content
      * @param data
      * @param params

@@ -52,6 +52,14 @@ export class HttpServerService implements HttpServerRouter {
     post(url: string, handler: HttpRequestHandler): void {
         this.expressApp.post(url, (req, res, next) => handler(requestContextFactory(req, res, next)));
     }
+
+    put(url: string, handler: HttpRequestHandler): void {
+        this.expressApp.put(url, (req, res, next) => handler(requestContextFactory(req, res, next)));
+    }
+
+    delete(url: string, handler: HttpRequestHandler): void {
+        this.expressApp.delete(url, (req, res, next) => handler(requestContextFactory(req, res, next)));
+    }
 }
 
 const requestContextFactory = (req: Request, res: Response, next: NextFunction) => new RequestContext(req, res, next);
