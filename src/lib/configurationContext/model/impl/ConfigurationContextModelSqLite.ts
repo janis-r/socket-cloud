@@ -26,7 +26,7 @@ export class ConfigurationContextModelSqLite implements ConfigurationContextMode
         `);
     }
 
-    async deleteConfiguration(contextId: ContextId): Promise<boolean> {
+    readonly deleteConfiguration = async (contextId: ContextId): Promise<boolean> => {
         const {changes} = await this.db.run(`
                     DELETE
                     FROM context_config
@@ -35,9 +35,9 @@ export class ConfigurationContextModelSqLite implements ConfigurationContextMode
             [contextId]
         );
         return !!changes;
-    }
+    };
 
-    async getConfiguration(contextId: ContextId): Promise<ConfigurationContext | null> {
+    readonly getConfiguration = async (contextId: ContextId): Promise<ConfigurationContext | null> => {
         const row = await this.db.get<{ configuration: string }>(`
                     SELECT configuration
                     FROM context_config
@@ -53,7 +53,7 @@ export class ConfigurationContextModelSqLite implements ConfigurationContextMode
         try {
             configuration = JSON.parse(row.configuration);
         } catch (e) {
-            throw new Error(`Configuration context data in invalid JSON e - ${e.message}`);
+            throw new Error(`Configuration context data is invalid JSON e - ${e.message}`);
         }
 
         if (!configurationContextValidator.validate(configuration)) {
@@ -61,20 +61,22 @@ export class ConfigurationContextModelSqLite implements ConfigurationContextMode
         }
 
         return configuration;
-    }
+    };
 
-    async saveConfiguration(configuration: ConfigurationContext): Promise<boolean> {
+    readonly saveConfiguration = async (configuration: ConfigurationContext): Promise<boolean> => {
         if (!configurationContextValidator.validate(configuration)) {
             throw new Error(`Cannot save invalid configuration context - err: ${JSON.stringify(configurationContextValidator.lastError)}`);
         }
+        await this.db.ready;
         const {changes} = await this.db.run(`
-                    INSERT OR REPLACE
+                    INSERT OR
+                    REPLACE
                     INTO context_config(id, configuration)
                     VALUES (?, ?);
             `,
             [configuration.id, JSON.stringify(configuration)]
         );
         return !!changes;
-    }
+    };
 }
 

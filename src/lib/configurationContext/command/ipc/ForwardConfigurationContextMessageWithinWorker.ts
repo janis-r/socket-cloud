@@ -1,9 +1,11 @@
 import {Command, EventDispatcher, Inject} from "quiver-framework";
 import {IpcMessageEvent} from "../../../ipcMessanger";
-import {deleteConfigIpcMessageValidator} from "../../data/ipc/DeleteConfigIpcMessage";
+import {
+    ConfigurationConfigIpcMessageType,
+    configurationConfigIpcMessageValidator
+} from "../../data/ipc/ConfigurationConfigIpcMessage";
 import {DeleteConfigurationContextEvent} from "../../event/DeleteConfigurationContextEvent";
 import {UpdateConfigurationContextEvent} from "../../event/UpdateConfigurationContextEvent";
-import {updateConfigIpcMessageValidator} from "../../data/ipc/UpdateConfigIpcMessage";
 
 export class ForwardConfigurationContextMessageWithinWorker implements Command {
 
@@ -14,12 +16,18 @@ export class ForwardConfigurationContextMessageWithinWorker implements Command {
 
     async execute(): Promise<void> {
         const {event: {message: {payload}}, eventDispatcher} = this;
-        if (deleteConfigIpcMessageValidator.validate(payload)) {
-            const {contextId} = payload;
-            eventDispatcher.dispatchEvent(new DeleteConfigurationContextEvent(contextId, true));
-        } else if (updateConfigIpcMessageValidator.validate(payload)) {
-            const {context} = payload;
-            eventDispatcher.dispatchEvent(new UpdateConfigurationContextEvent(context, true));
+        if (!configurationConfigIpcMessageValidator.validate(payload)) {
+            throw new Error(`Invalid incoming ConfigurationConfigIpcMessage encountered: ${JSON.stringify(payload)} `);
+        }
+
+        const {type, contextId} = payload;
+        switch (type) {
+            case ConfigurationConfigIpcMessageType.Update:
+                eventDispatcher.dispatchEvent(new UpdateConfigurationContextEvent(contextId, true));
+                break;
+            case ConfigurationConfigIpcMessageType.Delete:
+                eventDispatcher.dispatchEvent(new DeleteConfigurationContextEvent(contextId, true));
+                break;
         }
     }
 }

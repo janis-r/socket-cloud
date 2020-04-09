@@ -76,7 +76,7 @@ export class RequestContext {
      * @param data
      * @param params
      */
-    readonly sendJson = (data: Json, params?: ResponseParams) => this.sendResponse("json", data, params);
+    readonly sendJson = (data: any, params?: ResponseParams) => this.sendResponse("json", data, params);
 
     /**
      * Respond with text content

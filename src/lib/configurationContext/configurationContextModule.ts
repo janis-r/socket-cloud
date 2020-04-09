@@ -7,12 +7,10 @@ import {ValidateNewConnection} from "./command/ValidateNewConnection";
 import {ConfigurationContextModel} from "./model/ConfigurationContextModel";
 import {ConfigurationContextModelSqLite} from "./model/impl/ConfigurationContextModelSqLite";
 import {ConfigurationContextApiListener} from "./service/ConfigurationContextApiListener";
-import {ConfigurationContextManagerImpl} from "./service/impl/ConfigurationContextManagerImpl";
 import {DeleteConfigurationContext} from "./command/DeleteConfigurationContext";
 import {DeleteConfigurationContextEvent} from "./event/DeleteConfigurationContextEvent";
 import {UpdateConfigurationContext} from "./command/UpdateConfigurationContext";
 import {UpdateConfigurationContextEvent} from "./event/UpdateConfigurationContextEvent";
-import {ConfigurationContextManager} from "./service/ConfigurationContextManager";
 
 export const configurationContextModule: ModuleConfig = {
     requires: [
@@ -20,8 +18,7 @@ export const configurationContextModule: ModuleConfig = {
         HttpServerModule
     ],
     mappings: [
-        {map: ConfigurationContextManager, useType: ConfigurationContextManagerImpl},
-        {map: ConfigurationContextProvider, useExisting: ConfigurationContextManager},
+        ConfigurationContextProvider,
         {map: ConfigurationContextModel, useType: ConfigurationContextModelSqLite},
         {map: ConfigurationContextApiListener, instantiate: true}
     ],

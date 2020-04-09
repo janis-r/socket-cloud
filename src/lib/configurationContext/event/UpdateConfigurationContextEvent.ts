@@ -1,11 +1,11 @@
-import {ConfigurationContext} from "..";
-import {ResponsiveEvent} from "./ResponsiveEvent";
+import {Event} from "quiver-framework";
+import {ContextId} from "..";
 
-export class UpdateConfigurationContextEvent extends ResponsiveEvent<boolean> {
+export class UpdateConfigurationContextEvent extends Event<string> {
 
     static readonly TYPE = Symbol("update-configuration-context");
 
-    constructor(readonly context: ConfigurationContext, readonly isForwarded = false) {
-        super(UpdateConfigurationContextEvent.TYPE, context);
+    constructor(readonly contextId: ContextId, readonly isForwarded = false) {
+        super(UpdateConfigurationContextEvent.TYPE, contextId);
     }
 }

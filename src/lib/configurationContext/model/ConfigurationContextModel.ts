@@ -9,17 +9,17 @@ export abstract class ConfigurationContextModel {
      * Save configuration context
      * @param context
      */
-    abstract saveConfiguration(context: ConfigurationContext): Promise<boolean>;
+    abstract readonly saveConfiguration: (context: ConfigurationContext) => Promise<boolean>;
 
     /**
      * Retrieve configuration context.
      * @param contextId
      */
-    abstract getConfiguration(contextId: ContextId): Promise<ConfigurationContext | null>;
+    abstract readonly getConfiguration: (contextId: ContextId) => Promise<ConfigurationContext | null>;
 
     /**
      * Delete configuration context.
      * @param contextId
      */
-    abstract deleteConfiguration(contextId: ContextId): Promise<boolean>;
+    abstract readonly deleteConfiguration: (contextId: ContextId) => Promise<boolean>;
 }

@@ -1,20 +1,17 @@
 import {Command, Inject} from "quiver-framework";
-import {ConfigurationContextManager} from "../service/ConfigurationContextManager";
 import {UpdateConfigurationContextEvent} from "../event/UpdateConfigurationContextEvent";
+import {ConfigurationContextProvider} from "..";
 
 export class UpdateConfigurationContext implements Command {
 
     @Inject()
-    private readonly contextManager: ConfigurationContextManager;
+    private readonly contextProvider: ConfigurationContextProvider;
     @Inject()
     private readonly event: UpdateConfigurationContextEvent;
 
     async execute(): Promise<void> {
-        const {
-            contextManager: {updateConfiguration},
-            event: {context, isForwarded, setResponse}
-        } = this;
-        setResponse(await updateConfiguration(context, isForwarded));
+        const {event: {contextId}, contextProvider: {resetConfiguration}} = this;
+        resetConfiguration(contextId);
     }
 
 }

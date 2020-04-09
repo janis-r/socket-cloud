@@ -13,7 +13,6 @@ import {HandleRemovedConnection} from "./command/HandleRemovedConnection";
 import {defaultProtocolId} from "./data/defaultProtocolId";
 import {HttpServerModule} from "../httpServer";
 import {DataContextManagerProvider} from "./service/DataContextManagerProvider";
-import {AccessTokenManager} from "./service/AccessTokenManager";
 import {DataPushApiListener} from "./service/DataPushApiListener";
 import {IncomingClientMessageEvent} from "./event/IncomingClientMessageEvent";
 import {MessageType} from "./data";
@@ -26,7 +25,7 @@ import {MessageCache} from "./service/MessageCache";
 import {InMemoryMessageCache} from "./service/impl/InMemoryMessageCache";
 import {MessageIdProvider} from "./service/MessageIdProvider";
 import {InMemoryMessageIdProvider} from "./service/impl/InMemoryMessageIdProvider";
-import {DevAccessTokenManager} from "./service/impl/DevAccessTokenManager";
+import {authorizationModule} from "../authorization";
 
 const protocolGuard = ({data: {context: {protocol}}}: Event<ClientConnection>) => protocol === defaultProtocolId;
 
@@ -34,12 +33,12 @@ export const defaultProtocolModule: ModuleConfig = {
     requires: [
         ClientConnectionPoolModule,
         configurationContextModule,
-        HttpServerModule
+        HttpServerModule,
+        authorizationModule
     ],
     mappings: [
         {map: DataPushApiListener, instantiate: true},
         DataContextManagerProvider,
-        {map: AccessTokenManager, useType: DevAccessTokenManager},
         {map: MessageCache, useType: InMemoryMessageCache},
         {map: MessageIdProvider, useType: InMemoryMessageIdProvider}
     ],

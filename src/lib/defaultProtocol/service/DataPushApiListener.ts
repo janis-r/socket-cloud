@@ -1,8 +1,7 @@
 import {EventDispatcher, Injectable} from "quiver-framework";
 import {HttpRequestHandler, HttpServerRouter, HttpStatusCode} from "../../httpServer";
-import {AccessTokenManager} from "./AccessTokenManager";
+import {AccessTokenManager, TokenInfo} from "../../authorization";
 import {RequestContext} from "../../httpServer/data/RequestContext";
-import {TokenInfo} from "../data/TokenInfo";
 import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
 import {channelMessageUtil} from "../data/apiMessage/ChannelMessage";
 import {individualMessageUtil} from "../data/apiMessage/IndividualMessage";

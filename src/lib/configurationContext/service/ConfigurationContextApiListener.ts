@@ -1,6 +1,11 @@
 import {EventDispatcher, Injectable} from "quiver-framework";
 import {HttpRequestHandler, HttpServerRouter, HttpStatusCode} from "../../httpServer";
-import {ConfigurationContextProvider, configurationContextValidator, contextIdMatchRegexp} from "..";
+import {
+    ConfigurationContextModel,
+    ConfigurationContextProvider,
+    configurationContextValidator,
+    contextIdMatchRegexp
+} from "..";
 import {UpdateConfigurationContextEvent} from "../event/UpdateConfigurationContextEvent";
 import {DeleteConfigurationContextEvent} from "../event/DeleteConfigurationContextEvent";
 
@@ -10,9 +15,9 @@ export class ConfigurationContextApiListener {
 
     constructor(httpRouter: HttpServerRouter,
                 private readonly contextProvider: ConfigurationContextProvider,
+                private readonly contextModel: ConfigurationContextModel,
                 private readonly eventDispatcher: EventDispatcher) {
         const {servicePath} = this;
-
         httpRouter.get(`/${servicePath}/:contextId(${contextIdMatchRegexp})`, this.retrieveConfig);
         httpRouter.post(`/${servicePath}`, this.setConfig);
         httpRouter.delete(`/${servicePath}/:contextId(${contextIdMatchRegexp})`, this.deleteConfig);
@@ -32,7 +37,7 @@ export class ConfigurationContextApiListener {
 
     private readonly setConfig: HttpRequestHandler = async ({body, sendJson, sendStatus}) => {
         const {Ok, BadRequest} = HttpStatusCode;
-        const {eventDispatcher} = this;
+        const {contextModel: {saveConfiguration}, eventDispatcher} = this;
         const configuration = body;
         if (!configuration) {
             sendStatus(BadRequest);
@@ -43,9 +48,8 @@ export class ConfigurationContextApiListener {
             return;
         }
 
-        const event = new UpdateConfigurationContextEvent(configuration);
-        eventDispatcher.dispatchEvent(event);
-        if (await event.response) {
+        if (await saveConfiguration(configuration)) {
+            eventDispatcher.dispatchEvent(new UpdateConfigurationContextEvent(configuration.id));
             sendStatus(Ok);
         } else {
             sendStatus(BadRequest);
@@ -54,13 +58,11 @@ export class ConfigurationContextApiListener {
 
     private readonly deleteConfig: HttpRequestHandler = async ({param, sendStatus}) => {
         const {Ok, NotFound} = HttpStatusCode;
-        const {eventDispatcher} = this;
+        const {contextModel: {deleteConfiguration}, eventDispatcher} = this;
         const contextId = param("contextId").asString();
 
-        const event = new DeleteConfigurationContextEvent(contextId);
-        eventDispatcher.dispatchEvent(event);
-
-        if (await event.response) {
+        if (await deleteConfiguration(contextId)) {
+            eventDispatcher.dispatchEvent(new DeleteConfigurationContextEvent(contextId));
             sendStatus(Ok);
         } else {
             sendStatus(NotFound);

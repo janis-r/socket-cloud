@@ -1,7 +1,7 @@
+import {Event} from "quiver-framework";
 import {ContextId} from "..";
-import {ResponsiveEvent} from "./ResponsiveEvent";
 
-export class DeleteConfigurationContextEvent extends ResponsiveEvent<boolean> {
+export class DeleteConfigurationContextEvent extends Event<string> {
 
     static readonly TYPE = Symbol("delete-configuration-context");
 
