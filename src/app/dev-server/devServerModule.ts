@@ -1,5 +1,6 @@
 import * as cluster from "cluster";
 import * as express from "express";
+import url from "url";
 import {InjectionConfig, ModuleConfig} from "quiver-framework";
 import {Logger} from "../../lib/logger";
 import {SwaggerApiConfig, SwaggerApiDisplayModule} from "../../lib/swaggerApiDisplay";
@@ -8,11 +9,12 @@ import {defaultProtocolModule} from "../../lib/defaultProtocol";
 import {WebsocketListenerModule} from "../../lib/websocketListener";
 import {configurationContextModule} from "../../lib/configurationContext/configurationContextModule";
 import {HttpServerRouter, HttpServerService} from "../../lib/httpServer";
-import url from "url";
 import {SocketDescriptor} from "../../lib/websocketListener/data/SocketDescriptor";
+import {authorizationModule} from "../../lib/authorization";
 
 export const devServerModule: ModuleConfig = {
     requires: [
+        authorizationModule,
         configurationContextModule,
         SwaggerApiDisplayModule,
         PermessageDeflateExtensionModule,
@@ -33,6 +35,10 @@ export const devServerModule: ModuleConfig = {
                     {
                         name: "validation-api",
                         configFile: `${__dirname}/../../../api/validation-api.yaml`
+                    },
+                    {
+                        name: "internal-api",
+                        configFile: `${__dirname}/../../../api/internal-api.yaml`
                     }
                 ]
             }

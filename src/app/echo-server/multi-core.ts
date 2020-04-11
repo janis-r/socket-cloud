@@ -1,5 +1,5 @@
 import {AppContext, Injectable, InjectionConfig} from "quiver-framework";
-import {Logger, LoggerModule} from "../../lib/logger";
+import {Logger, loggerModule} from "../../lib/logger";
 import {EchoServerModule} from "./EchoServerModule";
 import cluster from "cluster";
 import {LoggerImpl} from "../../lib/logger/impl/LoggerImpl";
@@ -25,7 +25,7 @@ if (cluster.isMaster) {
 } else {
     const {injector} = new AppContext()
         .configure(
-            LoggerModule,
+            loggerModule,
             {
                 mappings: [
                     {

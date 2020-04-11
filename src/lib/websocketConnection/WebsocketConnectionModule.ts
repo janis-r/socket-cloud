@@ -1,8 +1,8 @@
 import {ModuleConfig} from "quiver-framework";
-import {LoggerModule} from "../logger";
+import {loggerModule} from "../logger";
 
 export const WebsocketConnectionModule: ModuleConfig = {
     requires: [
-        LoggerModule
+        loggerModule
     ]
 };

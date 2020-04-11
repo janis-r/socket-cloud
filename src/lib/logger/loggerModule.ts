@@ -1,9 +1,9 @@
-import {InjectionConfig, Module} from "quiver-framework";
+import {InjectionConfig, ModuleConfig} from "quiver-framework";
 import {Logger} from "./service/Logger";
 import {LoggerImpl} from "./impl/LoggerImpl";
 import {LoggerConfig} from "./data/LoggerConfig";
 
-@Module({
+export const loggerModule: ModuleConfig = {
     mappings: [
         {
             map: LoggerConfig,
@@ -14,10 +14,9 @@ import {LoggerConfig} from "./data/LoggerConfig";
             }
         } as InjectionConfig<LoggerConfig>,
         {map: Logger, useType: LoggerImpl},
-    ]
-})
-export class LoggerModule {
-    constructor({error}: Logger) {
+    ],
+    setup: injector => {
+        const {error} = injector.get(Logger);
         // Subscribe for system errors, if we're in node.js environment
         if (!!process?.versions?.node) {
             process.on(
@@ -41,4 +40,4 @@ export class LoggerModule {
             );*/
         }
     }
-}
+};

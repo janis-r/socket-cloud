@@ -11,7 +11,7 @@ import {HandleNewConnection} from "./command/HandleNewConnection";
 import {HandleClientMessage} from "./command/HandleClientMessage";
 import {HandleRemovedConnection} from "./command/HandleRemovedConnection";
 import {defaultProtocolId} from "./data/defaultProtocolId";
-import {HttpServerModule} from "../httpServer";
+import {httpServerModule} from "../httpServer";
 import {DataContextManagerProvider} from "./service/DataContextManagerProvider";
 import {DataPushApiListener} from "./service/DataPushApiListener";
 import {IncomingClientMessageEvent} from "./event/IncomingClientMessageEvent";
@@ -33,7 +33,7 @@ export const defaultProtocolModule: ModuleConfig = {
     requires: [
         ClientConnectionPoolModule,
         configurationContextModule,
-        HttpServerModule,
+        httpServerModule,
         authorizationModule
     ],
     mappings: [

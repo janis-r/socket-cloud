@@ -45,6 +45,10 @@ export class HttpServerService implements HttpServerRouter {
 
     private readonly upgradeListener = (req: UpgradeRequest, socket: Socket) => this.eventDispatcher.dispatchEvent(new HttpConnectionUpgradeEvent(req, socket));
 
+    use(url: string, handler: HttpRequestHandler): void {
+        this.expressApp.use(url, (req, res, next) => handler(requestContextFactory(req, res, next)));
+    }
+
     get(url: string, handler: HttpRequestHandler): void {
         this.expressApp.get(url, (req, res, next) => handler(requestContextFactory(req, res, next)));
     }

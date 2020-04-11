@@ -10,7 +10,7 @@ import {ConfigurationContextModel} from "../model/ConfigurationContextModel";
  */
 export class ConfigurationContextProvider {
 
-    private contextCache = new Map<ContextId, ConfigurationContext>();
+    private readonly contextCache = new Map<ContextId, ConfigurationContext>();
 
     @Inject()
     private readonly contextModel: ConfigurationContextModel;

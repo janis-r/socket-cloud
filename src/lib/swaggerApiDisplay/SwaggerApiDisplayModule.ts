@@ -1,12 +1,12 @@
 import {Module, Optional} from "quiver-framework"
-import {HttpServerModule, HttpServerService} from "../httpServer";
+import {httpServerModule, HttpServerService} from "../httpServer";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 import {SwaggerApiConfig} from "./config/SwaggerApiConfig";
 
 @Module({
     requires: [
-        HttpServerModule
+        httpServerModule
     ]
 })
 export class SwaggerApiDisplayModule {
@@ -42,7 +42,7 @@ export class SwaggerApiDisplayModule {
                 </style>
             </head>
             <body>
-                ${docs.map(({name}) => `<a href='${name}'>${name} API</a>`).join('<br />')}
+                ${docs.map(({name}) => `<a href='${name}'>${name}</a>`).join('<br />')}
             </body>
         </html>
         `));

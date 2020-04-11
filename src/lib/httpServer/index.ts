@@ -6,4 +6,4 @@ export * from "./data/UpgradeRequest";
 export * from "./event/HttpConnectionUpgradeEvent";
 export * from "./service/HttpServerService";
 export * from "./service/HttpServerRouter";
-export * from "./HttpServerModule";
+export * from "./httpServerModule";

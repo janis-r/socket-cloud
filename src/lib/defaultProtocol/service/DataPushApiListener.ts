@@ -1,6 +1,6 @@
 import {EventDispatcher, Injectable} from "quiver-framework";
 import {HttpRequestHandler, HttpServerRouter, HttpStatusCode} from "../../httpServer";
-import {AccessTokenManager, TokenInfo} from "../../authorization";
+import {AccessTokenProvider, TokenInfo} from "../../authorization";
 import {RequestContext} from "../../httpServer/data/RequestContext";
 import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
 import {channelMessageUtil} from "../data/apiMessage/ChannelMessage";
@@ -23,7 +23,7 @@ export class DataPushApiListener {
     };
 
     constructor(router: HttpServerRouter,
-                private readonly tokenManager: AccessTokenManager,
+                private readonly tokenManager: AccessTokenProvider,
                 private readonly messageCache: MessageCache,
                 private readonly messageIdProvider: MessageIdProvider,
                 private readonly eventDispatcher: EventDispatcher) {

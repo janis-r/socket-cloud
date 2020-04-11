@@ -7,3 +7,6 @@ export * from "./event/UpdateConfigurationContextEvent";
 export * from "./event/DeleteConfigurationContextEvent";
 export * from "./service/ConfigurationContextProvider";
 export * from "./model/ConfigurationContextModel";
+export * from "./configurationContextModule";
+export * from "./configurationContextModuleInMaster";
+export * from "./configurationContextModuleInWorker";

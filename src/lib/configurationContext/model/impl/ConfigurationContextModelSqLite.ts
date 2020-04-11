@@ -1,6 +1,7 @@
 import {SqLiteConnection} from "../../../sqLite";
 import {ConfigurationContextModel} from "../ConfigurationContextModel";
-import {ConfigurationContext, configurationContextValidator, ContextId} from "../..";
+import {ContextId} from "../../data/ContextId";
+import {ConfigurationContext, configurationContextValidator} from "../../data/ConfigurationContext";
 
 export class ConfigurationContextModelSqLite implements ConfigurationContextModel {
 
@@ -67,7 +68,7 @@ export class ConfigurationContextModelSqLite implements ConfigurationContextMode
         if (!configurationContextValidator.validate(configuration)) {
             throw new Error(`Cannot save invalid configuration context - err: ${JSON.stringify(configurationContextValidator.lastError)}`);
         }
-        await this.db.ready;
+
         const {changes} = await this.db.run(`
                     INSERT OR
                     REPLACE

@@ -1,3 +1,3 @@
 export * from "./data/TokenInfo";
-export * from "./service/AccessTokenManager";
+export * from "./service/AccessTokenProvider";
 export * from "./authorizationModule";

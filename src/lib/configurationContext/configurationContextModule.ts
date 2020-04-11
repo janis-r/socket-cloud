@@ -1,32 +1,32 @@
 import {ModuleConfig} from "quiver-framework";
-import {LoggerModule} from "../logger";
-import {HttpServerModule} from "../httpServer";
+import {loggerModule} from "../logger";
 import {ConfigurationContextProvider} from "./service/ConfigurationContextProvider";
-import {ValidateSocketConnectionEvent} from "../websocketListener";
-import {ValidateNewConnection} from "./command/ValidateNewConnection";
 import {ConfigurationContextModel} from "./model/ConfigurationContextModel";
 import {ConfigurationContextModelSqLite} from "./model/impl/ConfigurationContextModelSqLite";
-import {ConfigurationContextApiListener} from "./service/ConfigurationContextApiListener";
-import {DeleteConfigurationContext} from "./command/DeleteConfigurationContext";
-import {DeleteConfigurationContextEvent} from "./event/DeleteConfigurationContextEvent";
-import {UpdateConfigurationContext} from "./command/UpdateConfigurationContext";
-import {UpdateConfigurationContextEvent} from "./event/UpdateConfigurationContextEvent";
+import {httpServerModule} from "../httpServer";
+import {authorizationModule} from "../authorization";
 
 export const configurationContextModule: ModuleConfig = {
     requires: [
-        LoggerModule,
-        HttpServerModule
+        loggerModule,
+        httpServerModule,
+        authorizationModule
     ],
     mappings: [
         ConfigurationContextProvider,
         {map: ConfigurationContextModel, useType: ConfigurationContextModelSqLite},
-        {map: ConfigurationContextApiListener, instantiate: true}
+        // {
+        //     map: ConfigurationContextApiConfig,
+        //     useValue: {apiKey: process?.env?.CONFIGURATION_CONTEXT_API_KEY || "DEV::CONFIGURATION_CONTEXT_API_KEY"}
+        // } as InjectionConfig<ConfigurationContextApiConfig>,
+        // {map: ConfigurationContextApiListener, instantiate: true}
     ],
     commands: [
-        {event: ValidateSocketConnectionEvent.TYPE, command: ValidateNewConnection},
-        {event: DeleteConfigurationContextEvent.TYPE, command: DeleteConfigurationContext},
-        {event: UpdateConfigurationContextEvent.TYPE, command: UpdateConfigurationContext},
+        // {event: ValidateSocketConnectionEvent.TYPE, command: ValidateNewConnection},
+        // {event: DeleteConfigurationContextEvent.TYPE, command: DeleteConfigurationContext},
+        // {event: UpdateConfigurationContextEvent.TYPE, command: UpdateConfigurationContext},
     ],
+
     /*setup: injector => {
         // This is not a right place to leave this
         injector.get(ConfigurationContextModel).saveConfiguration(
