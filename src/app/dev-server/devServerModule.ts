@@ -11,6 +11,11 @@ import {configurationContextModule} from "../../lib/configurationContext/configu
 import {HttpServerRouter, HttpServerService} from "../../lib/httpServer";
 import {SocketDescriptor} from "../../lib/websocketListener/data/SocketDescriptor";
 import {authorizationModule} from "../../lib/authorization";
+import {ConfigurationContextApiConfig} from "../../lib/configurationContext/config/ConfigurationContextApiConfig";
+import {AccessTokenApiConfig} from "../../lib/authorization/config/AccessTokenApiConfig";
+
+export const configurationContextApiKey = "DEV::CONFIGURATION_CONTEXT_API_KEY";
+export const accessTokenApiKey = "DEV::ACCESS_TOKEN_MANAGER_KEY";
 
 export const devServerModule: ModuleConfig = {
     requires: [
@@ -42,7 +47,15 @@ export const devServerModule: ModuleConfig = {
                     }
                 ]
             }
-        } as InjectionConfig<SwaggerApiConfig>
+        } as InjectionConfig<SwaggerApiConfig>,
+        {
+            map: ConfigurationContextApiConfig,
+            useValue: {apiKey: process?.env?.CONFIGURATION_CONTEXT_API_KEY || configurationContextApiKey}
+        } as InjectionConfig<ConfigurationContextApiConfig>,
+        {
+            map: AccessTokenApiConfig,
+            useValue: {apiKey: process?.env?.ACCESS_TOKEN_MANAGER_KEY || accessTokenApiKey}
+        } as InjectionConfig<AccessTokenApiConfig>,
     ],
     setup: injector => {
 

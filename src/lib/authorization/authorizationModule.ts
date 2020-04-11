@@ -12,10 +12,6 @@ export const authorizationModule: ModuleConfig = {
     mappings: [
         AccessTokenProvider,
         {map: AccessTokenDataModel, useType: AccessTokenDataModelSqLite},
-        {
-            map: AccessTokenApiConfig,
-            useValue: {apiKey: process?.env?.ACCESS_TOKEN_MANAGER_KEY || "DEV::ACCESS_TOKEN_MANAGER_KEY"}
-        } as InjectionConfig<AccessTokenApiConfig>,
         {map: AccessTokenApiListener, instantiate: true}
     ]
 };
