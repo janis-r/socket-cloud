@@ -1,5 +1,6 @@
 import {TokenData} from "../data/TokenData";
 import {ContextId} from "../../configurationContext/data/ContextId";
+import {AccessConfiguration} from "../data/AccessConfiguration";
 
 /**
  * Data model that abstracts retrieval and saving of access token configuration into external storage,
@@ -7,10 +8,12 @@ import {ContextId} from "../../configurationContext/data/ContextId";
  */
 export abstract class AccessTokenDataModel {
     /**
-     * Save access token data
-     * @param data
+     * Create access entry
+     * @param contextId Configuration context scope
+     * @param permissions Access permissions to be granted for new entry
+     * @returns Token data that shall identify newly created entry
      */
-    abstract readonly saveTokenData: (data: TokenData) => Promise<boolean>;
+    abstract readonly createAccessEntry: (contextId: ContextId, permissions: AccessConfiguration) => Promise<TokenData["token"]>;
 
     /**
      * Retrieve access token data.

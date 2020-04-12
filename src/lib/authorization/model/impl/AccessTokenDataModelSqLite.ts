@@ -2,6 +2,7 @@ import {SqLiteConnection} from "../../../sqLite";
 import {AccessTokenDataModel} from "../AccessTokenDataModel";
 import {TokenData, tokenDataValidator} from "../../data/TokenData";
 import {ContextId} from "../../../configurationContext/data/ContextId";
+import {AccessConfiguration, accessConfigurationValidator} from "../../data/AccessConfiguration";
 
 export class AccessTokenDataModelSqLite implements AccessTokenDataModel {
 
@@ -82,20 +83,29 @@ export class AccessTokenDataModelSqLite implements AccessTokenDataModel {
         });
     };
 
-    readonly saveTokenData = async (data: TokenData): Promise<boolean> => {
+    readonly createAccessEntry = async (contextId: ContextId, permissions: AccessConfiguration): Promise<TokenData["token"]> => {
+
+        if (!accessConfigurationValidator.validate(permissions)) {
+            throw new Error(`Invalid access configuration: ${JSON.stringify(accessConfigurationValidator.lastError)}`);
+        }
+
+        const data: TokenData = {
+            token: await this.createNewToken(),
+            contextId,
+            ...permissions
+        };
+
         if (!tokenDataValidator.validate(data)) {
             throw new Error(`Cannot save invalid token data - err: ${JSON.stringify(tokenDataValidator.lastError)}`);
         }
 
-        const {changes} = await this.db.run(`
-                    INSERT OR
-                    REPLACE
-                    INTO access_token(token, context_id, configuration)
+        await this.db.run(`
+                    INSERT INTO access_token(token, context_id, configuration)
                     VALUES (?, ?, ?);
             `,
             [data.token, data.contextId, JSON.stringify(data)]
         );
-        return !!changes;
+        return data.token;
     };
 
     readonly deleteTokenData = async (tokenId: TokenData["token"]): Promise<boolean> => {
@@ -108,5 +118,32 @@ export class AccessTokenDataModelSqLite implements AccessTokenDataModel {
         );
         return !!changes;
     };
+
+    private async createNewToken() {
+        const {db: {get}} = this;
+        const token = new Array(3)
+            .fill(0)
+            .map(_ => Math.floor(Math.random() * 0xFFFFFF))
+            .map(v => v.toString(32))
+            .join("-");
+
+        let iterations = 0;
+        while (true) {
+            const result = await get(`
+                        SELECT 1
+                        FROM access_token
+                        WHERE token = ?`,
+                [token]
+            );
+            if (!result) {
+                return token;
+            }
+            if (iterations++ > 10) {
+                throw new Error(`New token takes too many iterations to generate!`);
+            }
+        }
+
+        return null;
+    }
 }
 

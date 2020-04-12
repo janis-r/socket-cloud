@@ -1,6 +1,8 @@
 import {launchServer, serverIsRunning, stopServer} from "./server-utils";
 import {SocketClient, spawnConnections} from "./connection-utils";
 import {PlatformApi} from "./PlatformApi";
+import {accessTokenApiKey} from "../../dev-server/devServerModule";
+import {AccessTokenApi} from "./AccessTokenApi";
 
 const debug = true;
 
@@ -45,5 +47,7 @@ export const resetConnections = done => {
 };
 
 export const createPlatformApi = (apiKey = 'valid-x-api-key') => new PlatformApi(serverUrl, contextId, apiKey);
+
+export const createAccessTokenApi = (apiKey = accessTokenApiKey) => new AccessTokenApi(serverUrl, contextId, apiKey);
 
 export const characterSequence = (length: number) => new Array(length).fill(0).map((_, index) => String.fromCharCode('a'.charCodeAt(0) + index));

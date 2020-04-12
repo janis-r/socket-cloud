@@ -17,7 +17,7 @@ describe('Platform API', () => {
     afterEach(resetConnections);
 
     it('Post with unauthorized access token will produce error', async done => {
-        const platformApi = createPlatformApi('invlid-access-token');
+        const platformApi = createPlatformApi('invalid-access-token');
         try {
             await platformApi.individualMessage("payload", connections[0].connectionId.toString());
         } catch (e) {

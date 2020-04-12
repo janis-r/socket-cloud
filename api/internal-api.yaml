@@ -60,28 +60,44 @@ paths:
       security:
         - ApiAuthKey: []
 
-  /access-token/:
+  /access-token/{contextId}/:
+    parameters:
+      - $ref: "#/components/parameters/contextId"
     post:
-      summary: Create access token
+      summary: Create access entry for configuration context.
       tags:
         - Access token API
       requestBody:
-        required: true
-        description: Access token data to be saved.
+        description: Access configuration data to be saved assigned to new token.
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TokenData"
+              $ref: "#/components/schemas/AccessConfiguration"
       responses:
         200:
-          description: Success!
+          $ref: "#/components/responses/NewAccessTokenData"
         400:
           $ref: "#/components/responses/InvalidInputData"
       security:
         - ApiAuthKey: []
 
-  /access-token/{accessToken}/:
+    get:
+      summary: Retrieve list of access tokens by configuration context.
+      tags:
+        - Access token API
+      responses:
+        200:
+          description: Return list of token info belonging to requested configuration context.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TokenData"
+
+  /access-token/{contextId}/{accessToken}/:
     parameters:
+      - $ref: "#/components/parameters/contextId"
       - $ref: "#/components/parameters/accessToken"
     get:
       summary: Get access token info.
@@ -93,7 +109,7 @@ paths:
         404:
           description: Unknown token id.
     delete:
-      summary: Delete access token data.
+      summary: Delete access configuration by token.
       tags:
         - Access token API
       responses:
@@ -101,23 +117,6 @@ paths:
           description: Record is deleted.
         404:
           description: Unknown token id.
-
-  /access-token/context/{contextId}/:
-    get:
-      summary: Retrieve list of access tokens by context id.
-      tags:
-        - Access token API
-      parameters:
-        - $ref: "#/components/parameters/contextId"
-      responses:
-        200:
-          description: Return list of token info belonging to requested configuration context.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/TokenData"
 
 components:
   schemas:
@@ -136,36 +135,27 @@ components:
         - protocol
     #        TODO: Full list of context config properties might follow once ConfigurationContext shape is stable
 
-    TokenData:
-      description: Access token configuration data
+    AccessConfiguration:
+      description: Access configuration data.
       type: object
       properties:
-        token:
-          type: string
-          minLength: 10
-          maxLength: 50
-          pattern: "^[\\w\\d-]+$"
-        contextId:
-          type: string
-          description: Context id this access token belongs to.
-          pattern: "^[\\w\\d-]+$"
         accessRights:
           description: General access rights that apply to all channells if not set otherwise within per channel config.
           oneOf:
-            - $ref: "#/components/schemas/AccessRightsToken"
+            - $ref: "#/components/schemas/AccessRightsConstant"
             - $ref: "#/components/schemas/AccessRightsPermissions"
         channelConfig:
           description: Per channel configurationn where object key refers to channel id and value represent configuration override over accessRights configuration.
           type: object
           additionalProperties:
             oneOf:
-              - $ref: "#/components/schemas/AccessRightsToken"
+              - $ref: "#/components/schemas/AccessRightsConstant"
               - $ref: "#/components/schemas/AccessRightsPermissions"
       required:
         - token
         - contextId
 
-    AccessRightsToken:
+    AccessRightsConstant:
       description: String token identifying access rights
       type: string
       enum:
@@ -182,24 +172,40 @@ components:
         postMultiChannelMessages:
           type: boolean
 
+    TokenData:
+      description: Access token full data.
+      allOf:
+        - type: object
+          properties:
+            token:
+              type: string
+              minLength: 10
+              maxLength: 50
+              pattern: "^[\\w\\d-]+$"
+            contextId:
+              type: string
+              description: Context id this access token belongs to.
+              pattern: "^[\\w\\d-]+$"
+        - $ref: "#/components/schemas/AccessConfiguration"
+
   parameters:
     contextId:
       in: path
       name: contextId
+      description: Configuration context id
       required: true
       schema:
         type: string
         pattern: "^[\\w\\d-]+$"
-      description: Configuration context path param
 
     accessToken:
       in: path
       name: accessToken
+      description: Access token value
       required: true
       schema:
         type: string
         pattern: "^[\\w\\d-]+$"
-      description: Access token path param
 
   responses:
     Unauthorized:
@@ -233,6 +239,19 @@ components:
                 description: Field id which caused error, if error is produced by specific field.
             required:
               - error
+
+    NewAccessTokenData:
+      description: Generated access token value.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+                description: Access token generated and configured to provide rights requested.
+            required:
+              - token
 
     TokenData:
       description: Data associated with requested token
