@@ -8,20 +8,41 @@ import {
 } from "..";
 import {UpdateConfigurationContextEvent} from "../event/UpdateConfigurationContextEvent";
 import {DeleteConfigurationContextEvent} from "../event/DeleteConfigurationContextEvent";
+import {ConfigurationContextApiConfig} from "../config/ConfigurationContextApiConfig";
+import {defaultProtocolId} from "../../defaultProtocol/data/defaultProtocolId";
 
 @Injectable()
 export class ConfigurationContextApiListener {
+
     readonly servicePath = "context-config";
+    private readonly apiKeyHeaderName = "X-API-KEY";
 
     constructor(httpRouter: HttpServerRouter,
                 private readonly contextProvider: ConfigurationContextProvider,
                 private readonly contextModel: ConfigurationContextModel,
+                private readonly config: ConfigurationContextApiConfig,
                 private readonly eventDispatcher: EventDispatcher) {
         const {servicePath} = this;
+        httpRouter.use(`/${servicePath}/`, this.validateRequestHeaders);
         httpRouter.get(`/${servicePath}/:contextId(${contextIdMatchRegexp})`, this.retrieveConfig);
         httpRouter.post(`/${servicePath}`, this.setConfig);
         httpRouter.delete(`/${servicePath}/:contextId(${contextIdMatchRegexp})`, this.deleteConfig);
     }
+
+    private readonly validateRequestHeaders: HttpRequestHandler = async ({sendText, header, next}) => {
+        const {apiKeyHeaderName, config: {apiKey}} = this;
+        const requestKey = header(apiKeyHeaderName);
+
+        const notAuthorizedParams = {status: HttpStatusCode.Unauthorized, headers: {WWW_Authenticate: "Basic"}};
+        if (!requestKey) {
+            sendText("API key not set", notAuthorizedParams);
+        } else if (requestKey !== apiKey) {
+            // TODO: Log big fat error in here!
+            sendText("Not authorized", notAuthorizedParams);
+        } else {
+            next();
+        }
+    };
 
     private readonly retrieveConfig: HttpRequestHandler = async ({param, sendJson, sendStatus}) => {
         const {NotFound} = HttpStatusCode;
@@ -39,10 +60,17 @@ export class ConfigurationContextApiListener {
         const {Ok, BadRequest} = HttpStatusCode;
         const {contextModel: {saveConfiguration}, eventDispatcher} = this;
         const configuration = body;
-        if (!configuration) {
+
+        if (!configuration || typeof configuration !== "object") {
             sendStatus(BadRequest);
             return;
         }
+
+        if (!("protocol" in configuration)) {
+            // Set protocol to default protocol once it's omitted
+            configuration["protocol"] = defaultProtocolId;
+        }
+
         if (!configurationContextValidator.validate(configuration)) {
             sendJson(configurationContextValidator.lastError, {status: 400});
             return;

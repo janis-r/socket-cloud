@@ -40,6 +40,11 @@ export abstract class ConfigurationContext {
     };
 }
 
+const cashingPolicyValidator = new Validator<ConfigurationContext["cachingPolicy"]>({
+    cacheTime: {type: "number", optional: true},
+    cacheSize: {type: "number", optional: true}
+});
+
 export const configurationContextValidator = new Validator<ConfigurationContext>({
     id: {type: "string", notEmpty: true, validator: ({length}: string) => length >= 2 && length <= 50},
     protocol: {type: "string", notEmpty: true},
@@ -56,13 +61,12 @@ export const configurationContextValidator = new Validator<ConfigurationContext>
     maxPayloadSize: {type: "number", optional: true},
     compressData: {type: "boolean", optional: true},
     cachingPolicy: {
-        validator: new Validator<ConfigurationContext["cachingPolicy"]>({
-            cacheTime: {type: "number", optional: true},
-            cacheSize: {type: "number", optional: true}
-        }).validate,
+        validator: cashingPolicyValidator.validate,
         optional: true
     },
-    channelConfig: { // TODO: Elaborate
-        type: "object", optional: true
+    channelConfig: {
+        type: "object",
+        optional: true,
+        validator: value => !Object.keys(value).some(entry => !cashingPolicyValidator.validate(entry))
     },
 });

@@ -1,18 +1,9 @@
-import {
-    createAccessTokenApi,
-    createConnections,
-    resetConnections,
-    startSocketServer,
-    stopSocketServer
-} from "../util/test-utils";
+import {createAccessTokenApi, startSocketServer, stopSocketServer} from "../util/test-utils";
 
 describe('Access token API', () => {
 
     beforeAll(startSocketServer());
     afterAll(stopSocketServer);
-
-    beforeEach(createConnections(1));
-    afterEach(resetConnections);
 
     it('Wrong api key will lead to error', async done => {
         const api = createAccessTokenApi('invalid-api-key');

@@ -3,15 +3,7 @@ import {ContextId} from "../../../lib/configurationContext";
 import {HttpStatusCode} from "../../../lib/httpServer";
 import {AccessConfiguration} from "../../../lib/authorization/data/AccessConfiguration";
 import {TokenData, tokenDataValidator} from "../../../lib/authorization/data/TokenData";
-
-const jsonHeaders = {"Accept": "application/json", "Content-Type": "application/json"};
-const createHeaders = (apiKey: string, useJson = true) => {
-    const headers = useJson ? jsonHeaders : {};
-    if (apiKey) {
-        return {...headers, "X-API-KEY": apiKey};
-    }
-    return {...headers};
-};
+import {createHeaders} from "./test-utils";
 
 export class AccessTokenApi {
     readonly servicePath = "access-token";
@@ -26,7 +18,7 @@ export class AccessTokenApi {
         const {serverUrl, contextId, apiAccessKey, servicePath} = this;
         const request = await fetch(`${serverUrl}/${servicePath}/${contextId}`, {
             method: "POST",
-            headers: createHeaders(apiAccessKey),
+            headers: createHeaders(apiAccessKey, true),
             body: configuration ? JSON.stringify(configuration) : null
         });
 

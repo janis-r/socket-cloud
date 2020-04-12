@@ -129,10 +129,9 @@ components:
           description: Context id.
         protocol:
           type: string
-          description: Data exchange protocol used by this context.
+          description: Data exchange protocol used by this context. If value is not provided, a default protocol will be in use.
       required:
         - id
-        - protocol
     #        TODO: Full list of context config properties might follow once ConfigurationContext shape is stable
 
     AccessConfiguration:

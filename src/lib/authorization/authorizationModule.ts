@@ -7,7 +7,7 @@ import {AccessTokenApiListener} from "./service/AccessTokenApiListener";
 
 export const authorizationModule: ModuleConfig = {
     requires: [
-        // configurationContextModule TODO: ....
+        // configurationContextModule TODO: Looks like authorizationModule and configurationContextModule should be merged
     ],
     mappings: [
         AccessTokenProvider,

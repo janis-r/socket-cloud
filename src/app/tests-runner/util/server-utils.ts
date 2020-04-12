@@ -37,6 +37,7 @@ export const stopServer = () => {
     }
     killProcessTree(serverProcess.pid);
     serverProcess = null;
+    logToConsole('>> server stopped!');
     return true;
 };
 
