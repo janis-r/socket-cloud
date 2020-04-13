@@ -8,16 +8,16 @@ type ConfigurationContextWithOptionalProtocol =
     & Omit<ConfigurationContext, "protocol">;
 
 export class ConfigurationContextApi {
-    readonly servicePath = "context-config";
 
-    constructor(readonly serverUrl: string, readonly apiAccessKey: string) {
+    constructor(readonly servicePath: string,
+                readonly apiKey: string) {
     }
 
     readonly configureConfigurationContext = async (configuration: ConfigurationContextWithOptionalProtocol): Promise<void> => {
-        const {serverUrl, apiAccessKey, servicePath} = this;
-        const request = await fetch(`${serverUrl}/${servicePath}/`, {
+        const {servicePath, apiKey} = this;
+        const request = await fetch(`${servicePath}/`, {
             method: "POST",
-            headers: createHeaders(apiAccessKey, true),
+            headers: createHeaders(apiKey, true),
             body: JSON.stringify(configuration)
         });
 
@@ -32,10 +32,10 @@ export class ConfigurationContextApi {
     };
 
     readonly getConfigurationContext = async (contextId: ContextId): Promise<ConfigurationContext> => {
-        const {serverUrl, apiAccessKey, servicePath} = this;
-        const request = await fetch(`${serverUrl}/${servicePath}/${contextId}`, {
+        const {servicePath, apiKey} = this;
+        const request = await fetch(`${servicePath}/${contextId}`, {
             method: "GET",
-            headers: createHeaders(apiAccessKey, false)
+            headers: createHeaders(apiKey, false)
         });
 
         const {status, statusText} = request;
@@ -56,10 +56,10 @@ export class ConfigurationContextApi {
     };
 
     readonly deleteConfigurationContext = async (contextId: ContextId): Promise<void> => {
-        const {serverUrl, apiAccessKey, servicePath} = this;
-        const request = await fetch(`${serverUrl}/${servicePath}/${contextId}`, {
+        const {servicePath, apiKey} = this;
+        const request = await fetch(`${servicePath}/${contextId}`, {
             method: "DELETE",
-            headers: createHeaders(apiAccessKey, false)
+            headers: createHeaders(apiKey, false)
         });
 
         const {status, statusText} = request;

@@ -16,7 +16,7 @@ describe('Channel message restoring', () => {
     beforeEach(createConnections(2));
     afterEach(resetConnections);
 
-    it('Channel subscription can be restored', async (done) => {
+    it('Channel subscription can be restored', async done => {
         const channel = 'cached-channel';
         const messages = characterSequence(10);
         const [firstConnection, secondConnection] = connections;

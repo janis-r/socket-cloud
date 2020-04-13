@@ -10,7 +10,7 @@ import {ConfigurationContextProvider} from "../../configurationContext";
 
 @Injectable()
 export class AccessTokenApiListener {
-    readonly servicePath = "access-token";
+    static readonly servicePath = "api/access-token";
 
     private readonly apiKeyHeaderName = "X-API-KEY";
 
@@ -19,18 +19,15 @@ export class AccessTokenApiListener {
                 private readonly tokenProvider: AccessTokenProvider,
                 private readonly tokenDataModel: AccessTokenDataModel,
                 private readonly contextProvider: ConfigurationContextProvider) {
-        const {servicePath: path} = this;
+        const {servicePath: path} = AccessTokenApiListener;
 
         const contextIdParam = `:contextId(${contextIdMatchRegexp})`;
         const tokenParam = `:token(${tokenMatchRegexp})`;
-
         httpRouter.use(`/${path}/`, this.validateRequestHeaders);
-
         httpRouter.post(`/${path}/${contextIdParam}`, this.createAccessConfiguration);
         httpRouter.get(`/${path}/${contextIdParam}`, this.getTokensInfoByContext);
         httpRouter.get(`/${path}/${contextIdParam}/${tokenParam}`, this.getTokenInfo);
         httpRouter.delete(`/${path}/${contextIdParam}/${tokenParam}`, this.deleteToken);
-
     }
 
     private readonly validateRequestHeaders: HttpRequestHandler = async ({sendText, header, next}) => {

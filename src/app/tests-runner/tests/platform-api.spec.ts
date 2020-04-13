@@ -17,7 +17,7 @@ describe('Platform API', () => {
     afterEach(resetConnections);
 
     it('Post with unauthorized access token will produce error', async done => {
-        const platformApi = createPlatformApi('invalid-access-token');
+        const platformApi = await createPlatformApi('invalid-access-token');
         try {
             await platformApi.individualMessage("payload", connections[0].connectionId.toString());
         } catch (e) {
@@ -26,8 +26,7 @@ describe('Platform API', () => {
         }
     });
     it('Can post single individual message to several clients', async done => {
-
-        const platformApi = createPlatformApi();
+        const platformApi = await createPlatformApi();
         const payload = Math.floor(Math.random() * 0xFFFFFFFF).toString(16);
 
         let messageCount = 0;
@@ -63,7 +62,7 @@ describe('Platform API', () => {
     });
 
     it('Can post unique individual message to several clients', async done => {
-        const platformApi = createPlatformApi();
+        const platformApi = await createPlatformApi();
         const messageCount = connections.length;
         let receivedMessagesCount = 0;
         let sendToCount = 0;
@@ -97,7 +96,7 @@ describe('Platform API', () => {
     });
 
     it('Can post channel message', async done => {
-        const platformApi = createPlatformApi();
+        const platformApi = await createPlatformApi();
         const payload = Math.floor(Math.random() * 0xFFFFFFFF).toString(16);
         const channel = "channel-name";
 
@@ -123,7 +122,7 @@ describe('Platform API', () => {
     });
 
     it('Can post several channel messages', async done => {
-        const platformApi = createPlatformApi();
+        const platformApi = await createPlatformApi();
         const payloads = [
             Math.floor(Math.random() * 0xFFFFFFFF).toString(16),
             Math.floor(Math.random() * 0xFFFFFFFF).toString(16)

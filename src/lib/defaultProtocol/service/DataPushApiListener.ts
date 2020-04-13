@@ -13,6 +13,7 @@ import {contextIdMatchRegexp} from "../../configurationContext";
 
 @Injectable()
 export class DataPushApiListener {
+    static readonly servicePath = "api/push";
 
     private readonly authTokenHeaderName = 'X-API-KEY';
     private readonly authTokenErrorResponseParams = {
@@ -27,10 +28,10 @@ export class DataPushApiListener {
                 private readonly messageCache: MessageCache,
                 private readonly messageIdProvider: MessageIdProvider,
                 private readonly eventDispatcher: EventDispatcher) {
-
-        router.post(`/:contextId(${contextIdMatchRegexp})/individual-message/`, this.individualMessageHandler);
-        router.post(`/:contextId(${contextIdMatchRegexp})/channel-message/`, this.channelMessageHandler);
-        router.post(`/:contextId(${contextIdMatchRegexp})/multi-channel-message/`, this.multiChannelMessageHandler);
+        const {servicePath} = DataPushApiListener;
+        router.post(`/${servicePath}/:contextId(${contextIdMatchRegexp})/individual-message/`, this.individualMessageHandler);
+        router.post(`/${servicePath}/:contextId(${contextIdMatchRegexp})/channel-message/`, this.channelMessageHandler);
+        router.post(`/${servicePath}/:contextId(${contextIdMatchRegexp})/multi-channel-message/`, this.multiChannelMessageHandler);
     }
 
     private readonly individualMessageHandler: HttpRequestHandler = async request => {
@@ -45,7 +46,7 @@ export class DataPushApiListener {
         const {context: {id: contextId, maxPayloadSize}, accessRights} = config;
 
         // Check permissions
-        if (accessRights !== "all" && !accessRights.postIndividualMessages) {
+        if (accessRights !== "all" && !accessRights?.postIndividualMessages) {
             sendJson({error: "Action is not allowed"}, {status: MethodNotAllowed});
             return;
         }

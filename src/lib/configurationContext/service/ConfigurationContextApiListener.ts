@@ -14,7 +14,8 @@ import {defaultProtocolId} from "../../defaultProtocol/data/defaultProtocolId";
 @Injectable()
 export class ConfigurationContextApiListener {
 
-    readonly servicePath = "context-config";
+    static readonly servicePath = "api/context-config";
+
     private readonly apiKeyHeaderName = "X-API-KEY";
 
     constructor(httpRouter: HttpServerRouter,
@@ -22,7 +23,7 @@ export class ConfigurationContextApiListener {
                 private readonly contextModel: ConfigurationContextModel,
                 private readonly config: ConfigurationContextApiConfig,
                 private readonly eventDispatcher: EventDispatcher) {
-        const {servicePath} = this;
+        const {servicePath} = ConfigurationContextApiListener;
         httpRouter.use(`/${servicePath}/`, this.validateRequestHeaders);
         httpRouter.get(`/${servicePath}/:contextId(${contextIdMatchRegexp})`, this.retrieveConfig);
         httpRouter.post(`/${servicePath}`, this.setConfig);

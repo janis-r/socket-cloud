@@ -4,20 +4,19 @@ import {ContextId} from "../../../lib/configurationContext";
 import {ChannelId} from "../../../lib/defaultProtocol/data/ChannelId";
 import {MessageValidator} from "../../../lib/defaultProtocol/util/MessageValidator";
 import {HttpStatusCode} from "../../../lib/httpServer";
+import {createHeaders} from "./test-utils";
 
 export class PlatformApi {
-    constructor(readonly serverUrl: string, readonly contextId: ContextId, readonly apiAccessKey: string) {
+    constructor(readonly serviceUrl: string,
+                readonly contextId: ContextId,
+                readonly apiKey: string) {
     }
 
     readonly individualMessage = async (payload: string, ...connectionIds: ExternalId[]): Promise<MessageDeliveryReport> => {
-        const {serverUrl, contextId, apiAccessKey} = this;
-        const request = await fetch(`${serverUrl}/${contextId}/individual-message`, {
+        const {serviceUrl, contextId, apiKey} = this;
+        const request = await fetch(`${serviceUrl}/${contextId}/individual-message`, {
             method: "POST",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "X-API-KEY": apiAccessKey
-            },
+            headers: createHeaders(apiKey, true),
             body: JSON.stringify({connectionIds, payload})
         });
 
@@ -38,14 +37,10 @@ export class PlatformApi {
     };
 
     readonly channelMessage = async (payload: string, ...channels: ChannelId[]): Promise<MessageDeliveryReport> => {
-        const {serverUrl, contextId, apiAccessKey} = this;
-        const request = await fetch(`${serverUrl}/${contextId}/channel-message`, {
+        const {serviceUrl, contextId, apiKey} = this;
+        const request = await fetch(`${serviceUrl}/${contextId}/channel-message`, {
             method: "POST",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "X-API-KEY": apiAccessKey
-            },
+            headers: createHeaders(apiKey, true),
             body: JSON.stringify({channels, payload})
         });
 
@@ -66,14 +61,10 @@ export class PlatformApi {
     };
 
     readonly multiChannelMessage = async (...messages: { payload: string, channels: ChannelId[] }[]): Promise<MessageDeliveryReport> => {
-        const {serverUrl, contextId, apiAccessKey} = this;
-        const request = await fetch(`${serverUrl}/${contextId}/multi-channel-message`, {
+        const {serviceUrl, contextId, apiKey} = this;
+        const request = await fetch(`${serviceUrl}/${contextId}/multi-channel-message`, {
             method: "POST",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "X-API-KEY": apiAccessKey
-            },
+            headers: createHeaders(apiKey, true),
             body: JSON.stringify(messages)
         });
 

@@ -6,19 +6,18 @@ import {TokenData, tokenDataValidator} from "../../../lib/authorization/data/Tok
 import {createHeaders} from "./test-utils";
 
 export class AccessTokenApi {
-    readonly servicePath = "access-token";
 
-    constructor(readonly serverUrl: string,
+    constructor(readonly servicePath: string,
                 readonly contextId: ContextId,
-                readonly apiAccessKey: string
+                readonly apiKey: string
     ) {
     }
 
     readonly createAccessEntry = async (configuration?: AccessConfiguration): Promise<TokenData["token"]> => {
-        const {serverUrl, contextId, apiAccessKey, servicePath} = this;
-        const request = await fetch(`${serverUrl}/${servicePath}/${contextId}`, {
+        const {servicePath, contextId, apiKey} = this;
+        const request = await fetch(`${servicePath}/${contextId}`, {
             method: "POST",
-            headers: createHeaders(apiAccessKey, true),
+            headers: createHeaders(apiKey, true),
             body: configuration ? JSON.stringify(configuration) : null
         });
 
@@ -36,10 +35,10 @@ export class AccessTokenApi {
     };
 
     readonly getTokensByContext = async (contextId: ContextId = this.contextId): Promise<TokenData[]> => {
-        const {serverUrl, apiAccessKey, servicePath} = this;
-        const request = await fetch(`${serverUrl}/${servicePath}/${contextId}`, {
+        const {servicePath, apiKey} = this;
+        const request = await fetch(`${servicePath}/${contextId}`, {
             method: "GET",
-            headers: createHeaders(apiAccessKey, false)
+            headers: createHeaders(apiKey, false)
         });
 
         const {status, statusText} = request;
@@ -65,10 +64,10 @@ export class AccessTokenApi {
     };
 
     readonly getTokenData = async (token: TokenData["token"], contextId: ContextId = this.contextId): Promise<TokenData> => {
-        const {serverUrl, apiAccessKey, servicePath} = this;
-        const request = await fetch(`${serverUrl}/${servicePath}/${contextId}/${token}`, {
+        const {servicePath, apiKey} = this;
+        const request = await fetch(`${servicePath}/${contextId}/${token}`, {
             method: "GET",
-            headers: createHeaders(apiAccessKey, false)
+            headers: createHeaders(apiKey, false)
         });
 
         const {status, statusText} = request;
@@ -89,10 +88,10 @@ export class AccessTokenApi {
     };
 
     readonly deleteAccessToken = async (token: TokenData["token"], contextId: ContextId = this.contextId): Promise<void> => {
-        const {serverUrl, apiAccessKey, servicePath} = this;
-        const request = await fetch(`${serverUrl}/${servicePath}/${contextId}/${token}`, {
+        const {servicePath, apiKey} = this;
+        const request = await fetch(`${servicePath}/${contextId}/${token}`, {
             method: "DELETE",
-            headers: createHeaders(apiAccessKey, false)
+            headers: createHeaders(apiKey, false)
         });
 
         const {status, statusText} = request;
