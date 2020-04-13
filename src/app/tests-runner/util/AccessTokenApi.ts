@@ -35,7 +35,7 @@ export class AccessTokenApi {
         })}`);
     };
 
-    readonly getTokensByContext = async (contextId: ContextId = this.contextId) => {
+    readonly getTokensByContext = async (contextId: ContextId = this.contextId): Promise<TokenData[]> => {
         const {serverUrl, apiAccessKey, servicePath} = this;
         const request = await fetch(`${serverUrl}/${servicePath}/${contextId}`, {
             method: "GET",
@@ -64,7 +64,7 @@ export class AccessTokenApi {
         });
     };
 
-    readonly getTokensData = async (token: TokenData["token"], contextId: ContextId = this.contextId) => {
+    readonly getTokenData = async (token: TokenData["token"], contextId: ContextId = this.contextId): Promise<TokenData> => {
         const {serverUrl, apiAccessKey, servicePath} = this;
         const request = await fetch(`${serverUrl}/${servicePath}/${contextId}/${token}`, {
             method: "GET",
@@ -73,7 +73,7 @@ export class AccessTokenApi {
 
         const {status, statusText} = request;
         if (status !== HttpStatusCode.Ok) {
-            throw new Error(`AccessToken API getTokensData produced error: ${JSON.stringify({
+            throw new Error(`AccessToken API getTokenData produced error: ${JSON.stringify({
                 status,
                 statusText,
                 response: await request.text()
@@ -86,5 +86,22 @@ export class AccessTokenApi {
         }
 
         return data;
+    };
+
+    readonly deleteAccessToken = async (token: TokenData["token"], contextId: ContextId = this.contextId): Promise<void> => {
+        const {serverUrl, apiAccessKey, servicePath} = this;
+        const request = await fetch(`${serverUrl}/${servicePath}/${contextId}/${token}`, {
+            method: "DELETE",
+            headers: createHeaders(apiAccessKey, false)
+        });
+
+        const {status, statusText} = request;
+        if (status !== HttpStatusCode.Ok) {
+            throw new Error(`AccessToken API deleteAccessToken produced error: ${JSON.stringify({
+                status,
+                statusText,
+                response: await request.text()
+            })}`);
+        }
     };
 }

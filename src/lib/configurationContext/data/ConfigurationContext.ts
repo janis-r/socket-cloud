@@ -45,6 +45,13 @@ const cashingPolicyValidator = new Validator<ConfigurationContext["cachingPolicy
     cacheSize: {type: "number", optional: true}
 });
 
+const perChannelConfigValidator = new Validator<ConfigurationContext["channelConfig"][0]>({
+    cachingPolicy: {
+        optional: true,
+        validator: value => cashingPolicyValidator.validate(value) ? true : JSON.stringify(cashingPolicyValidator.lastError)
+    }
+});
+
 export const configurationContextValidator = new Validator<ConfigurationContext>({
     id: {type: "string", notEmpty: true, validator: ({length}: string) => length >= 2 && length <= 50},
     protocol: {type: "string", notEmpty: true},
@@ -61,12 +68,18 @@ export const configurationContextValidator = new Validator<ConfigurationContext>
     maxPayloadSize: {type: "number", optional: true},
     compressData: {type: "boolean", optional: true},
     cachingPolicy: {
-        validator: cashingPolicyValidator.validate,
-        optional: true
+        optional: true,
+        validator: value => cashingPolicyValidator.validate(value) ? true : JSON.stringify(cashingPolicyValidator.lastError)
     },
     channelConfig: {
         type: "object",
         optional: true,
-        validator: value => !Object.keys(value).some(entry => !cashingPolicyValidator.validate(entry))
+        validator: value => {
+            const error = Object.keys(value).find(channelId => !perChannelConfigValidator.validate(value[channelId]));
+            if (error) {
+                return `Invalid per channel caching policy entry encountered - ${JSON.stringify(error)}, error - ${JSON.stringify(perChannelConfigValidator.lastError)}`;
+            }
+            return true;
+        }
     },
 });

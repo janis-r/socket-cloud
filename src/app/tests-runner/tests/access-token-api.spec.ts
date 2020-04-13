@@ -6,19 +6,20 @@ describe('Access token API', () => {
     afterAll(stopSocketServer);
 
     it('Wrong api key will lead to error', async done => {
-        const api = createAccessTokenApi('invalid-api-key');
+        const {createAccessEntry} = createAccessTokenApi('invalid-api-key');
         try {
-            const token = await api.createAccessEntry();
+            await createAccessEntry();
         } catch (e) {
             expect(e).toBeTruthy();
             done();
         }
     });
 
-    it('Can create new access entry', async () => {
-        const {createAccessEntry} = createAccessTokenApi();
+    it('Can create new access entry and then delete it', async () => {
+        const {createAccessEntry, deleteAccessToken} = createAccessTokenApi();
         const token = await createAccessEntry();
         expect(token).toBeTruthy();
+        await deleteAccessToken(token);
     });
 
     it('Can retrieve all context tokens', async () => {
@@ -37,9 +38,9 @@ describe('Access token API', () => {
     });
 
     it('Can retrieve context token entry', async () => {
-        const {createAccessEntry, getTokensData} = createAccessTokenApi();
+        const {createAccessEntry, getTokenData} = createAccessTokenApi();
         const newEntryToken = await createAccessEntry();
-        const data = await getTokensData(newEntryToken);
+        const data = await getTokenData(newEntryToken);
         expect(data.token).toBe(newEntryToken);
     });
 

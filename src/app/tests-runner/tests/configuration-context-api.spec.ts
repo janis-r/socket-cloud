@@ -10,8 +10,6 @@ describe('Configuration context API', () => {
         try {
             await configureConfigurationContext({id: "will never be in use"});
         } catch (e) {
-            console.log(e.message);
-            expect(e).toBeTruthy();
             done();
         }
     });
