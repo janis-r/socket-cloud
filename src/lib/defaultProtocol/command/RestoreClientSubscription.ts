@@ -2,7 +2,7 @@ import {Command, Event, Inject} from "quiver-framework";
 import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
 import {MessageType, RestoreChannelsRequestMessage} from "../data";
 import {ClientConnection} from "../../clientConnectionPool";
-import {MessageCache} from "../service/MessageCache";
+import {MessageManager} from "../service/MessageManager";
 import {
     RestoreChannelsResponseMessage,
     restoreResponseUtil
@@ -16,7 +16,7 @@ export class RestoreClientSubscription implements Command {
     @Inject()
     private dataContextManagerProvider: DataContextManagerProvider;
     @Inject()
-    private messageCache: MessageCache;
+    private messageCache: MessageManager;
 
     async execute(): Promise<void> {
         const {

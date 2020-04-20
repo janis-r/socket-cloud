@@ -115,6 +115,8 @@ export class SqLiteConnection {
             }
         })
     );
+
+    readonly prepare = (sql: string) => this.db.prepare(sql);
 }
 
 type QueryResponse = {

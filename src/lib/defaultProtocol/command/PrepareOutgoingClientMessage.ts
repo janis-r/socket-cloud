@@ -1,9 +1,7 @@
 import {Command, Event, EventDispatcher, Inject} from "quiver-framework";
-import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
 import {MessageType, PushToServerMessage} from "../data";
 import {ClientConnection} from "../../clientConnectionPool";
-import {MessageCache} from "../service/MessageCache";
-import {MessageIdProvider} from "../service/MessageIdProvider";
+import {MessageManager} from "../service/MessageManager";
 import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
 import {PushToClientMessage} from "../data/serverMessage/PushToClientMessage";
 
@@ -12,11 +10,7 @@ export class PrepareOutgoingClientMessage implements Command {
     @Inject()
     private event: Event<{ connection: ClientConnection, message: PushToServerMessage }>;
     @Inject()
-    private dataContextManagerProvider: DataContextManagerProvider;
-    @Inject()
-    private messageCache: MessageCache;
-    @Inject()
-    private messageIdProvider: MessageIdProvider;
+    private messageManager: MessageManager;
     @Inject()
     private eventDispatcher: EventDispatcher;
 
@@ -25,25 +19,22 @@ export class PrepareOutgoingClientMessage implements Command {
             event: {
                 data: {
                     message: {channels, payload},
-                    connection: {context: {id: contextId}}
+                    connection: {context: {id: contextId}, id, externalId}
                 }
             },
-            dataContextManagerProvider: {getContextManager},
-            messageCache,
-            messageIdProvider: {nextMessageId},
+            messageManager,
             eventDispatcher
         } = this;
 
-        const contextManager = await getContextManager(contextId);
-        const cachedChannels = channels.filter(channelId => !!contextManager.getChannelCachingPolicy(channelId));
+        const messageId = await messageManager.registerMessage(contextId, payload, {connectionId: id}, channels);
 
-        const messageId = nextMessageId();
-        const time = Date.now();
-        const message: PushToClientMessage = {type: MessageType.PushToClient, time, messageId, payload, channels};
-
-        if (cachedChannels.length > 0) {
-            messageCache.writeMessage(contextId, {time, messageId, payload, channels: cachedChannels});
-        }
+        const message: PushToClientMessage = {
+            type: MessageType.PushToClient,
+            time: Date.now(),
+            messageId,
+            payload,
+            channels
+        };
 
         const messageEvent = new OutgoingMessageEvent(contextId, message);
         eventDispatcher.dispatchEvent(messageEvent);

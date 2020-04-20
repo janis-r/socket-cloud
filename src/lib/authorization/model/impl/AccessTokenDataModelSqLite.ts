@@ -10,7 +10,7 @@ export class AccessTokenDataModelSqLite implements AccessTokenDataModel {
 
     constructor() {
         try {
-            this.db = new SqLiteConnection("access-token");
+            this.db = new SqLiteConnection("db/access-token.db");
             this.db.ready.then(() => this.initialize());
         } catch (e) {
             console.log(`Error while connecting to Sqlite: ${e.message}`);

@@ -18,7 +18,9 @@ export const launchServer = (singleCore: boolean = true, showLogs = false, mode:
     const time = new Timer();
     serverProcess = exec(exePath);
     serverProcess.stderr.on("data", err => {
-        throw err;
+        logToConsole('>> serverProcess.stderr');
+        showLogs && logToConsole(err);
+        process.exit();
     });
     serverProcess.stdout.on("data", async chunk => {
         const text = typeof chunk === "string" ? chunk : (chunk instanceof Buffer ? chunk.toString("utf8") : null);

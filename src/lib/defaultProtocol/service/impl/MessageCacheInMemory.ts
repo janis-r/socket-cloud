@@ -2,14 +2,15 @@ import {Inject} from "quiver-framework";
 import {ConfigurationContext, ConfigurationContextProvider, ContextId} from "../../../configurationContext";
 import {ChannelId} from "../../data/ChannelId";
 import {CachedMessage} from "../../data/cache/CachedMessage";
-import {MessageCache} from "../MessageCache";
+import {MessageManager} from "../MessageManager";
 import {CacheFilter} from "../../data/cache/CacheFilter";
 import {ChannelMessageCache} from "../../util/ChannelMessageCache";
 
 /**
  * In memory implementation of message cache service - it should not be in use for a production env.
  */
-export class InMemoryMessageCache implements MessageCache {
+// TODO: Make an in memory message manager out of this or delete
+/*export class MessageCacheInMemory implements MessageManager {
 
     @Inject()
     private readonly contextProvider: ConfigurationContextProvider;
@@ -18,7 +19,7 @@ export class InMemoryMessageCache implements MessageCache {
     // private readonly messagesByContext = new Map<ContextId, Set<CachedMessage>>();
     private readonly channelsByContext = new Map<ContextId, Map<ChannelId, ChannelMessageCache>>();
 
-    async writeMessage(contextId: ContextId, message: CachedMessage): Promise<void> {
+    async registerMessage(contextId: ContextId, message: CachedMessage): Promise<void> {
         const {channelsByContext, contextProvider: {getConfigurationContext}} = this;
 
         // if (!messagesByContext.has(context)) {
@@ -63,5 +64,5 @@ export class InMemoryMessageCache implements MessageCache {
         }
 
     }
-}
+}*/
 

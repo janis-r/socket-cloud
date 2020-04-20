@@ -39,7 +39,7 @@ export class BroadcastOutgoingMessage implements Command {
                 );
         }
 
-        const msg = serializeServerMessage(message);
+        const msg = serializeServerMessage(message); //TODO: Each connection should receive only listing of channels it's subscribed to and parameter indicating whether this is individual message
         connections.forEach(connection => connection.send(msg));
 
         reportConnectionCount(connections.size);

@@ -24,8 +24,8 @@ export abstract class ConfigurationContext {
     maxPayloadSize?: number;
     // Whether to compress data
     compressData?: boolean;
-    // General instructions on how to cache outgoing messages applicable to all channels unless channel
-    // specific instructions are provided
+    // General instructions on how to cache outgoing messages applicable to all channels and individual messages unless
+    // channel or individual message specific instructions are provided
     cachingPolicy?: {
         // Number of milliseconds for which to keep outgoing messages in cache
         cacheTime?: number;
@@ -38,6 +38,10 @@ export abstract class ConfigurationContext {
             cachingPolicy?: ConfigurationContext["cachingPolicy"]
         }
     };
+    // Individual message configuration. If omitted global configuration within cachingPolicy will be used.
+    individualMessageConfig?: {
+        cachingPolicy?: ConfigurationContext["cachingPolicy"]
+    }
 }
 
 const cashingPolicyValidator = new Validator<ConfigurationContext["cachingPolicy"]>({
@@ -48,7 +52,14 @@ const cashingPolicyValidator = new Validator<ConfigurationContext["cachingPolicy
 const perChannelConfigValidator = new Validator<ConfigurationContext["channelConfig"][0]>({
     cachingPolicy: {
         optional: true,
-        validator: value => cashingPolicyValidator.validate(value) ? true : JSON.stringify(cashingPolicyValidator.lastError)
+        validator: value => cashingPolicyValidator.validate(value) === true ? true : JSON.stringify(cashingPolicyValidator.lastError)
+    }
+});
+
+const individualMessageConfigValidator = new Validator<ConfigurationContext["individualMessageConfig"]>({
+    cachingPolicy: {
+        optional: true,
+        validator: value => cashingPolicyValidator.validate(value) === true ? true : JSON.stringify(cashingPolicyValidator.lastError)
     }
 });
 
@@ -69,17 +80,20 @@ export const configurationContextValidator = new Validator<ConfigurationContext>
     compressData: {type: "boolean", optional: true},
     cachingPolicy: {
         optional: true,
-        validator: value => cashingPolicyValidator.validate(value) ? true : JSON.stringify(cashingPolicyValidator.lastError)
+        validator: value => cashingPolicyValidator.validate(value) === true ? true : JSON.stringify(cashingPolicyValidator.lastError)
     },
     channelConfig: {
-        type: "object",
         optional: true,
         validator: value => {
-            const error = Object.keys(value).find(channelId => !perChannelConfigValidator.validate(value[channelId]));
+            const error = Object.keys(value).find(channelId => perChannelConfigValidator.validate(value[channelId]) !== true);
             if (error) {
                 return `Invalid per channel caching policy entry encountered - ${JSON.stringify(error)}, error - ${JSON.stringify(perChannelConfigValidator.lastError)}`;
             }
             return true;
         }
     },
+    individualMessageConfig: {
+        optional: true,
+        validator: value => individualMessageConfigValidator.validate(value) === true ? true : JSON.stringify(individualMessageConfigValidator.lastError)
+    }
 });

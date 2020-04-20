@@ -7,9 +7,10 @@ import {channelMessageUtil} from "../data/apiMessage/ChannelMessage";
 import {individualMessageUtil} from "../data/apiMessage/IndividualMessage";
 import {MessageType} from "../data";
 import {PushToClientMessage} from "../data/serverMessage/PushToClientMessage";
-import {MessageIdProvider} from "./MessageIdProvider";
-import {MessageCache} from "./MessageCache";
+import {MessageManager} from "./MessageManager";
 import {contextIdMatchRegexp} from "../../configurationContext";
+import {DataPushApiCallManager} from "./DataPushApiCallManager";
+import {ScopedLogger} from "../util/ScopedLogger";
 
 @Injectable()
 export class DataPushApiListener {
@@ -25,8 +26,8 @@ export class DataPushApiListener {
 
     constructor(router: HttpServerRouter,
                 private readonly tokenManager: AccessTokenProvider,
-                private readonly messageCache: MessageCache,
-                private readonly messageIdProvider: MessageIdProvider,
+                private readonly messageManager: MessageManager,
+                private readonly apiCallLogger: DataPushApiCallManager,
                 private readonly eventDispatcher: EventDispatcher) {
         const {servicePath} = DataPushApiListener;
         router.post(`/${servicePath}/:contextId(${contextIdMatchRegexp})/individual-message/`, this.individualMessageHandler);
@@ -36,23 +37,28 @@ export class DataPushApiListener {
 
     private readonly individualMessageHandler: HttpRequestHandler = async request => {
         const {BadRequest, MethodNotAllowed, PayloadTooLarge} = HttpStatusCode;
-        const {messageCache, messageIdProvider: {nextMessageId}, eventDispatcher} = this;
-        const config = await this.validateApiCall(request);
-        if (!config) {
+        const {messageManager, eventDispatcher} = this;
+
+        const context = await this.getApiCallContext(request);
+        if (!context) {
             return;
         }
 
+        const {tokenInfo, apiCallId, logger} = context;
         const {sendJson, body} = request;
-        const {context: {id: contextId, maxPayloadSize}, accessRights} = config;
+        const {context: {id: contextId, maxPayloadSize}, accessRights} = tokenInfo;
 
         // Check permissions
         if (accessRights !== "all" && !accessRights?.postIndividualMessages) {
-            sendJson({error: "Action is not allowed"}, {status: MethodNotAllowed});
+            const error = "Action is not allowed";
+            sendJson({error}, {status: MethodNotAllowed});
+            logger.log({error}).commit();
             return;
         }
         // Check data format
         if (!individualMessageUtil.validate(body)) {
             sendJson(individualMessageUtil.lastError, {status: BadRequest});
+            logger.log(individualMessageUtil.lastError).commit();
             return;
         }
 
@@ -60,46 +66,51 @@ export class DataPushApiListener {
 
         // Check payload
         if (maxPayloadSize && maxPayloadSize < Buffer.byteLength(body.payload)) {
-            sendJson({error: "Max payload exceeded"}, {status: PayloadTooLarge});
+            const error = "Max payload exceeded";
+            sendJson({error}, {status: PayloadTooLarge});
+            logger.log({error}).commit();
             return;
         }
 
         const message: PushToClientMessage = {
             type: MessageType.PushToClient,
             time: Date.now(),
-            messageId: nextMessageId(),
+            messageId: await messageManager.registerMessage(contextId, payload, {apiCallId}, null, connectionIds),
             payload
         };
-
-        const {type, ...typelessMessage} = message;
-        messageCache.writeMessage(contextId, typelessMessage);
 
         const event = new OutgoingMessageEvent(contextId, message, connectionIds);
         eventDispatcher.dispatchEvent(event);
         const recipients = await event.getRecipientCount();
 
         sendJson({recipients});
+        logger.log({recipients}).commit();
     };
 
     private readonly channelMessageHandler: HttpRequestHandler = async request => {
         const {BadRequest, MethodNotAllowed, PayloadTooLarge} = HttpStatusCode;
-        const {messageCache, messageIdProvider: {nextMessageId}, eventDispatcher} = this;
-        const config = await this.validateApiCall(request);
-        if (!config) {
+        const {messageManager, eventDispatcher} = this;
+
+        const context = await this.getApiCallContext(request);
+        if (!context) {
             return;
         }
 
+        const {tokenInfo, apiCallId, logger} = context;
         const {sendJson, body} = request;
-        const {context: {id: contextId, maxPayloadSize}, accessRights} = config;
+        const {context: {id: contextId, maxPayloadSize}, accessRights} = tokenInfo;
 
         // Check permissions
         if (accessRights !== "all" && !accessRights.postChannelMessages) {
-            sendJson({error: "Action is not allowed"}, {status: MethodNotAllowed});
+            const error = "Action is not allowed";
+            sendJson({error}, {status: MethodNotAllowed});
+            logger.log({error}).commit();
             return;
         }
         // Check data format
         if (!channelMessageUtil.validate(body)) {
             sendJson(channelMessageUtil.lastError, {status: BadRequest});
+            logger.log(channelMessageUtil.lastError).commit();
             return;
         }
 
@@ -107,64 +118,73 @@ export class DataPushApiListener {
 
         // Check payload
         if (maxPayloadSize && maxPayloadSize < Buffer.byteLength(body.payload)) {
+            const error = "Max payload exceeded";
             sendJson({error: "Max payload exceeded"}, {status: PayloadTooLarge});
+            logger.log({error}).commit();
             return;
         }
 
         const message: PushToClientMessage = {
             type: MessageType.PushToClient,
             time: Date.now(),
-            messageId: nextMessageId(),
+            messageId: await messageManager.registerMessage(contextId, payload, {apiCallId}, channels),
             channels,
             payload
         };
-
-        const {type, ...typelessMessage} = message;
-        messageCache.writeMessage(contextId, typelessMessage);
 
         const event = new OutgoingMessageEvent(contextId, message);
         eventDispatcher.dispatchEvent(event);
         const recipients = await event.getRecipientCount();
 
         sendJson({recipients});
+        logger.log({recipients}).commit();
     };
 
     private readonly multiChannelMessageHandler: HttpRequestHandler = async request => {
         const {BadRequest, MethodNotAllowed, PayloadTooLarge} = HttpStatusCode;
-        const {messageCache, messageIdProvider: {nextMessageId}, eventDispatcher} = this;
-        const config = await this.validateApiCall(request);
-        if (!config) {
+        const {messageManager, eventDispatcher} = this;
+
+        const context = await this.getApiCallContext(request);
+        if (!context) {
             return;
         }
 
+        const {tokenInfo, apiCallId, logger} = context;
         const {sendJson, body} = request;
-        const {context: {id: contextId, maxPayloadSize}, accessRights} = config;
+        const {context: {id: contextId, maxPayloadSize}, accessRights} = tokenInfo;
 
         // Check permissions
         if (accessRights !== "all" && !accessRights.postMultiChannelMessages) {
-            sendJson({error: "Action is not allowed"}, {status: MethodNotAllowed});
+            const error = "Action is not allowed";
+            sendJson({error}, {status: MethodNotAllowed});
+            logger.log({error}).commit();
             return;
         }
         // Check data format
         if (!Array.isArray(body)) {
-            sendJson('Message body should be an array', {status: BadRequest});
+            const error = 'Message body should be an array';
+            sendJson({error}, {status: BadRequest});
+            logger.log({error}).commit();
             return;
         }
         for (const message of body) {
             if (!channelMessageUtil.validate(message)) {
-                sendJson(`Some message is faulty: ${JSON.stringify(
+                const error = `Some message is faulty: ${JSON.stringify(
                     {message, error: channelMessageUtil.lastError}
-                )}`, {status: BadRequest});
+                )}`;
+                sendJson({error}, {status: BadRequest});
+                logger.log({error}).commit();
                 return;
             }
             // Check payload
             if (maxPayloadSize && maxPayloadSize < Buffer.byteLength(message.payload)) {
-                sendJson({error: `Max payload exceeded - message:${JSON.stringify(message)}`}, {status: PayloadTooLarge});
+                const error = `Max payload exceeded - message:${JSON.stringify(message)}`;
+                sendJson({error}, {status: PayloadTooLarge});
+                logger.log({error}).commit();
                 return;
             }
         }
 
-        let recipients = 0;
         let recipientDataPromises = new Set<Promise<number>>();
         for (const data of body) {
             if (!channelMessageUtil.validate(data)) {
@@ -175,41 +195,44 @@ export class DataPushApiListener {
             const message: PushToClientMessage = {
                 type: MessageType.PushToClient,
                 time: Date.now(),
-                messageId: nextMessageId(),
+                messageId: await messageManager.registerMessage(contextId, payload, {apiCallId}, channels),
                 channels,
                 payload
             };
 
-            const {type, ...typelessMessage} = message;
-            messageCache.writeMessage(contextId, typelessMessage);
-
             const event = new OutgoingMessageEvent(contextId, message);
+            recipientDataPromises.add(event.getRecipientCount());
             eventDispatcher.dispatchEvent(event);
-            const promise = event.getRecipientCount();
-            promise.then(value => recipients += value);
-            recipientDataPromises.add(promise);
         }
 
-        await Promise.all([...recipientDataPromises]);
+        const responses = await Promise.all([...recipientDataPromises]);
+        const recipients = responses.reduce((prev, curr) => prev + curr);
         sendJson({recipients});
+        logger.log({recipients}).commit();
     };
 
-    private async validateApiCall(request: RequestContext): Promise<TokenInfo | null> {
-        const {authTokenHeaderName, authTokenErrorResponseParams, tokenManager: {validateToken}} = this;
-        const {header, sendJson} = request;
+    private async getApiCallContext(request: RequestContext): Promise<{ apiCallId: number, tokenInfo: TokenInfo, logger: ScopedLogger } | null> {
+        const {authTokenHeaderName, authTokenErrorResponseParams, tokenManager: {validateToken}, apiCallLogger} = this;
+        const {header, sendJson, ipAddress, path, body} = request;
+
+        const {id: apiCallId, logger} = await apiCallLogger.registerApiCall({headers: request.request.headers, ipAddress, path, body});
 
         const accessToken = header(authTokenHeaderName);
         if (!accessToken) {
-            sendJson({error: "API key is not set"}, authTokenErrorResponseParams);
+            const error = "API key is not set";
+            sendJson({error}, authTokenErrorResponseParams);
+            logger.log({error}).commit();
             return null;
         }
 
         const tokenInfo = await validateToken(accessToken);
         if (!tokenInfo) {
-            sendJson({error: "API key, or its data context, is invalid"}, authTokenErrorResponseParams);
+            const error = "API key, or its data context, is invalid";
+            sendJson({error}, authTokenErrorResponseParams);
+            logger.log({error}).commit();
             return null;
         }
 
-        return tokenInfo;
+        return {apiCallId, tokenInfo, logger};
     }
 }

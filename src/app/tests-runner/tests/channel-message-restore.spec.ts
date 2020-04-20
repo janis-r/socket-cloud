@@ -10,14 +10,14 @@ import {PushToClientMessage, RestoreChannelsResponseMessage} from "../../../lib/
 
 describe('Channel message restoring', () => {
 
-    beforeAll(startSocketServer());
-    afterAll(stopSocketServer);
+    // beforeAll(startSocketServer());
+    // afterAll(stopSocketServer);
 
     beforeEach(createConnections(2));
     afterEach(resetConnections);
 
     it('Channel subscription can be restored', async done => {
-        const channel = 'cached-channel';
+        const channel = "cached-channel";
         const messages = characterSequence(10);
         const [firstConnection, secondConnection] = connections;
         messages.forEach(message => firstConnection.sendChannelMessage(message, channel));

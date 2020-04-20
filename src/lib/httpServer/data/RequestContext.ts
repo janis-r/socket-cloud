@@ -40,6 +40,10 @@ export class RequestContext {
         return this.request.header("Referer");
     }
 
+    get path() {
+        return this.request.path;
+    }
+
     /**
      * Get URL "get" variable value
      * @param key

@@ -21,11 +21,11 @@ import {PrepareOutgoingClientMessage} from "./command/PrepareOutgoingClientMessa
 import {OutgoingMessageEvent} from "./event/OutgoingMessageEvent";
 import {BroadcastOutgoingMessage} from "./command/BroadcastOutgoingMessage";
 import {RestoreClientSubscription} from "./command/RestoreClientSubscription";
-import {MessageCache} from "./service/MessageCache";
-import {InMemoryMessageCache} from "./service/impl/InMemoryMessageCache";
-import {MessageIdProvider} from "./service/MessageIdProvider";
-import {InMemoryMessageIdProvider} from "./service/impl/InMemoryMessageIdProvider";
+import {MessageManager} from "./service/MessageManager";
 import {authorizationModule} from "../authorization";
+import {DataPushApiCallManager} from "./service/DataPushApiCallManager";
+import {DataPushApiCallManagerSqLite} from "./service/impl/DataPushApiCallManagerSqLite";
+import {MessageManagerSqLite} from "./service/impl/MessageManagerSqLite";
 
 const protocolGuard = ({data: {context: {protocol}}}: Event<ClientConnection>) => protocol === defaultProtocolId;
 
@@ -39,8 +39,8 @@ export const defaultProtocolModule: ModuleConfig = {
     mappings: [
         {map: DataPushApiListener, instantiate: true},
         DataContextManagerProvider,
-        {map: MessageCache, useType: InMemoryMessageCache},
-        {map: MessageIdProvider, useType: InMemoryMessageIdProvider}
+        {map: MessageManager, useType: MessageManagerSqLite},
+        {map: DataPushApiCallManager, useType: DataPushApiCallManagerSqLite},
     ],
     commands: [
         {event: NewConnectionEvent.TYPE, command: HandleNewConnection, guard: protocolGuard},

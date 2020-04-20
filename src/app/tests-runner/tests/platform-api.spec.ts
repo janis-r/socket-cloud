@@ -10,8 +10,8 @@ import {
 
 describe('Platform API', () => {
 
-    beforeAll(startSocketServer());
-    afterAll(stopSocketServer);
+    // beforeAll(startSocketServer());
+    // afterAll(stopSocketServer);
 
     beforeEach(createConnections(1));
     afterEach(resetConnections);

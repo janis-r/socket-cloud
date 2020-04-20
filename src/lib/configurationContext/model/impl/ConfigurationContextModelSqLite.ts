@@ -9,7 +9,7 @@ export class ConfigurationContextModelSqLite implements ConfigurationContextMode
 
     constructor() {
         try {
-            this.db = new SqLiteConnection("context-config");
+            this.db = new SqLiteConnection("db/context-config.db");
             this.db.ready.then(() => this.initialize());
         } catch (e) {
             console.log(`Error while connecting to Sqlite: ${e.message}`);
