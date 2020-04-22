@@ -1,4 +1,5 @@
 import {
+    cachedChannelName,
     characterSequence,
     connections,
     createConnections,
@@ -8,32 +9,35 @@ import {
 } from "../util/test-utils";
 import {PushToClientMessage, RestoreChannelsResponseMessage} from "../../../lib/defaultProtocol";
 
-describe('Channel message restoring', () => {
+describe("Message restore from cache", () => {
 
-    // beforeAll(startSocketServer());
-    // afterAll(stopSocketServer);
+    beforeAll(startSocketServer());
+    afterAll(stopSocketServer);
 
     beforeEach(createConnections(2));
     afterEach(resetConnections);
 
-    it('Channel subscription can be restored', async done => {
-        const channel = "cached-channel";
-        const messages = characterSequence(10);
+    it("Channel messages can be restored from cache", async done => {
+        const channel = cachedChannelName;
+        const messages = characterSequence(10).map(v => `${v}-${Math.floor(Math.random() * 0xFFF)}`);
         const [firstConnection, secondConnection] = connections;
         messages.forEach(message => firstConnection.sendChannelMessage(message, channel));
 
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
         const dataPromise = new Promise<RestoreChannelsResponseMessage>(resolve => secondConnection.onRestore(resolve).once());
         secondConnection.restore({channel});
-        const message = await dataPromise;
-        if (message.payload.some(({channels}) => !channels.includes(channel))) {
-            fail(`Restored message must include channel it was requested by`);
+        const {payload: incomingMessages} = await dataPromise;
+        if (incomingMessages.some(({channels}) => !channels.includes(channel) && channels.length !== 1)) {
+            fail(`Restored message must include only channel it was requested by`);
         }
-        expect(messages).toMatchObject(message.payload.map(({payload}) => payload));
+
+        expect(messages.some(msg => !incomingMessages.some(({payload}) => payload === msg))).toBe(false);
         done();
     });
 
-    it('Channel subscription can be restored from last received message', async (done) => {
-        const channel = 'cached-channel';
+    it("Channel messages can be restored by last message id", async done => {
+        const channel = cachedChannelName;
         const messages = characterSequence(10);
         const [firstConnection, secondConnection] = connections;
 

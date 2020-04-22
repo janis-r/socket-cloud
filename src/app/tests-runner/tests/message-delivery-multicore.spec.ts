@@ -7,7 +7,7 @@ import {
     stopSocketServer
 } from "../util/test-utils";
 
-describe('Multicore message delivery', () => {
+describe("Message delivery multicore", () => {
 
     beforeAll(startSocketServer(false));
     afterAll(stopSocketServer);

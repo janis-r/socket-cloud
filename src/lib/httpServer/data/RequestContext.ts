@@ -35,7 +35,6 @@ export class RequestContext {
         return this.request.body;
     }
 
-
     get referer() {
         return this.request.header("Referer");
     }
@@ -43,6 +42,11 @@ export class RequestContext {
     get path() {
         return this.request.path;
     }
+
+    get headers(): Readonly<Request["headers"]> {
+        return this.request.headers;
+    }
+
 
     /**
      * Get URL "get" variable value

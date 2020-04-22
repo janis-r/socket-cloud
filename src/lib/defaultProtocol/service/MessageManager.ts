@@ -20,6 +20,17 @@ export abstract class MessageManager {
                              connectionIds?: ExternalId[]
     ): Promise<string>;
 
+    /**
+     * Retrieve cached messages
+     * @param contextId
+     * @param channelId
+     * @param filter
+     */
     abstract getCachedMessages(contextId: ContextId, channelId: ChannelId, filter: CacheFilter): Promise<Array<CachedMessage> | null>;
+
+    /**
+     * Clear message storage of overdue messages.
+     */
+    abstract clearMessageCache(): Promise<void>;
 }
 

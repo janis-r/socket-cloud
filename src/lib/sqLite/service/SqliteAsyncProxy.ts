@@ -1,54 +1,10 @@
-import {Database, OPEN_CREATE, OPEN_READWRITE, verbose} from "sqlite3";
+import {Database} from "sqlite3";
 import {QueryResponse} from "../data/QueryResponse";
 
-// TODO: This should be enabled only in dev/debug mode
-verbose();
+export class SqliteAsyncProxy {
 
-/**
- * Sqlite connection.
- * Partial implementation of Database class from sqlite3 module refactored for async flow.
- */
-export class SqLiteConnection {
-
-    /**
-     * Defines if connection is established
-     */
-    readonly ready?: Promise<SqLiteConnection>;
-
-    private _closed: boolean = false;
-
-    private readonly db?: Database;
-
-    /**
-     * Create new connection
-     * @param filename Filename to connect to or string ':memory:' to create in memory database
-     * @param mode Binary flags to identify connection mode OPEN_CREATE | OPEN_READWRITE | OPEN_READONLY
-     */
-    constructor(readonly filename: ":memory:" | string, readonly mode = OPEN_READWRITE | OPEN_CREATE) {
-        let readyCallback: (connection: this) => void;
-        this.ready = new Promise<this>(resolve => readyCallback = resolve);
-        this.db = new Database(filename, mode, err => {
-            if (err) {
-                throw err;
-            }
-            readyCallback(this);
-        });
+    constructor(private readonly db: Pick<Database, "run" | "get" | "all"> & Partial<Pick<Database, "exec">>) {
     }
-
-    /**
-     * Defines if connection is closed.
-     */
-    get closed(): boolean {
-        return this._closed;
-    }
-
-    /**
-     * Closes the database.
-     */
-    readonly close = () => {
-        this._closed = true;
-        return new Promise<void>((resolve, reject) => this.db.close(err => err ? reject(err) : resolve()));
-    };
 
     /**
      * Runs the SQL query with the specified parameters and resolved promise afterwards.
@@ -107,17 +63,18 @@ export class SqLiteConnection {
      * Runs all SQL queries in the supplied string. No result rows are retrieved.
      * @param sql The SQL query to run.
      */
-    readonly exec = (sql: string) => new Promise<void>((resolve, reject) =>
-        this.db!.exec(sql, err => {
-            if (err) {
-                reject(err.message);
-            } else {
-                resolve();
-            }
-        })
-    );
-
-    readonly prepare = (sql: string) => this.db.prepare(sql); // TODO: Statement should be converted to async syntax as well
+    readonly exec = (sql: string) => {
+        if (!this.db.exec) {
+            throw new Error(`Exec is invoked on object that ain't got one`);
+        }
+        return new Promise<void>((resolve, reject) =>
+            this.db!.exec(sql, err => {
+                if (err) {
+                    reject(err.message);
+                } else {
+                    resolve();
+                }
+            })
+        );
+    }
 }
-
-

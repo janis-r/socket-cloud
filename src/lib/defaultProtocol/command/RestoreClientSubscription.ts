@@ -16,7 +16,7 @@ export class RestoreClientSubscription implements Command {
     @Inject()
     private dataContextManagerProvider: DataContextManagerProvider;
     @Inject()
-    private messageCache: MessageManager;
+    private messageManager: MessageManager;
 
     async execute(): Promise<void> {
         const {
@@ -28,7 +28,7 @@ export class RestoreClientSubscription implements Command {
                 }
             },
             dataContextManagerProvider: {getContextManager},
-            messageCache
+            messageManager
         } = this;
 
         const contextManager = await getContextManager(contextId);
@@ -42,7 +42,7 @@ export class RestoreClientSubscription implements Command {
                 return;
             }
 
-            const messages = await messageCache.getCachedMessages(contextId, channel, filter);
+            const messages = await messageManager.getCachedMessages(contextId, channel, filter);
             if (messages) {
                 channelMessages.push(...messages);
             }

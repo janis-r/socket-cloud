@@ -19,14 +19,14 @@ export class PrepareOutgoingClientMessage implements Command {
             event: {
                 data: {
                     message: {channels, payload},
-                    connection: {context: {id: contextId}, id, externalId}
+                    connection: {id: connectionId, context: {id: contextId}}
                 }
             },
             messageManager,
             eventDispatcher
         } = this;
 
-        const messageId = await messageManager.registerMessage(contextId, payload, {connectionId: id}, channels);
+        const messageId = await messageManager.registerMessage(contextId, payload, {connectionId}, channels);
 
         const message: PushToClientMessage = {
             type: MessageType.PushToClient,

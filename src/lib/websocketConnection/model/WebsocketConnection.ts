@@ -42,7 +42,7 @@ export class WebsocketConnection {
         this.outgoingMessageBuffer = new OutgoingMessageBuffer(
             socket,
             extensions?.filter(({outgoingDataPipe: pipe}) => !!pipe) || [],
-            context.outgoingMessageFragmentSize
+            context?.outgoingMessageFragmentSize || 2 ** 14 // TODO: Default outgoingMessageFragmentSize could be stored in some more meaningful location
         );
 
         const {incomingMessageBuffer, parsedDataHandler} = this;

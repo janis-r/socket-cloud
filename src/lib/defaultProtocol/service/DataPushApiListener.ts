@@ -213,9 +213,9 @@ export class DataPushApiListener {
 
     private async getApiCallContext(request: RequestContext): Promise<{ apiCallId: number, tokenInfo: TokenInfo, logger: ScopedLogger } | null> {
         const {authTokenHeaderName, authTokenErrorResponseParams, tokenManager: {validateToken}, apiCallLogger} = this;
-        const {header, sendJson, ipAddress, path, body} = request;
+        const {header, sendJson, headers, ipAddress, path, body} = request;
 
-        const {id: apiCallId, logger} = await apiCallLogger.registerApiCall({headers: request.request.headers, ipAddress, path, body});
+        const {id: apiCallId, logger} = await apiCallLogger.registerApiCall({headers, ipAddress, path, body});
 
         const accessToken = header(authTokenHeaderName);
         if (!accessToken) {

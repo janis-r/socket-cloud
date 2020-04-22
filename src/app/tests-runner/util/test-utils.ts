@@ -15,21 +15,25 @@ const debug = true;
 
 const serverUrl = "http://localhost:8001";
 
+export const cachedChannelName = "cached-channel";
+export const notCachedChannelName = "no-cache-channel";
+export const defaultCacheSize = 5;
+export const defaultCacheTime = toMilliseconds(5, "seconds");
+
 const testContext: ConfigurationContext = {
     id: "tests-runner",
     protocol: defaultProtocolId,
     validationApi: {
-        url: "http://localhost:8001/validationAPI",
+        url: `${serverUrl}/validationAPI`,
         validateNewConnections: true
     },
-    pingTimeout: toMilliseconds(30, "seconds"),
-    outgoingMessageFragmentSize: 2 ** 14, // 16 kb,
+    cachingPolicy: {
+        cacheSize: defaultCacheSize,
+        cacheTime: defaultCacheTime
+    },
     channelConfig: {
-        "cached-channel": {
-            cachingPolicy: {
-                cacheSize: 100
-            }
-        }
+        [cachedChannelName]: {cachingPolicy: {cacheSize: 100}},
+        [notCachedChannelName]: {cachingPolicy: {}}
     }
 };
 
