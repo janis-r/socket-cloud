@@ -7,48 +7,19 @@ import {ConfigurationContextApi} from "./ConfigurationContextApi";
 import {DataPushApiListener} from "@defaultProtocol/service/DataPushApiListener";
 import {AccessTokenApiListener} from "../../../lib/authorization/service/AccessTokenApiListener";
 import {ConfigurationContextApiListener} from "../../../lib/configurationContext/service/ConfigurationContextApiListener";
-import {toMilliseconds} from "ugd10a";
-import {ConfigurationContext} from "../../../lib/configurationContext";
-import {defaultProtocolId} from "@defaultProtocol/data/defaultProtocolId";
+import {configurationContext, debug, serverUrl} from "../config";
 
-const debug = true;
-
-const serverUrl = "http://localhost:8001";
-
-export const cachedChannelName = "cached-channel";
-export const notCachedChannelName = "no-cache-channel";
-export const defaultCacheSize = 5;
-export const defaultCacheTime = toMilliseconds(5, "seconds");
-
-const testContext: ConfigurationContext = {
-    id: "tests-runner",
-    protocol: defaultProtocolId,
-    validationApi: {
-        url: `${serverUrl}/validationAPI`,
-        validateNewConnections: true
-    },
-    cachingPolicy: {
-        cacheSize: defaultCacheSize,
-        cacheTime: defaultCacheTime
-    },
-    channelConfig: {
-        [cachedChannelName]: {cachingPolicy: {cacheSize: 100}},
-        [notCachedChannelName]: {cachingPolicy: {}}
-    }
-};
-
-const contextId = testContext.id;
+const contextId = configurationContext.id;
 
 const _clientConnections = new Array<SocketClient>();
 export const connections: ReadonlyArray<SocketClient> = _clientConnections;
-
 
 export const startSocketServer = (singleCore = true) => done => {
     if (serverIsRunning()) {
         done();
     } else {
         launchServer(singleCore, debug)
-            .then(() => createConfigurationContextApi().configureConfigurationContext(testContext))
+            .then(() => createConfigurationContextApi().configureConfigurationContext(configurationContext))
             .then(done);
     }
 };
@@ -110,3 +81,5 @@ export const createConfigurationContextApi = (apiKey = configurationContextApiKe
 };
 
 export const characterSequence = (length: number) => new Array(length).fill(0).map((_, index) => String.fromCharCode('a'.charCodeAt(0) + index));
+
+export const timeout = (time: number) => new Promise<void>(resolve => setTimeout(resolve, time));

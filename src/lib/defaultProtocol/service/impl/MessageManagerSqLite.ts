@@ -91,7 +91,10 @@ export class MessageManagerSqLite implements MessageManager {
         const queryLimit = cacheSize && maxAge ? Math.min(cacheSize, maxLength) : cacheSize ?? maxLength;
 
         const messages = await all<{ id: number, time: string, payload: string, channel: ChannelId }>(`
-                    SELECT id, time, payload, channel
+                    SELECT id,
+                           datetime(time, 'localtime') as time, 
+                           payload, 
+                           channel
                     FROM messages
                              JOIN message_recipients ON message_recipients.message_id = messages.id AND channel = $channelId
                     WHERE messages.context_id = $contextId
@@ -105,7 +108,7 @@ export class MessageManagerSqLite implements MessageManager {
                 $channelId: channelId,
                 $contextId: contextId,
                 $messageId: messageId ? parseInt(messageId, 32) : null,
-                $maxAge: queryMaxAge ? toSeconds(queryMaxAge, "milliseconds") : null
+                $maxAge: queryMaxAge ? toSeconds(Date.now() - queryMaxAge, "milliseconds") : null
             }
         );
 
@@ -130,7 +133,8 @@ export class MessageManagerSqLite implements MessageManager {
             WHERE payload IS NOT NULL
             ORDER BY id
         `);
-        console.log('>> cachedMessages', cachedMessages);
+        console.log('>> cachedMessages', cachedMessages.length);
+
         if (!cachedMessages.length) {
             return;
         }
@@ -157,9 +161,15 @@ export class MessageManagerSqLite implements MessageManager {
         const messagesToClear = new Set<number>();
 
         for (const [messageId, messages] of groupedById) {
-            const cachingPolicies = await Promise.all(
+            const cachingPolicies = (await Promise.all(
                 [...messages].map(({context_id, channel}) => this.getChannelCachingPolicy(context_id, channel))
-            );
+            )).filter(entry => !!entry);
+
+            if (!cachingPolicies.length) {
+                // Caching policy cannot be found (could be removed)
+                messagesToClear.add(messageId);
+                continue;
+            }
 
             const {cacheTime, cacheSize} = cachingPolicies.filter(entry => !!entry)
                 .reduce(({cacheSize, cacheTime}, {cacheSize: c_cacheSize, cacheTime: c_cacheTime}) => ({
@@ -178,6 +188,7 @@ export class MessageManagerSqLite implements MessageManager {
                 messagesToClear.add(messageId);
             }
         }
+
         console.log('>> removed due to time', [...messagesToClear]);
         if (![...groupedById.keys()].some(id => !messagesToClear.has(id))) {
             // There are no untouched message ids left
@@ -186,7 +197,7 @@ export class MessageManagerSqLite implements MessageManager {
 
         for (const messages of groupedByContextAndChannel.values()) {
             const {context_id, channel} = [...messages][0];
-            const {cacheSize} = await this.getChannelCachingPolicy(context_id, channel);
+            const {cacheSize} = await this.getChannelCachingPolicy(context_id, channel) || {};
             if (cacheSize && messages.size > cacheSize) {
                 [...messages].slice(0, messages.size - cacheSize).forEach(({id}) => messagesToClear.add(id));
             }
@@ -197,12 +208,9 @@ export class MessageManagerSqLite implements MessageManager {
             await this.db.run(`
                         UPDATE messages
                         SET payload = NULL
-                        WHERE id IN (?)
-                `,
-                [
-                    [...messagesToClear]
-                ]
-            )
+                        WHERE id IN (${[...messagesToClear].join(",")})
+                `
+            );
         }
 
     }
