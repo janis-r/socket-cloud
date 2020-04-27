@@ -1,7 +1,7 @@
 import {Inject} from "quiver-framework";
 import {toSeconds} from "ugd10a";
 import {CachingPolicy, ConfigurationContextProvider, ContextId} from "../../../configurationContext";
-import {ChannelId, getExternalIdFromChannelId} from "../../data/ChannelId";
+import {ChannelId, externalIdFromChannelId} from "../../data/ChannelId";
 import {CachedMessage} from "../../data/cache/CachedMessage";
 import {MessageManager} from "../MessageManager";
 import {CacheFilter} from "../../data/cache/CacheFilter";
@@ -226,7 +226,7 @@ export class MessageManagerSqLite implements MessageManager {
             }
         }
 
-        if (!channels.some(getExternalIdFromChannelId)) {
+        if (!channels.some(externalIdFromChannelId)) {
             return false;
         }
 

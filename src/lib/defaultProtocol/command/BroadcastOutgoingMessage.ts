@@ -3,7 +3,7 @@ import {DataContextManagerProvider} from "../service/DataContextManagerProvider"
 import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
 import {ClientConnection, ClientConnectionPool, ExternalId} from "../../clientConnectionPool";
 import {serializeServerMessage} from "../data";
-import {getExternalIdFromChannelId} from "../data/ChannelId";
+import {externalIdFromChannelId} from "../data/ChannelId";
 
 export class BroadcastOutgoingMessage implements Command {
 
@@ -28,7 +28,7 @@ export class BroadcastOutgoingMessage implements Command {
 
         const externalIds = new Set<ExternalId>();
         const channels = message.channels.filter(channel => {
-            const externalId = getExternalIdFromChannelId(channel);
+            const externalId = externalIdFromChannelId(channel);
             if (externalId) {
                 externalIds.add(externalId);
                 return false;

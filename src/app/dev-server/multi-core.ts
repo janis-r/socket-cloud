@@ -4,6 +4,7 @@ import {devServerModule} from "./devServerModule";
 import {defaultProtocolModuleInMaster, defaultProtocolModuleInWorker} from "../../lib/defaultProtocol";
 import {configurationContextModuleInMaster} from "../../lib/configurationContext/configurationContextModuleInMaster";
 import {configurationContextModuleInWorker} from "../../lib/configurationContext/configurationContextModuleInWorker";
+import {configurationContextModule} from "../../lib/configurationContext/configurationContextModule";
 
 if (cluster.isMaster) {
     const {injector} = new AppContext()
@@ -15,9 +16,9 @@ if (cluster.isMaster) {
 } else {
     const {injector} = new AppContext()
         .configure(
-            devServerModule,
             defaultProtocolModuleInWorker,
-            configurationContextModuleInWorker
+            configurationContextModuleInWorker,
+            devServerModule,
         )
         .initialize();
 }

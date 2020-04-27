@@ -11,7 +11,7 @@ import {MessageManager} from "./MessageManager";
 import {contextIdMatchRegexp} from "../../configurationContext";
 import {DataPushApiCallManager} from "./DataPushApiCallManager";
 import {ScopedLogger} from "../util/ScopedLogger";
-import {channelIdByExternalId} from "../data/ChannelId";
+import {channelIdFromExternalId} from "../data/ChannelId";
 
 
 @Injectable()
@@ -74,7 +74,7 @@ export class DataPushApiListener {
             return;
         }
 
-        const channels = connectionIds.map(channelIdByExternalId);
+        const channels = connectionIds.map(channelIdFromExternalId);
         const message: PushToClientMessage = {
             type: MessageType.PushToClient,
             time: Date.now(),
