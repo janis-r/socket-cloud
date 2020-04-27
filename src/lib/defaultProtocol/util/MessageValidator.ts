@@ -45,6 +45,8 @@ export class MessageValidator<T> {
         return this.validator.lastError;
     }
 
+    readonly getLastError = () => this.validator.getLastError();
+
     readonly validate = (value: unknown): value is T => this.validator.validate(value);
 
     readonly serialize = (value: T): string | null => {

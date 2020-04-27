@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
-  title: Validation API
-  description: Data validation API implemented by Operator in order to provide validation for data context actions.
+  title: Operator API
+  description: Data API implemented by Operator in order to provide validation for data context actions.
   contact:
     name: Jānis Radiņš
     email: jr@janisradins.com
@@ -9,9 +9,9 @@ info:
 tags:
   - name: Validation
 paths:
-  /validate-connection/:
-    post:
-      summary: Validate new connection before it's added to connection pool.
+  /connection/:
+    put:
+      summary: New connection hanshake request executed before it's added to connection pool.
       tags:
         - Validation
       requestBody:
@@ -23,12 +23,30 @@ paths:
               $ref: "#/components/schemas/ConnectionData"
       responses:
         200:
-          $ref: "#/components/responses/ValidationSuccess"
+          $ref: "#/components/responses/ConnectionValidated"
         405:
           $ref: "#/components/responses/ActionProhibited"
 
-      security:
-        - ApiAuthKey: []
+    post:
+      summary: Connection authorization success notification.
+      tags:
+        - Validation
+      requestBody:
+        required: true
+        description: All the data known about connection and external id, if present, received from connection valiation call.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ConnectionData"
+                - type: object
+                  properties:
+                    externalId:
+                      description: External id assigned to connection by Operator, if any.
+                      type: string
+      responses:
+        200:
+          description: Success
 
 components:
   schemas:
@@ -65,8 +83,9 @@ components:
         - ipAddress
         - host
         - url
+
   responses:
-    ValidationSuccess:
+    ConnectionValidated:
       description: Success response to new connection validation request indicating that connection handshake can be carried on.
       content:
         application/json:
@@ -76,33 +95,13 @@ components:
               externalId:
                 description: External id to be assigned to connection so it can be referenced via Operator to Platform API calls.
                 type: string
-    Unauthorized:
-      description: API key is missing, invalid or data context is disabled.
-      headers:
-        WWW_Authenticate:
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-            required:
-              - error
-    ActionProhibited:
-      description: Action is not allowed
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
 
-  securitySchemes:
-    ApiAuthKey:
-      type: apiKey
-      in: header
-      name: X-API-KEY
+    ActionProhibited:
+      description: Action is not allowed due to reasons explained within error message.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string

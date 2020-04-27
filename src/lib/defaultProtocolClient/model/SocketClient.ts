@@ -1,14 +1,17 @@
 import {CallbackCollection} from "../../utils/CallbackCollection";
 import {Adapter} from "../data/Adapter";
-import {RestoreChannelsResponseMessage} from "@defaultProtocol/data/serverMessage/RestoreChannelsResponseMessage";
-import {deserializeServerMessage} from "@defaultProtocol/data/serverMessage/ServerMessage";
-import {MessageType} from "@defaultProtocol/data/MessageType";
-import {subscribeMessageUtil} from "@defaultProtocol/data/clientMessage/SubscribeMessage";
-import {unsubscribeMessageUtil} from "@defaultProtocol/data/clientMessage/UnsubscribeMessage";
-import {restoreRequestUtil, RestoreTarget} from "@defaultProtocol/data/clientMessage/RestoreChannelsRequestMessage";
-import {globalMessageChannel} from "@defaultProtocol/data/globalMessageChannel";
-import {pushToServerUtil} from "@defaultProtocol/data/clientMessage/PushToServerMessage";
-import {PushToClientMessage} from "@defaultProtocol/data/serverMessage/PushToClientMessage";
+import {RestoreChannelsResponseMessage} from "../../defaultProtocol/data/serverMessage/RestoreChannelsResponseMessage";
+import {deserializeServerMessage} from "../../defaultProtocol/data/serverMessage/ServerMessage";
+import {MessageType} from "../../defaultProtocol/data/MessageType";
+import {subscribeMessageUtil} from "../../defaultProtocol/data/clientMessage/SubscribeMessage";
+import {unsubscribeMessageUtil} from "../../defaultProtocol/data/clientMessage/UnsubscribeMessage";
+import {
+    restoreRequestUtil,
+    RestoreTarget
+} from "../../defaultProtocol/data/clientMessage/RestoreChannelsRequestMessage";
+import {globalMessageChannel} from "../../defaultProtocol/data/globalMessageChannel";
+import {pushToServerUtil} from "../../defaultProtocol/data/clientMessage/PushToServerMessage";
+import {PushToClientMessage} from "../../defaultProtocol/data/serverMessage/PushToClientMessage";
 
 /**
  * A socket client connector that'll take socket connection wrapped as Adapter and wrap it into implementation

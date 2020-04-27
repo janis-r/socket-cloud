@@ -166,7 +166,7 @@ export class WebsocketConnection {
 
         // NoStatusRcvd & AbnormalClosure are not allowed to appear in data requests
         if (code !== null && ([NoStatusRcvd, AbnormalClosure].includes(code) || !isValidWebsocketCloseCode(code))) {
-            this.close(ProtocolError, `Invalid close code received: ${{code}}`);
+            this.close(ProtocolError, `Invalid close code received: ${JSON.stringify(code)}`);
             return;
         }
 

@@ -1,5 +1,5 @@
-import {WebSocketAdapter} from "@defaultProtocolClient/model/WebSocketAdapter";
-import {SocketClient} from "@defaultProtocolClient/model/SocketClient";
+import {WebSocketAdapter} from "../../lib/defaultProtocolClient/model/WebSocketAdapter";
+import {SocketClient} from "../../lib/defaultProtocolClient/model/SocketClient";
 
 export const createClient = (url: string) => new SocketClient(new WebSocketAdapter(url));
 export const version = "__buildVersion__";

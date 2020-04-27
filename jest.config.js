@@ -6,6 +6,5 @@ module.exports = {
     roots: ['./src'],
     preset: 'ts-jest',
     testMatch: ['**/?(*.)spec.ts'],
-    testTimeout: 30000,
-    moduleNameMapper: require("jest-module-name-mapper").bootstrap()
+    testTimeout: 30000
 };

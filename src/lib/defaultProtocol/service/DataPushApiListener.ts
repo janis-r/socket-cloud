@@ -11,6 +11,8 @@ import {MessageManager} from "./MessageManager";
 import {contextIdMatchRegexp} from "../../configurationContext";
 import {DataPushApiCallManager} from "./DataPushApiCallManager";
 import {ScopedLogger} from "../util/ScopedLogger";
+import {channelIdByExternalId} from "../data/ChannelId";
+
 
 @Injectable()
 export class DataPushApiListener {
@@ -55,6 +57,7 @@ export class DataPushApiListener {
             logger.log({error}).commit();
             return;
         }
+
         // Check data format
         if (!individualMessageUtil.validate(body)) {
             sendJson(individualMessageUtil.lastError, {status: BadRequest});
@@ -62,9 +65,8 @@ export class DataPushApiListener {
             return;
         }
 
-        const {payload, connectionIds} = body;
-
         // Check payload
+        const {payload, connectionIds} = body;
         if (maxPayloadSize && maxPayloadSize < Buffer.byteLength(body.payload)) {
             const error = "Max payload exceeded";
             sendJson({error}, {status: PayloadTooLarge});
@@ -72,14 +74,16 @@ export class DataPushApiListener {
             return;
         }
 
+        const channels = connectionIds.map(channelIdByExternalId);
         const message: PushToClientMessage = {
             type: MessageType.PushToClient,
             time: Date.now(),
-            messageId: await messageManager.registerMessage(contextId, payload, {apiCallId}, null, connectionIds),
-            payload
+            messageId: await messageManager.registerMessage(contextId, payload, {apiCallId}, channels),
+            payload,
+            channels
         };
 
-        const event = new OutgoingMessageEvent(contextId, message, connectionIds);
+        const event = new OutgoingMessageEvent(contextId, message);
         eventDispatcher.dispatchEvent(event);
         const recipients = await event.getRecipientCount();
 
@@ -201,8 +205,8 @@ export class DataPushApiListener {
             };
 
             const event = new OutgoingMessageEvent(contextId, message);
-            recipientDataPromises.add(event.getRecipientCount());
             eventDispatcher.dispatchEvent(event);
+            recipientDataPromises.add(event.getRecipientCount());
         }
 
         const responses = await Promise.all([...recipientDataPromises]);

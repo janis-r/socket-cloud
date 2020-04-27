@@ -1,12 +1,11 @@
 import {Inject} from "quiver-framework";
 import {toSeconds} from "ugd10a";
 import {CachingPolicy, ConfigurationContextProvider, ContextId} from "../../../configurationContext";
-import {ChannelId} from "../../data/ChannelId";
+import {ChannelId, getExternalIdFromChannelId} from "../../data/ChannelId";
 import {CachedMessage} from "../../data/cache/CachedMessage";
 import {MessageManager} from "../MessageManager";
 import {CacheFilter} from "../../data/cache/CacheFilter";
 import {SqLiteConnection} from "../../../sqLite";
-import {ExternalId} from "../../../clientConnectionPool";
 
 export class MessageManagerSqLite implements MessageManager {
 
@@ -40,17 +39,17 @@ export class MessageManagerSqLite implements MessageManager {
             CREATE TABLE IF NOT EXISTS message_recipients
             (
                 message_id INTEGER NOT NULL,
-                channel    VARCHAR NOT NULL, -- channel id or external id of a connection this message was sent to in form @exid:{externalId}
+                channel    VARCHAR NOT NULL,
                 FOREIGN KEY (message_id) REFERENCES messages (id)
             );
             CREATE INDEX IF NOT EXISTS message_recipients_message_id ON message_recipients (message_id);
         `);
     }
 
-    async registerMessage(contextId: ContextId, payload: string, origin: { connectionId: string } | { apiCallId: string }, channels: string[] | null, connectionIds: ExternalId[] | null): Promise<string> {
+    async registerMessage(contextId: ContextId, payload: string, origin: { connectionId: string } | { apiCallId: string }, channels: string[]): Promise<string> {
         const {db: {run, prepare}} = this;
 
-        const useCache = await this.shouldCacheMessage(contextId, channels, connectionIds);
+        const useCache = await this.shouldCacheMessage(contextId, channels);
         const {lastID: messageId} = await run(`
                     INSERT INTO messages (context_id, payload, origin, size)
                     VALUES (?, ?, ?, ?)
@@ -58,20 +57,12 @@ export class MessageManagerSqLite implements MessageManager {
             [contextId, useCache ? payload : null, JSON.stringify(origin), Buffer.byteLength(payload)]
         );
 
-        const messageChannels = channels?.length ? [...channels] : [];
-        if (connectionIds) {
-            messageChannels.push(...connectionIds.map(id => `@exid:${id}`));
-        }
-
-        if (messageChannels.length) {
-            // TODO : this
-            const insertStatement = prepare(`
-                INSERT INTO message_recipients (message_id, channel)
-                VALUES (?, ?)
-            `);
-            messageChannels.forEach(channel => insertStatement.run([messageId, channel]));
-            insertStatement.finalize();
-        }
+        const insertStatement = prepare(`
+            INSERT INTO message_recipients (message_id, channel)
+            VALUES (?, ?)
+        `);
+        channels.forEach(channel => insertStatement.run([messageId, channel]));
+        insertStatement.finalize();
 
         return messageId.toString(32);
     }
@@ -219,9 +210,8 @@ export class MessageManagerSqLite implements MessageManager {
      * Check if context, channels and external ids combination requires message to be cached
      * @param contextId
      * @param channels
-     * @param connectionIds
      */
-    private async shouldCacheMessage(contextId: ContextId, channels: ChannelId[] | null, connectionIds: ExternalId[] | null): Promise<boolean> {
+    private async shouldCacheMessage(contextId: ContextId, channels: ChannelId[]): Promise<boolean> {
         const {contextProvider: {getConfigurationContext}} = this;
         const {cachingPolicy, channelConfig, individualMessageConfig} = await getConfigurationContext(contextId);
 
@@ -236,7 +226,7 @@ export class MessageManagerSqLite implements MessageManager {
             }
         }
 
-        if (!connectionIds || !connectionIds.length) {
+        if (!channels.some(getExternalIdFromChannelId)) {
             return false;
         }
 

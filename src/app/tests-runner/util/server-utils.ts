@@ -20,7 +20,7 @@ export const launchServer = (singleCore: boolean = true, showLogs = false, mode:
     serverProcess.stderr.on("data", err => {
         logToConsole('>> serverProcess.stderr');
         showLogs && logToConsole(err);
-        process.exit();
+        // process.exit();
     });
     serverProcess.stdout.on("data", async chunk => {
         const text = typeof chunk === "string" ? chunk : (chunk instanceof Buffer ? chunk.toString("utf8") : null);

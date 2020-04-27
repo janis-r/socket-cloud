@@ -4,10 +4,10 @@ import {PlatformApi} from "./PlatformApi";
 import {accessTokenApiKey, configurationContextApiKey} from "../../dev-server/devServerModule";
 import {AccessTokenApi} from "./AccessTokenApi";
 import {ConfigurationContextApi} from "./ConfigurationContextApi";
-import {DataPushApiListener} from "@defaultProtocol/service/DataPushApiListener";
 import {AccessTokenApiListener} from "../../../lib/authorization/service/AccessTokenApiListener";
 import {ConfigurationContextApiListener} from "../../../lib/configurationContext/service/ConfigurationContextApiListener";
 import {configurationContext, debug, serverUrl} from "../config";
+import {DataPushApiListener} from "../../../lib/defaultProtocol/service/DataPushApiListener";
 
 const contextId = configurationContext.id;
 

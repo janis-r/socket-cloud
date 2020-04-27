@@ -7,6 +7,7 @@ import {
     startSocketServer,
     stopSocketServer
 } from "../util/test-utils";
+import {getExternalIdFromChannelId} from "../../../lib/defaultProtocol/data/ChannelId";
 
 describe('Platform API', () => {
 
@@ -38,8 +39,10 @@ describe('Platform API', () => {
                     fail(`Wrong message data`);
                 } else if (message.payload !== payload) {
                     fail(`Wrong payload`);
-                } else if (message.channels && message.channels.length > 0) {
-                    fail(`Message channels must be empty or not set`);
+                } else if (!message.channels || message.channels.length === 0) {
+                    fail(`Message channels must be set`);
+                } else if (!message.channels.every(getExternalIdFromChannelId)) {
+                    fail(`All message channels must contain external id`);
                 } else {
                     messageCount++;
                     if (messageCount === connections.length && recipientCount) {
@@ -73,8 +76,10 @@ describe('Platform API', () => {
                     fail(`Wrong message data`);
                 } else if (message.payload !== connectionId.toString()) {
                     fail(`Wrong payload`);
-                } else if (message.channels && message.channels.length > 0) {
-                    fail(`Message channels must be empty or not set`);
+                } else if (!message.channels || message.channels.length === 0) {
+                    fail(`Message channels must be set`);
+                } else if (!message.channels.every(getExternalIdFromChannelId)) {
+                    fail(`All message channels must contain external id`);
                 } else {
                     receivedMessagesCount++;
                     if (receivedMessagesCount === messageCount && sendToCount === messageCount) {

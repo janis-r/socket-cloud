@@ -1,12 +1,13 @@
 import {MessageType} from "../MessageType";
 import {MessageValidator} from "../../util/MessageValidator";
+import {ChannelId, isChannelId} from "../../data/ChannelId";
 
 export type PushToClientMessage = {
     type: MessageType.PushToClient,
     time: number,
     messageId: string,
     payload: string,
-    channels?: string[],
+    channels?: ChannelId[],
 }
 
 export const pushToClientUtil = new MessageValidator<PushToClientMessage>([
@@ -14,5 +15,5 @@ export const pushToClientUtil = new MessageValidator<PushToClientMessage>([
     {field: "time", type: "number"},
     {field: "messageId", type: "string"},
     {field: "payload", type: "string"},
-    {field: "channels", type: "string[]", optional: true}
+    {field: "channels", type: "string[]", itemValidator: isChannelId}
 ]);
