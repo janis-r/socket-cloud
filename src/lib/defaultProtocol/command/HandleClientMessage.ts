@@ -1,9 +1,10 @@
 import {Command, EventDispatcher, Inject} from "quiver-framework";
-import {ClientMessageEvent, CloseReason} from "../../clientConnectionPool";
-import {deserializeClientMessage, MessageType} from "../data";
+import {ClientMessageEvent} from "../../clientConnectionPool/event/ClientMessageEvent";
+import {CloseReason} from "../../clientConnectionPool/data/CloseReason";
+import {deserializeClientMessage} from "../data/clientMessage/ClientMessage";
+import {MessageType} from "../data/MessageType";
 import {IncomingClientMessageEvent} from "../event/IncomingClientMessageEvent";
 import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
-import chalk from "chalk";
 
 export class HandleClientMessage implements Command {
 

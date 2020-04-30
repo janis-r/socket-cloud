@@ -1,6 +1,7 @@
 import {Command, Event, EventDispatcher, Inject} from "quiver-framework";
-import {MessageType, PushToServerMessage} from "../data";
-import {ClientConnection} from "../../clientConnectionPool";
+import {MessageType} from "../data/MessageType";
+import {PushToServerMessage} from "../data/clientMessage/PushToServerMessage";
+import {ClientConnection} from "../../clientConnectionPool/model/ClientConnection";
 import {MessageManager} from "../service/MessageManager";
 import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
 import {PushToClientMessage} from "../data/serverMessage/PushToClientMessage";

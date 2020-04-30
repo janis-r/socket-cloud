@@ -6,7 +6,8 @@ import {
     startSocketServer,
     stopSocketServer
 } from "../util/test-utils";
-import {PushToClientMessage, RestoreChannelsResponseMessage} from "../../../lib/defaultProtocol";
+import {PushToClientMessage} from "../../../lib/defaultProtocol/data/serverMessage/PushToClientMessage";
+import {RestoreChannelsResponseMessage} from "../../../lib/defaultProtocol/data/serverMessage/RestoreChannelsResponseMessage";
 import {cachedChannelName} from "../config";
 
 describe("Message restore from cache", () => {

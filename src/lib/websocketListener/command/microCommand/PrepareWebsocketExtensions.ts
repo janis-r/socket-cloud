@@ -1,7 +1,7 @@
 import {Command, Inject, Optional} from "quiver-framework";
 import {WebsocketConnectionValidationRequest} from "../../event/WebsocketConnectionValidationRequest";
-import {Logger} from "../../../logger";
-import {WebsocketExtensionRegistry} from "../../../websocketExtension";
+import {Logger} from "../../../logger/service/Logger";
+import {WebsocketExtensionRegistry} from "../../../websocketExtension/service/WebsocketExtensionRegistry";
 
 export class PrepareWebsocketExtensions implements Command<boolean> {
 

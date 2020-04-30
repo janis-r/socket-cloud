@@ -1,4 +1,5 @@
-import {ContextId, contextIdMatchRegexp} from "../../configurationContext";
+import {ContextId} from "../../configurationContext/data/ContextId";
+import {contextIdMatchRegexp} from "../../configurationContext/data/contextIdMatchRegexp";
 import {tokenMatchRegexp} from "./tokenMatchRegexp";
 import {AccessConfiguration, accessConfigurationValidator} from "./AccessConfiguration";
 

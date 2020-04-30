@@ -1,7 +1,9 @@
 import {Command, Inject} from "quiver-framework";
-import {IpcMessage, IpcMessageEvent, WorkerMessengerProvider} from "../../ipcMessanger";
-import {DataSyncMessage, DataSyncMessageType, dataSyncMessageUtil, defaultProtocolId} from "../index";
-import {WorkerManager} from "../../workerManager";
+import {IpcMessage} from "../../ipcMessanger/data/IpcMessage";
+import {IpcMessageEvent} from "../../ipcMessanger/event/IpcMessageEvent";
+import {WorkerMessengerProvider} from "../../ipcMessanger/service/WorkerMessengerProvider";
+import {DataSyncMessage, DataSyncMessageType} from "../data/ipc/DataSyncMessage";
+import {WorkerManager} from "../../workerManager/service/WorkerManager";
 
 export class ForwardDataSyncMessageToNodes implements Command {
 

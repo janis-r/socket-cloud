@@ -1,4 +1,4 @@
-import {ConfigurationContext} from "../../configurationContext";
+import {ConfigurationContext} from "../../configurationContext/data/ConfigurationContext";
 import {TokenData} from "./TokenData";
 
 /**

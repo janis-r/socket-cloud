@@ -1,7 +1,8 @@
 import {Command, Event, Inject} from "quiver-framework";
 import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
-import {MessageType, RestoreChannelsRequestMessage} from "../data";
-import {ClientConnection} from "../../clientConnectionPool";
+import {MessageType} from "../data/MessageType";
+import {RestoreChannelsRequestMessage} from "../data/clientMessage/RestoreChannelsRequestMessage";
+import {ClientConnection} from "../../clientConnectionPool/model/ClientConnection";
 import {MessageManager} from "../service/MessageManager";
 import {
     RestoreChannelsResponseMessage,

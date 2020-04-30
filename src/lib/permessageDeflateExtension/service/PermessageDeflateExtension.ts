@@ -1,7 +1,9 @@
 import {Inject} from "quiver-framework";
 import {valueBelongsToEnum} from "ugd10a";
 import {PermessageDeflateConfig} from "../config/PermessageDeflateConfig";
-import {WebsocketExtension, WebsocketExtensionAgent, WebsocketExtensionConfig} from "../../websocketExtension";
+import {WebsocketExtension} from "../../websocketExtension/service/WebsocketExtension";
+import {WebsocketExtensionAgent} from "../../websocketExtension/service/WebsocketExtensionAgent";
+import {WebsocketExtensionConfig} from "../../websocketExtension/config/WebsocketExtensionConfig";
 import {PermessageDeflateParam} from "../data/PermessageDeflateParam";
 import {PermessageDeflateAgent} from "./PermessageDeflateAgent";
 import {PermessageDeflateExtensionConfig} from "../data/PermessageDeflateExtensionConfig";

@@ -1,6 +1,6 @@
 import {Command, Inject} from "quiver-framework";
 import {WebsocketConnectionValidationRequest} from "../../event/WebsocketConnectionValidationRequest";
-import {Logger} from "../../../logger";
+import {Logger} from "../../../logger/service/Logger";
 
 export class ValidateConnectionHeaders implements Command<boolean> {
 

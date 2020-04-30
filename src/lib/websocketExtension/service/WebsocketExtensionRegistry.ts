@@ -1,5 +1,5 @@
 import {Inject} from "quiver-framework";
-import {Logger} from "../../logger";
+import {Logger} from "../../logger/service/Logger";
 import {WebsocketExtension} from "./WebsocketExtension";
 import {parseWebsocketExtensionOffers} from "../util/parse-websocket-extension-offers";
 import {WebsocketExtensionAgent} from "./WebsocketExtensionAgent";

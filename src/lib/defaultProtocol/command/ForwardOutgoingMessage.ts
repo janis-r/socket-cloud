@@ -1,8 +1,8 @@
 import {Command, Inject} from "quiver-framework";
 import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
 import {DataSyncMessage, DataSyncMessageType} from "../data/ipc/DataSyncMessage";
-import {defaultProtocolId} from "..";
-import {IpcMessenger} from "../../ipcMessanger";
+import {defaultProtocolId} from "../data/defaultProtocolId";
+import {IpcMessenger} from "../../ipcMessanger/service/IpcMessenger";
 
 /**
  * Forward outgoing message to other IPC communication parties.

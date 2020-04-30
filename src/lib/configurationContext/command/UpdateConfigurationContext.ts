@@ -1,6 +1,6 @@
 import {Command, Inject} from "quiver-framework";
 import {UpdateConfigurationContextEvent} from "../event/UpdateConfigurationContextEvent";
-import {ConfigurationContextProvider} from "..";
+import {ConfigurationContextProvider} from "../service/ConfigurationContextProvider";
 
 export class UpdateConfigurationContext implements Command {
 

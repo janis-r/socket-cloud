@@ -9,7 +9,7 @@ import {ForwardConfigurationContextMessageWithinWorker} from "./command/ipc/Forw
 
 export const configurationContextModuleInWorker: ModuleConfig = {
     requires: [
-        configurationContextModule // TODO A MAJOR FUCKUP IF THIS LINE STAYS COMMENTED
+        configurationContextModule
     ],
     commands: [
         {

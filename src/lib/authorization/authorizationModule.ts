@@ -1,6 +1,5 @@
-import {InjectionConfig, ModuleConfig} from "quiver-framework";
+import {ModuleConfig} from "quiver-framework";
 import {AccessTokenProvider} from "./service/AccessTokenProvider";
-import {AccessTokenApiConfig} from "./config/AccessTokenApiConfig";
 import {AccessTokenDataModel} from "./model/AccessTokenDataModel";
 import {AccessTokenDataModelSqLite} from "./model/impl/AccessTokenDataModelSqLite";
 import {AccessTokenApiListener} from "./service/AccessTokenApiListener";

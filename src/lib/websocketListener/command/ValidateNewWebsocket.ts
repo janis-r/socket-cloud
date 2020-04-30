@@ -1,13 +1,13 @@
 import {Inject, MacroCommand, referenceToString, SubCommand} from "quiver-framework";
 import {isPromise} from "ugd10a/validator";
 import {WebsocketConnectionValidationRequest} from "../event/WebsocketConnectionValidationRequest";
-import {Logger} from "../../logger";
+import {Logger} from "../../logger/service/Logger";
 import {AuthorizeConnectionContext} from "./microCommand/AuthorizeConnectionContext";
 import {ValidateConnectionHeaders} from "./microCommand/ValidateConnectionHeaders";
 import {WebsocketClientConnection} from "../model/WebsocketClientConnection";
 import {PrepareWebsocketExtensions} from "./microCommand/PrepareWebsocketExtensions";
 import {RespondToHandshake} from "./microCommand/RespondToHandshake";
-import {ClientConnectionPool} from "../../clientConnectionPool";
+import {ClientConnectionPool} from "../../clientConnectionPool/model/ClientConnectionPool";
 
 export class ValidateNewWebsocket<T extends boolean> extends MacroCommand<T> {
 

@@ -1,7 +1,8 @@
 import cluster from "cluster";
 import {AppContext} from "quiver-framework";
 import {devServerModule} from "./devServerModule";
-import {defaultProtocolModuleInMaster, defaultProtocolModuleInWorker} from "../../lib/defaultProtocol";
+import {defaultProtocolModuleInMaster} from "../../lib/defaultProtocol/defaultProtocolModuleInMaster";
+import {defaultProtocolModuleInWorker} from "../../lib/defaultProtocol/defaultProtocolModuleInWorker";
 import {configurationContextModuleInMaster} from "../../lib/configurationContext/configurationContextModuleInMaster";
 import {configurationContextModuleInWorker} from "../../lib/configurationContext/configurationContextModuleInWorker";
 

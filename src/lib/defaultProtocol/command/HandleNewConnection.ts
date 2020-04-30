@@ -1,5 +1,6 @@
 import {Command, Inject} from "quiver-framework";
-import {ClientConnectionPool, NewConnectionEvent} from "../../clientConnectionPool";
+import {ClientConnectionPool} from "../../clientConnectionPool/model/ClientConnectionPool";
+import {NewConnectionEvent} from "../../clientConnectionPool/event/NewConnectionEvent";
 import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
 
 export class HandleNewConnection implements Command {

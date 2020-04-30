@@ -1,11 +1,13 @@
 import {Inject} from "quiver-framework";
 import {toSeconds} from "ugd10a";
-import {CachingPolicy, ConfigurationContextProvider, ContextId} from "../../../configurationContext";
+import {CachingPolicy} from "../../../configurationContext/data/CachingPolicy";
+import {ConfigurationContextProvider} from "../../../configurationContext/service/ConfigurationContextProvider";
+import {ContextId} from "../../../configurationContext/data/ContextId";
 import {ChannelId, externalIdFromChannelId} from "../../data/ChannelId";
 import {CachedMessage} from "../../data/cache/CachedMessage";
 import {MessageManager} from "../MessageManager";
 import {CacheFilter} from "../../data/cache/CacheFilter";
-import {SqLiteConnection} from "../../../sqLite";
+import {SqLiteConnection} from "../../../sqLite/service/SqLiteConnection";
 
 export class MessageManagerSqLite implements MessageManager {
 

@@ -1,7 +1,9 @@
 import {Command, Event, Inject} from "quiver-framework";
 import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
-import {MessageType, SubscribeMessage, UnsubscribeMessage} from "../data";
-import {ClientConnection} from "../../clientConnectionPool";
+import {MessageType} from "../data/MessageType";
+import {SubscribeMessage} from "../data/clientMessage/SubscribeMessage";
+import {UnsubscribeMessage} from "../data/clientMessage/UnsubscribeMessage";
+import {ClientConnection} from "../../clientConnectionPool/model/ClientConnection";
 
 export class UpdateClientSubscriptions implements Command {
 

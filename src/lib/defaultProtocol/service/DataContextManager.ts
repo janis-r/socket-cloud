@@ -1,9 +1,10 @@
 import {Inject} from "quiver-framework";
-import {CachingPolicy, ConfigurationContext} from "../../configurationContext";
-import {ClientConnection} from "../../clientConnectionPool";
+import {CachingPolicy} from "../../configurationContext/data/CachingPolicy";
+import {ConfigurationContext} from "../../configurationContext/data/ConfigurationContext";
+import {ClientConnection} from "../../clientConnectionPool/model/ClientConnection";
 import {ChannelId} from "../data/ChannelId";
-import {Logger} from "../../logger";
-import {globalMessageChannel} from "..";
+import {Logger} from "../../logger/service/Logger";
+import {globalMessageChannel} from "../data/globalMessageChannel";
 
 export class DataContextManager {
 

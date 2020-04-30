@@ -7,7 +7,7 @@ import {
     stopSocketServer,
     timeout
 } from "../util/test-utils";
-import {RestoreChannelsResponseMessage} from "../../../lib/defaultProtocol";
+import {RestoreChannelsResponseMessage} from "../../../lib/defaultProtocol/data/serverMessage/RestoreChannelsResponseMessage";
 import {defaultCacheSize, defaultCacheTime, notCachedChannelName} from "../config";
 
 describe("Message cache config", () => {

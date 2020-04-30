@@ -1,6 +1,7 @@
 import {toMilliseconds} from "ugd10a";
 import {CachedMessage} from "../data/cache/CachedMessage";
-import {CachingPolicy, ConfigurationContext} from "../../configurationContext";
+import {ConfigurationContext} from "../../configurationContext/data/ConfigurationContext";
+import {CachingPolicy} from "../../configurationContext/data/CachingPolicy";
 import {CacheFilter} from "../data/cache/CacheFilter";
 import {CallbackCollection} from "../../utils/CallbackCollection";
 

@@ -1,20 +1,20 @@
 import {connectWebsocket} from "./connectWebsocket";
+import {deserializeServerMessage} from "../../../lib/defaultProtocol/data/serverMessage/ServerMessage";
+import {globalMessageChannel} from "../../../lib/defaultProtocol/data/globalMessageChannel";
+import {MessageType} from "../../../lib/defaultProtocol/data/MessageType";
+import {defaultProtocolId} from "../../../lib/defaultProtocol/data/defaultProtocolId";
+import {PushToClientMessage} from "../../../lib/defaultProtocol/data/serverMessage/PushToClientMessage";
+import {pushToServerUtil} from "../../../lib/defaultProtocol/data/clientMessage/PushToServerMessage";
+import {RestoreChannelsResponseMessage} from "../../../lib/defaultProtocol/data/serverMessage/RestoreChannelsResponseMessage";
 import {
-    deserializeServerMessage,
-    globalMessageChannel,
-    MessageType,
-    defaultProtocolId,
-    PushToClientMessage,
-    pushToServerUtil,
     RestoreChannelsRequestMessage,
-    RestoreChannelsResponseMessage,
-    restoreRequestUtil,
-    subscribeMessageUtil,
-    unsubscribeMessageUtil
-} from "../../../lib/defaultProtocol";
+    restoreRequestUtil
+} from "../../../lib/defaultProtocol/data/clientMessage/RestoreChannelsRequestMessage";
+import {subscribeMessageUtil} from "../../../lib/defaultProtocol/data/clientMessage/SubscribeMessage";
+import {unsubscribeMessageUtil} from "../../../lib/defaultProtocol/data/clientMessage/UnsubscribeMessage";
 import {CallbackCollection} from "../../../lib/utils/CallbackCollection";
-import {ContextId} from "../../../lib/configurationContext";
-import {WebsocketConnection} from "../../../lib/websocketConnection";
+import {ContextId} from "../../../lib/configurationContext/data/ContextId";
+import {WebsocketConnection} from "../../../lib/websocketConnection/model/WebsocketConnection";
 
 const protocol = defaultProtocolId;
 

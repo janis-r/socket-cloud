@@ -1,6 +1,7 @@
-import {WebsocketExtensionAgent} from "../../websocketExtension";
+import {WebsocketExtensionAgent} from "../../websocketExtension/service/WebsocketExtensionAgent";
 import {getDeflator, getInflator} from "../util/indeflate-utils";
-import {DataFrame, DataFrameType} from "../../websocketConnection";
+import {DataFrame} from "../../websocketConnection/data/DataFrame";
+import {DataFrameType} from "../../websocketConnection/data/DataFrameType";
 
 const {TextFrame, BinaryFrame} = DataFrameType;
 
@@ -11,7 +12,8 @@ export class PermessageDeflateAgent implements WebsocketExtensionAgent {
 
     constructor(readonly config: AgentConfig,
                 readonly configOfferResponse: string
-    ) {}
+    ) {
+    }
 
     async incomingDataPipe(dataFrame: DataFrame) {
         const {type, rsv1, payload} = dataFrame;

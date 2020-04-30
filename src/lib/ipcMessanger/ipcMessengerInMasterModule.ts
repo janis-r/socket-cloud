@@ -1,8 +1,9 @@
 import {ModuleConfig} from "quiver-framework";
-import {workerManagerModule, WorkerMessageEvent} from "../workerManager";
+import {workerManagerModule} from "../workerManager/workerManagerModule";
+import {WorkerMessageEvent} from "../workerManager/event/WorkerMessageEvent";
 import {WorkerMessengerProvider} from "./service/WorkerMessengerProvider";
 import {CreateIpcMessageEvent} from "./command/CreateIpcMessageEvent";
-import {loggerModule} from "../logger";
+import {loggerModule} from "../logger/loggerModule";
 
 export const ipcMessengerInMasterModule: ModuleConfig = {
     requires: [

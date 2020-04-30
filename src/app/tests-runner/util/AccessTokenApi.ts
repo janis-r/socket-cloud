@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
-import {ContextId} from "../../../lib/configurationContext";
-import {HttpStatusCode} from "../../../lib/httpServer";
+import {ContextId} from "../../../lib/configurationContext/data/ContextId";
+import {HttpStatusCode} from "../../../lib/httpServer/data/HttpStatusCode";
 import {AccessConfiguration} from "../../../lib/authorization/data/AccessConfiguration";
 import {TokenData, tokenDataValidator} from "../../../lib/authorization/data/TokenData";
 import {createHeaders} from "./test-utils";

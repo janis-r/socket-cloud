@@ -1,6 +1,6 @@
 import {Command, Inject} from "quiver-framework";
 import {WebsocketConnectionValidationRequest} from "../../event/WebsocketConnectionValidationRequest";
-import {Logger} from "../../../logger";
+import {Logger} from "../../../logger/service/Logger";
 import {handshakeResponse} from "../../util/handshakeResponse";
 
 export class RespondToHandshake implements Command<boolean> {

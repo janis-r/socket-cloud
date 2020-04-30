@@ -2,7 +2,7 @@ import {DataFrame} from "../../data/DataFrame";
 import {DataFrameType} from "../../data/DataFrameType";
 import {CallbackCollection} from "../../../utils/CallbackCollection";
 import {WebsocketDataBuffer} from "../../util/WebsocketDataBuffer";
-import {WebsocketExtensionAgent} from "../../../websocketExtension";
+import {WebsocketExtensionAgent} from "../../../websocketExtension/service/WebsocketExtensionAgent";
 import {ExecutionQueue} from "ugd10a";
 import {isPromise} from "ugd10a/validator";
 import {CloseCode} from "../../data/CloseCode";

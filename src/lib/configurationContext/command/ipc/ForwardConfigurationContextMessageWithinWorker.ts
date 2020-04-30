@@ -1,5 +1,5 @@
 import {Command, EventDispatcher, Inject} from "quiver-framework";
-import {IpcMessageEvent} from "../../../ipcMessanger";
+import {IpcMessageEvent} from "../../../ipcMessanger/event/IpcMessageEvent";
 import {
     ConfigurationConfigIpcMessageType,
     configurationConfigIpcMessageValidator

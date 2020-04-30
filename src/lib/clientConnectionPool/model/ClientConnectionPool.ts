@@ -1,10 +1,14 @@
 import {ClientConnection} from "./ClientConnection";
-import {ConnectionRemovedEvent, ConnectionState, ExternalId, NewConnectionEvent} from "..";
+import {ConnectionRemovedEvent} from "../event/ConnectionRemovedEvent";
+import {ConnectionState} from "../data/ConnectionState";
+import {ExternalId} from "../data/ExternalId";
+import {NewConnectionEvent} from "../event/NewConnectionEvent";
 import {EventDispatcher, Injectable} from "quiver-framework";
 import {ClientMessageEvent} from "../event/ClientMessageEvent";
 import {ConnectionId} from "../data/ConnectionId";
-import {ContextId} from "../../configurationContext";
-import {Logger, LoggerEntity} from "../../logger";
+import {ContextId} from "../../configurationContext/data/ContextId";
+import {Logger} from "../../logger/service/Logger";
+import {LoggerEntity} from "../../logger/data/LoggerEntity";
 
 @Injectable()
 export class ClientConnectionPool {

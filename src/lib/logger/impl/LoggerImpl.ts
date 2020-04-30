@@ -2,7 +2,11 @@ import {Injectable} from "quiver-framework";
 import {currentDateToObject} from "ugd10a";
 import * as fs from "fs";
 import chalk, {Chalk} from "chalk";
-import {createLogFileName, Logger, LoggerConfig, LoggerEntity, LogLevel} from "..";
+import {createLogFileName} from "../util/createLogFileName";
+import {Logger} from "../service/Logger";
+import {LoggerConfig} from "../data/LoggerConfig";
+import {LoggerEntity} from "../data/LoggerEntity";
+import {LogLevel} from "../data/LogLevel";
 
 @Injectable()
 export class LoggerImpl extends Logger {

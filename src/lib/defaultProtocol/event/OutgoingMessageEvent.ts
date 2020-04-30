@@ -1,5 +1,5 @@
 import {Event} from "quiver-framework";
-import {ContextId} from "../../configurationContext";
+import {ContextId} from "../../configurationContext/data/ContextId";
 import {PushToClientMessage} from "../data/serverMessage/PushToClientMessage";
 
 export class OutgoingMessageEvent extends Event {

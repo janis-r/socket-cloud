@@ -1,5 +1,5 @@
 import * as crypto from "crypto";
-import {ConnectionState} from "../../../clientConnectionPool";
+import {ConnectionState} from "../../../clientConnectionPool/data/ConnectionState";
 import {CloseCode} from "../../data/CloseCode";
 import {spawnFrameData} from "../../util/websocket-utils";
 import {DataFrameType} from "../../data/DataFrameType";

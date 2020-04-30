@@ -1,9 +1,9 @@
 import {Command, EventDispatcher, Inject} from "quiver-framework";
 import {SocketDescriptor} from "../../data/SocketDescriptor";
-import {ValidateSocketConnectionEvent} from "../..";
+import {ValidateSocketConnectionEvent} from "../../event/ValidateSocketConnectionEvent";
 import {WebsocketConnectionValidationRequest} from "../../event/WebsocketConnectionValidationRequest";
-import {Logger} from "../../../logger";
-import {ConfigurationContextProvider} from "../../../configurationContext";
+import {Logger} from "../../../logger/service/Logger";
+import {ConfigurationContextProvider} from "../../../configurationContext/service/ConfigurationContextProvider";
 import url from "url";
 
 export class AuthorizeConnectionContext implements Command<boolean> {

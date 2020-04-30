@@ -1,12 +1,15 @@
 import {Socket} from "net";
-import {ClientConnection, CloseReason} from "../../clientConnectionPool";
-import {WebsocketExtensionAgent} from "../../websocketExtension";
-import {ConfigurationContext} from "../../configurationContext";
+import {ClientConnection} from "../../clientConnectionPool/model/ClientConnection";
+import {CloseReason} from "../../clientConnectionPool/data/CloseReason";
+import {WebsocketExtensionAgent} from "../../websocketExtension/service/WebsocketExtensionAgent";
 import {SocketDescriptor} from "../data/SocketDescriptor";
 import {OperatorData} from "../data/OperatorData";
-import {WebsocketConnection} from "../../websocketConnection";
+import {WebsocketConnection} from "../../websocketConnection/model/WebsocketConnection";
 import {ClientConnectionEventBase} from "./ClientConnectionEventBase";
-import {ErrorEvent, MessageEvent, StateChangeEvent} from "../../clientConnectionPool/connectionEvent";
+import {ErrorEvent} from "../../clientConnectionPool/connectionEvent/ErrorEvent";
+import {MessageEvent} from "../../clientConnectionPool/connectionEvent/MessageEvent";
+import {ConfigurationContext} from "../../configurationContext/data/ConfigurationContext";
+import {StateChangeEvent} from "../../clientConnectionPool/connectionEvent/StateChangeEvent";
 
 export class WebsocketClientConnection extends ClientConnectionEventBase implements ClientConnection {
 

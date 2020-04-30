@@ -1,4 +1,4 @@
-import {ExternalId} from "../../../clientConnectionPool";
+import {ExternalId} from "../../../clientConnectionPool/data/ExternalId";
 import {MessageValidator} from "../../util/MessageValidator";
 
 export type IndividualMessage = {

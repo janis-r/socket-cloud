@@ -1,7 +1,7 @@
 import {EventDispatcher, ModuleConfig} from "quiver-framework";
 import {IpcMessenger} from "./service/IpcMessenger";
 import {IpcMessageEvent} from "./event/IpcMessageEvent";
-import {loggerModule} from "../logger";
+import {loggerModule} from "../logger/loggerModule";
 
 export const ipcMessengerInWorkerModule: ModuleConfig = {
     requires: [

@@ -1,6 +1,6 @@
 import {Inject} from "quiver-framework";
 import {Timer} from "ugd10a";
-import {Logger} from "../../logger";
+import {Logger} from "../../logger/service/Logger";
 import {Pool, PoolClient, PoolConfig, QueryConfig} from "pg";
 import {PgConfig} from "../data/PgConfig";
 import {Query} from "../data/Query";
@@ -81,7 +81,7 @@ export class PgConnection {
         }
 
         const {values, text} = queryConfig;
-        const {connection, logger:{error: logError, console: logToConsole, notice: logNotice}, config: {slowQueryThreshold}} = this;
+        const {connection, logger: {error: logError, console: logToConsole, notice: logNotice}, config: {slowQueryThreshold}} = this;
 
         const time = new Timer();
         const cleanQuery = text.replace(/\s+/g, ' ').replace(/^\s+/, '');

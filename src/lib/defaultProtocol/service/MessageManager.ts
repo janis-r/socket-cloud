@@ -1,4 +1,4 @@
-import {ContextId} from "../../configurationContext";
+import {ContextId} from "../../configurationContext/data/ContextId";
 import {ChannelId} from "../data/ChannelId";
 import {CachedMessage} from "../data/cache/CachedMessage";
 import {CacheFilter} from "../data/cache/CacheFilter";

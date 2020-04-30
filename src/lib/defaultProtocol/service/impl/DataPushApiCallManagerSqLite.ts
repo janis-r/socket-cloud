@@ -1,5 +1,5 @@
 import {DataPushApiCallManager} from "../DataPushApiCallManager";
-import {SqLiteConnection} from "../../../sqLite";
+import {SqLiteConnection} from "../../../sqLite/service/SqLiteConnection";
 import {ScopedLogger} from "../../util/ScopedLogger";
 
 export class DataPushApiCallManagerSqLite implements DataPushApiCallManager {

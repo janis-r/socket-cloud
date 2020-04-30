@@ -1,12 +1,15 @@
 import {Command, Inject} from "quiver-framework";
-import {Logger} from "../../logger";
+import {Logger} from "../../logger/service/Logger";
 import fetch from "node-fetch";
 import {HttpStatusCode} from "../../httpServer/data/HttpStatusCode";
 import {Json} from "../../types/Json";
-import {ValidateSocketConnectionEvent, ValidationError} from "../../websocketListener";
+import {
+    ValidateSocketConnectionEvent,
+    ValidationError
+} from "../../websocketListener/event/ValidateSocketConnectionEvent";
 import {ConnectionValidationError} from "../data/ConnectionValidationError";
 import {isOperatorData} from "../../websocketListener/data/OperatorData";
-import {ClientConnectionPool} from "../../clientConnectionPool";
+import {ClientConnectionPool} from "../../clientConnectionPool/model/ClientConnectionPool";
 
 export class ValidateNewConnection implements Command<void> {
     @Inject()

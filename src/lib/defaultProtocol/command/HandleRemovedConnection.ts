@@ -1,5 +1,5 @@
 import {Command, Inject} from "quiver-framework";
-import {ConnectionRemovedEvent} from "../../clientConnectionPool";
+import {ConnectionRemovedEvent} from "../../clientConnectionPool/event/ConnectionRemovedEvent";
 import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
 
 export class HandleRemovedConnection implements Command {

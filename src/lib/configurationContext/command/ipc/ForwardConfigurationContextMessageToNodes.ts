@@ -1,6 +1,7 @@
 import {Command, Inject} from "quiver-framework";
-import {IpcMessageEvent, WorkerMessengerProvider} from "../../../ipcMessanger";
-import {WorkerManager} from "../../../workerManager";
+import {IpcMessageEvent} from "../../../ipcMessanger/event/IpcMessageEvent";
+import {WorkerMessengerProvider} from "../../../ipcMessanger/service/WorkerMessengerProvider";
+import {WorkerManager} from "../../../workerManager/service/WorkerManager";
 
 export class ForwardConfigurationContextMessageToNodes implements Command {
 

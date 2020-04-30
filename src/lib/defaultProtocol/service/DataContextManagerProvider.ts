@@ -1,5 +1,7 @@
 import {Inject, Injector} from "quiver-framework";
-import {ConfigurationContext, ConfigurationContextProvider, ContextId} from "../../configurationContext";
+import {ConfigurationContextProvider} from "../../configurationContext/service/ConfigurationContextProvider";
+import {ConfigurationContext} from "../../configurationContext/data/ConfigurationContext";
+import {ContextId} from "../../configurationContext/data/ContextId";
 import {DataContextManager} from "./DataContextManager";
 
 export class DataContextManagerProvider {

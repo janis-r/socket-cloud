@@ -6,7 +6,7 @@ import bodyParser from "body-parser";
 import compression from "compression";
 import {Socket} from "net";
 import {EventDispatcher, Injectable} from "quiver-framework";
-import {Logger} from "../../logger";
+import {Logger} from "../../logger/service/Logger";
 import {HttpServerConfig} from "../config/HttpServerConfig";
 import {HttpConnectionUpgradeEvent} from "../event/HttpConnectionUpgradeEvent";
 import {UpgradeRequest} from "../data/UpgradeRequest";

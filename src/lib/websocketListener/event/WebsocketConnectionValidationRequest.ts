@@ -1,9 +1,9 @@
 import {Event} from "quiver-framework";
 import {Socket} from "net";
-import {UpgradeRequest} from "../../httpServer";
+import {UpgradeRequest} from "../../httpServer/data/UpgradeRequest";
 import {SocketDescriptor} from "../data/SocketDescriptor";
-import {ConfigurationContext} from "../../configurationContext";
-import {WebsocketExtensionAgent} from "../../websocketExtension";
+import {ConfigurationContext} from "../../configurationContext/data/ConfigurationContext";
+import {WebsocketExtensionAgent} from "../../websocketExtension/service/WebsocketExtensionAgent";
 import {OperatorData} from "../data/OperatorData";
 
 /**

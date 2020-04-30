@@ -1,7 +1,7 @@
 import {Inject} from "quiver-framework";
 import {TokenInfo} from "../data/TokenInfo";
 import {AccessTokenDataModel} from "../model/AccessTokenDataModel";
-import {ConfigurationContextProvider} from "../../configurationContext";
+import {ConfigurationContextProvider} from "../../configurationContext/service/ConfigurationContextProvider";
 
 export class AccessTokenProvider {
 

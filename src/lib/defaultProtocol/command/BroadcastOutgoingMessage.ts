@@ -1,8 +1,10 @@
 import {Command, Inject} from "quiver-framework";
 import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
 import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
-import {ClientConnection, ClientConnectionPool, ExternalId} from "../../clientConnectionPool";
-import {serializeServerMessage} from "../data";
+import {ClientConnection} from "../../clientConnectionPool/model/ClientConnection";
+import {ClientConnectionPool} from "../../clientConnectionPool/model/ClientConnectionPool";
+import {ExternalId} from "../../clientConnectionPool/data/ExternalId";
+import {serializeServerMessage} from "../data/serverMessage/ServerMessage";
 import {externalIdFromChannelId} from "../data/ChannelId";
 
 export class BroadcastOutgoingMessage implements Command {

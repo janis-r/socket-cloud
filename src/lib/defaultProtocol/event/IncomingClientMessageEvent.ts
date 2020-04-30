@@ -1,6 +1,6 @@
 import {Event} from "quiver-framework";
-import {ClientMessage} from "../data";
-import {ClientConnection} from "../../clientConnectionPool";
+import {ClientMessage} from "../data/clientMessage/ClientMessage";
+import {ClientConnection} from "../../clientConnectionPool/model/ClientConnection";
 
 export class IncomingClientMessageEvent extends Event<{connection: ClientConnection, message: ClientMessage}> {
     static readonly TYPE = Symbol("incoming-client-message");

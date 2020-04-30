@@ -3,8 +3,9 @@ import {IncomingMessage} from "http";
 import * as https from "https";
 import {Socket} from "net";
 import * as crypto from "crypto";
-import {handshakeResponse} from "../../../lib/websocketListener";
-import {HttpStatusCode} from "../../../lib/httpServer";
+import {handshakeResponse} from "../../../lib/websocketListener/util/handshakeResponse";
+import {HttpStatusCode} from "../../../lib/httpServer/data/HttpStatusCode";
+
 
 export const connectWebsocket = async (url: string, version: 8 | 13 = 13) => new Promise<{ socket: Socket, authKey: string, version: number }>((resolve, reject) => {
     const authKey = crypto.randomBytes(16).toString("base64");

@@ -1,5 +1,5 @@
 import {ModuleConfig} from "quiver-framework";
-import {IpcMessageEvent} from "../ipcMessanger";
+import {IpcMessageEvent} from "../ipcMessanger/event/IpcMessageEvent";
 import {configurationContextIpcScope} from "./data/ipc/configurationContextIpcScope";
 import {ForwardConfigurationContextMessageToNodes} from "./command/ipc/ForwardConfigurationContextMessageToNodes";
 

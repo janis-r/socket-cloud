@@ -1,6 +1,6 @@
 import {Command, Inject} from "quiver-framework";
 import {DeleteConfigurationContextEvent} from "../event/DeleteConfigurationContextEvent";
-import {ConfigurationContextProvider} from "..";
+import {ConfigurationContextProvider} from "../service/ConfigurationContextProvider";
 
 export class DeleteConfigurationContext implements Command {
 

@@ -1,12 +1,14 @@
 import {Injectable} from "quiver-framework";
-import {HttpRequestHandler, HttpServerRouter, HttpStatusCode} from "../../httpServer";
+import {HttpServerRouter} from "../../httpServer/service/HttpServerRouter";
+import {HttpRequestHandler} from "../../httpServer/data/HttpRequestHandler";
+import {HttpStatusCode} from "../../httpServer/data/HttpStatusCode";
 import {AccessTokenProvider} from "./AccessTokenProvider";
 import {AccessTokenDataModel} from "../model/AccessTokenDataModel";
 import {tokenMatchRegexp} from "../data/tokenMatchRegexp";
 import {contextIdMatchRegexp} from "../../configurationContext/data/contextIdMatchRegexp";
 import {AccessTokenApiConfig} from "../config/AccessTokenApiConfig";
 import {accessConfigurationValidator} from "../data/AccessConfiguration";
-import {ConfigurationContextProvider} from "../../configurationContext";
+import {ConfigurationContextProvider} from "../../configurationContext/service/ConfigurationContextProvider";
 
 @Injectable()
 export class AccessTokenApiListener {

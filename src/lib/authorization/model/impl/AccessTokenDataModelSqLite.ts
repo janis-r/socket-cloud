@@ -1,4 +1,4 @@
-import {SqLiteConnection} from "../../../sqLite";
+import {SqLiteConnection} from "../../../sqLite/service/SqLiteConnection";
 import {AccessTokenDataModel} from "../AccessTokenDataModel";
 import {TokenData, tokenDataValidator} from "../../data/TokenData";
 import {ContextId} from "../../../configurationContext/data/ContextId";

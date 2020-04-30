@@ -1,11 +1,13 @@
 import {InjectionConfig, Injector, Module} from "quiver-framework";
-import {WebsocketListenerModule} from "../../lib/websocketListener";
-import {ConfigurationContextProvider} from "../../lib/configurationContext";
+import {WebsocketListenerModule} from "../../lib/websocketListener/WebsocketListenerModule";
+import {ConfigurationContextProvider} from "../../lib/configurationContext/service/ConfigurationContextProvider";
 import {SocketDescriptor} from "../../lib/websocketListener/data/SocketDescriptor";
-import {PermessageDeflateConfig, PermessageDeflateExtensionModule} from "../../lib/permessageDeflateExtension";
-import {ClientMessageEvent} from "../../lib/clientConnectionPool";
+import {PermessageDeflateConfig} from "../../lib/permessageDeflateExtension/config/PermessageDeflateConfig";
+import {PermessageDeflateExtensionModule} from "../../lib/permessageDeflateExtension/PermessageDeflateExtensionModule";
+import {ClientMessageEvent} from "../../lib/clientConnectionPool/event/ClientMessageEvent";
 import {EchoMessageCommand} from "./EchoMessageCommand";
-import {HttpServerConfig, HttpServerRouter} from "../../lib/httpServer";
+import {HttpServerConfig} from "../../lib/httpServer/config/HttpServerConfig";
+import {HttpServerRouter} from "../../lib/httpServer/service/HttpServerRouter";
 
 @Module({
     requires: [

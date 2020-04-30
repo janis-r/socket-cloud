@@ -1,6 +1,8 @@
 import {Command, EventDispatcher, Inject} from "quiver-framework";
 import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
-import {IpcMessage, IpcMessageEvent, ipcMessageUtil, IpcMessenger} from "../../ipcMessanger";
+import {IpcMessage, ipcMessageUtil} from "../../ipcMessanger/data/IpcMessage";
+import {IpcMessageEvent} from "../../ipcMessanger/event/IpcMessageEvent";
+import {IpcMessenger} from "../../ipcMessanger/service/IpcMessenger";
 import {DataSyncMessage, DataSyncMessageType, dataSyncMessageUtil} from "../data/ipc/DataSyncMessage";
 
 export class HandleForwardedMessage implements Command {

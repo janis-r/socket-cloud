@@ -2,15 +2,17 @@ import * as cluster from "cluster";
 import * as express from "express";
 import url from "url";
 import {InjectionConfig, ModuleConfig} from "quiver-framework";
-import {Logger} from "../../lib/logger";
-import {SwaggerApiConfig, SwaggerApiDisplayModule} from "../../lib/swaggerApiDisplay";
-import {PermessageDeflateConfig, PermessageDeflateExtensionModule} from "../../lib/permessageDeflateExtension";
-import {defaultProtocolModule} from "../../lib/defaultProtocol";
-import {WebsocketListenerModule} from "../../lib/websocketListener";
-import {configurationContextModule} from "../../lib/configurationContext/configurationContextModule";
-import {HttpServerRouter, HttpServerService} from "../../lib/httpServer";
+import {Logger} from "../../lib/logger/service/Logger";
+import {SwaggerApiConfig} from "../../lib/swaggerApiDisplay/config/SwaggerApiConfig";
+import {SwaggerApiDisplayModule} from "../../lib/swaggerApiDisplay/SwaggerApiDisplayModule";
+import {HttpServerRouter} from "../../lib/httpServer/service/HttpServerRouter";
+import {HttpServerService} from "../../lib/httpServer/service/HttpServerService";
 import {SocketDescriptor} from "../../lib/websocketListener/data/SocketDescriptor";
-import {authorizationModule} from "../../lib/authorization";
+import {authorizationModule} from "../../lib/authorization/authorizationModule";
+import {PermessageDeflateExtensionModule} from "../../lib/permessageDeflateExtension/PermessageDeflateExtensionModule";
+import {defaultProtocolModule} from "../../lib/defaultProtocol/defaultProtocolModule";
+import {WebsocketListenerModule} from "../../lib/websocketListener/WebsocketListenerModule";
+import {PermessageDeflateConfig} from "../../lib/permessageDeflateExtension/config/PermessageDeflateConfig";
 import {ConfigurationContextApiConfig} from "../../lib/configurationContext/config/ConfigurationContextApiConfig";
 import {AccessTokenApiConfig} from "../../lib/authorization/config/AccessTokenApiConfig";
 
@@ -20,7 +22,6 @@ export const accessTokenApiKey = "DEV::ACCESS_TOKEN_MANAGER_KEY";
 export const devServerModule: ModuleConfig = {
     requires: [
         authorizationModule,
-        configurationContextModule,
         SwaggerApiDisplayModule,
         PermessageDeflateExtensionModule,
         defaultProtocolModule,

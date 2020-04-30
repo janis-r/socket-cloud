@@ -1,11 +1,11 @@
 import {EventDispatcher, Injectable} from "quiver-framework";
-import {HttpRequestHandler, HttpServerRouter, HttpStatusCode} from "../../httpServer";
-import {
-    ConfigurationContextModel,
-    ConfigurationContextProvider,
-    configurationContextValidator,
-    contextIdMatchRegexp
-} from "..";
+import {HttpRequestHandler} from "../../httpServer/data/HttpRequestHandler";
+import {HttpServerRouter} from "../../httpServer/service/HttpServerRouter";
+import {HttpStatusCode} from "../../httpServer/data/HttpStatusCode";
+import {ConfigurationContextModel} from "../model/ConfigurationContextModel";
+import {ConfigurationContextProvider} from "./ConfigurationContextProvider";
+import {contextIdMatchRegexp} from "../data/contextIdMatchRegexp";
+import {configurationContextValidator} from "../data/ConfigurationContext"
 import {UpdateConfigurationContextEvent} from "../event/UpdateConfigurationContextEvent";
 import {DeleteConfigurationContextEvent} from "../event/DeleteConfigurationContextEvent";
 import {ConfigurationContextApiConfig} from "../config/ConfigurationContextApiConfig";

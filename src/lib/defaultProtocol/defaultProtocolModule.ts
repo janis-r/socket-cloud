@@ -1,28 +1,26 @@
 import {Event, ModuleConfig} from "quiver-framework";
-import {
-    ClientConnection,
-    ClientConnectionPoolModule,
-    ClientMessageEvent,
-    ConnectionRemovedEvent,
-    NewConnectionEvent
-} from "../clientConnectionPool";
+import {ClientConnection} from "../clientConnectionPool/model/ClientConnection";
+import {ClientConnectionPoolModule} from "../clientConnectionPool/ClientConnectionPoolModule";
+import {ClientMessageEvent} from "../clientConnectionPool/event/ClientMessageEvent";
+import {ConnectionRemovedEvent} from "../clientConnectionPool/event/ConnectionRemovedEvent";
+import {NewConnectionEvent} from "../clientConnectionPool/event/NewConnectionEvent";
 import {configurationContextModule} from "../configurationContext/configurationContextModule";
 import {HandleNewConnection} from "./command/HandleNewConnection";
 import {HandleClientMessage} from "./command/HandleClientMessage";
 import {HandleRemovedConnection} from "./command/HandleRemovedConnection";
 import {defaultProtocolId} from "./data/defaultProtocolId";
-import {httpServerModule} from "../httpServer";
+import {httpServerModule} from "../httpServer/httpServerModule";
 import {DataContextManagerProvider} from "./service/DataContextManagerProvider";
 import {DataPushApiListener} from "./service/DataPushApiListener";
 import {IncomingClientMessageEvent} from "./event/IncomingClientMessageEvent";
-import {MessageType} from "./data";
+import {MessageType} from "./data/MessageType";
 import {UpdateClientSubscriptions} from "./command/UpdateClientSubscriptions";
 import {PrepareOutgoingClientMessage} from "./command/PrepareOutgoingClientMessage";
 import {OutgoingMessageEvent} from "./event/OutgoingMessageEvent";
 import {BroadcastOutgoingMessage} from "./command/BroadcastOutgoingMessage";
 import {RestoreClientSubscription} from "./command/RestoreClientSubscription";
 import {MessageManager} from "./service/MessageManager";
-import {authorizationModule} from "../authorization";
+import {authorizationModule} from "../authorization/authorizationModule";
 import {DataPushApiCallManager} from "./service/DataPushApiCallManager";
 import {DataPushApiCallManagerSqLite} from "./service/impl/DataPushApiCallManagerSqLite";
 import {MessageManagerSqLite} from "./service/impl/MessageManagerSqLite";

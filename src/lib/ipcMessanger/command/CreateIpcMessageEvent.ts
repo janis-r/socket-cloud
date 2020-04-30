@@ -1,6 +1,7 @@
 import {Command, EventDispatcher, Inject} from "quiver-framework";
-import {WorkerMessageEvent} from "../../workerManager";
-import {IpcMessageEvent, ipcMessageUtil} from "..";
+import {WorkerMessageEvent} from "../../workerManager/event/WorkerMessageEvent";
+import {IpcMessageEvent} from "../event/IpcMessageEvent";
+import {ipcMessageUtil} from "../data/IpcMessage";
 
 export class CreateIpcMessageEvent implements Command {
 

@@ -1,9 +1,9 @@
 import fetch from "node-fetch";
-import {ExternalId} from "../../../lib/clientConnectionPool";
-import {ContextId} from "../../../lib/configurationContext";
+import {ExternalId} from "../../../lib/clientConnectionPool/data/ExternalId";
+import {ContextId} from "../../../lib/configurationContext/data/ContextId";
 import {ChannelId} from "../../../lib/defaultProtocol/data/ChannelId";
 import {MessageValidator} from "../../../lib/defaultProtocol/util/MessageValidator";
-import {HttpStatusCode} from "../../../lib/httpServer";
+import {HttpStatusCode} from "../../../lib/httpServer/data/HttpStatusCode";
 import {createHeaders} from "./test-utils";
 
 export class PlatformApi {

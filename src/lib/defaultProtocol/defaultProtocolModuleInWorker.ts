@@ -1,7 +1,8 @@
 import {ModuleConfig} from "quiver-framework";
 import {OutgoingMessageEvent} from "./event/OutgoingMessageEvent";
 import {defaultProtocolModule} from "./defaultProtocolModule";
-import {IpcMessageEvent, ipcMessengerInWorkerModule} from "../ipcMessanger";
+import {IpcMessageEvent} from "../ipcMessanger/event/IpcMessageEvent";
+import {ipcMessengerInWorkerModule} from "../ipcMessanger/ipcMessengerInWorkerModule";
 import {ForwardOutgoingMessage} from "./command/ForwardOutgoingMessage";
 import {HandleForwardedMessage} from "./command/HandleForwardedMessage";
 import {defaultProtocolId} from "./data/defaultProtocolId";

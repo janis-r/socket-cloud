@@ -1,5 +1,6 @@
 import {Module, Optional} from "quiver-framework"
-import {httpServerModule, HttpServerService} from "../httpServer";
+import {httpServerModule} from "../httpServer/httpServerModule";
+import {HttpServerService} from "../httpServer/service/HttpServerService";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 import {SwaggerApiConfig} from "./config/SwaggerApiConfig";

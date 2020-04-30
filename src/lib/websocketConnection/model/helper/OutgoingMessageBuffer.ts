@@ -3,7 +3,7 @@ import {ExecutionQueue} from "ugd10a";
 import {isPromise} from "ugd10a/validator";
 import {composeWebsocketFrame, fragmentWebsocketFrame} from "../../util/websocket-utils";
 import {DataFrame} from "../../data/DataFrame";
-import {WebsocketExtensionAgent} from "../../../websocketExtension";
+import {WebsocketExtensionAgent} from "../../../websocketExtension/service/WebsocketExtensionAgent";
 import {debug} from "../WebsocketConnection";
 
 export class OutgoingMessageBuffer {

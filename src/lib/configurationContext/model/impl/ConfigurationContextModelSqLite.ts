@@ -1,4 +1,4 @@
-import {SqLiteConnection} from "../../../sqLite";
+import {SqLiteConnection} from "../../../sqLite/service/SqLiteConnection";
 import {ConfigurationContextModel} from "../ConfigurationContextModel";
 import {ContextId} from "../../data/ContextId";
 import {ConfigurationContext, configurationContextValidator} from "../../data/ConfigurationContext";

@@ -1,6 +1,7 @@
 import {toMilliseconds} from "ugd10a";
-import {ConfigurationContext} from "../../lib/configurationContext";
-import {defaultProtocolId} from "../../lib/defaultProtocol";
+import {ConfigurationContext} from "../../lib/configurationContext/data/ConfigurationContext";
+import {defaultProtocolId} from "../../lib/defaultProtocol/data/defaultProtocolId";
+
 
 export const debug = true;
 export const serverUrl = "http://localhost:8001";

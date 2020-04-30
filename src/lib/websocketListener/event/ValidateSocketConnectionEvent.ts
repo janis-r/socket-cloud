@@ -1,5 +1,5 @@
 import {AsyncValidationEvent} from "quiver-framework";
-import {ConfigurationContext} from "../../configurationContext";
+import {ConfigurationContext} from "../../configurationContext/data/ConfigurationContext";
 import {SocketDescriptor} from "../data/SocketDescriptor";
 import {OperatorData} from "../data/OperatorData";
 

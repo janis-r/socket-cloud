@@ -1,7 +1,7 @@
 import {Command, EventDispatcher, Inject} from "quiver-framework";
-import {HttpConnectionUpgradeEvent} from "../../httpServer";
+import {HttpConnectionUpgradeEvent} from "../../httpServer/event/HttpConnectionUpgradeEvent";
 import {WebsocketConnectionValidationRequest} from "../event/WebsocketConnectionValidationRequest";
-import {Logger} from "../../logger";
+import {Logger} from "../../logger/service/Logger";
 
 export class HandleConnectionUpgradeRequest implements Command {
 
