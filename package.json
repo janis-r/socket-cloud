@@ -30,7 +30,7 @@
     "express-session": "^1.16.2",
     "node": "^12.13.0",
     "node-fetch": "^2.6.0",
-    "quiver-framework": "^1.0.0",
+    "quiver-framework": "^1.0.1",
     "sqlite3": "^4.1.1",
     "swagger-ui-express": "^4.1.2",
     "tsconfig-paths": "^3.9.0",

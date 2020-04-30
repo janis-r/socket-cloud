@@ -28,27 +28,5 @@ export const configurationContextModule: ModuleConfig = {
         {event: ValidateSocketConnectionEvent.TYPE, command: ValidateNewConnection},
         {event: DeleteConfigurationContextEvent.TYPE, command: DeleteConfigurationContext},
         {event: UpdateConfigurationContextEvent.TYPE, command: UpdateConfigurationContext},
-    ],
-
-    /*setup: injector => {
-        // This is not a right place to leave this
-        injector.get(ConfigurationContextModel).saveConfiguration(
-            {
-                id: "tests-runner",
-                protocol: defaultProtocolId,
-                validationApi: {
-                    url: "http://localhost:8001/validationAPI",
-                    validateNewConnections: true
-                },
-                pingTimeout: toMilliseconds(30, "seconds"),
-                outgoingMessageFragmentSize: 2 ** 14, // 16 kb,
-                channelConfig: {
-                    "cached-channel": {
-                        cachingPolicy: {
-                            cacheSize: 100
-                        }
-                    }
-                }
-            });
-    }*/
+    ]
 };
