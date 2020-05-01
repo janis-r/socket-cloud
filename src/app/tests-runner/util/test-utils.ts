@@ -7,7 +7,8 @@ import {ConfigurationContextApi} from "./ConfigurationContextApi";
 import {AccessTokenApiListener} from "../../../lib/authorization/service/AccessTokenApiListener";
 import {ConfigurationContextApiListener} from "../../../lib/configurationContext/service/ConfigurationContextApiListener";
 import {configurationContext, debug, serverUrl} from "../config";
-import {DataPushApiListener} from "../../../lib/defaultProtocol/service/DataPushApiListener";
+import {PlatformApiListener} from "../../../lib/defaultProtocol/service/PlatformApiListener";
+import {authTokenHeaderName} from "../../../lib/authorization/data/auth-credentials";
 
 const contextId = configurationContext.id;
 
@@ -55,7 +56,7 @@ export const jsonHeaders = {"Accept": "application/json", "Content-Type": "appli
 export const createHeaders = (apiKey: string, useJson = true) => {
     const headers = useJson ? jsonHeaders : {};
     if (apiKey) {
-        return {...headers, "X-API-KEY": apiKey};
+        return {...headers, [authTokenHeaderName]: apiKey};
     }
     return {...headers};
 };
@@ -66,7 +67,7 @@ export const createPlatformApi = async (apiKey?: string) => {
             accessRights: "all"
         });
     }
-    const servicePath = `${serverUrl}/${DataPushApiListener.servicePath}`;
+    const servicePath = `${serverUrl}/${PlatformApiListener.servicePath}`;
     return new PlatformApi(servicePath, contextId, apiKey);
 };
 

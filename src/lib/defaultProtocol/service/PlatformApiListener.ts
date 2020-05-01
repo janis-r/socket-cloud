@@ -12,29 +12,22 @@ import {MessageType} from "../data/MessageType";
 import {PushToClientMessage} from "../data/serverMessage/PushToClientMessage";
 import {MessageManager} from "./MessageManager";
 import {contextIdMatchRegexp} from "../../configurationContext/data/contextIdMatchRegexp";
-import {DataPushApiCallManager} from "./DataPushApiCallManager";
+import {PlatformApiCallManager} from "./PlatformApiCallManager";
 import {ScopedLogger} from "../util/ScopedLogger";
 import {channelIdFromExternalId} from "../data/ChannelId";
+import {authTokenErrorResponseParams, authTokenHeaderName} from "../../authorization/data/auth-credentials";
 
 
 @Injectable()
-export class DataPushApiListener {
-    static readonly servicePath = "api/push";
-
-    private readonly authTokenHeaderName = 'X-API-KEY';
-    private readonly authTokenErrorResponseParams = {
-        status: 401,
-        headers: {
-            WWW_Authenticate: "Basic"
-        }
-    };
+export class PlatformApiListener {
+    static readonly servicePath = "api/platform";
 
     constructor(router: HttpServerRouter,
                 private readonly tokenManager: AccessTokenProvider,
                 private readonly messageManager: MessageManager,
-                private readonly apiCallLogger: DataPushApiCallManager,
+                private readonly apiCallLogger: PlatformApiCallManager,
                 private readonly eventDispatcher: EventDispatcher) {
-        const {servicePath} = DataPushApiListener;
+        const {servicePath} = PlatformApiListener;
         router.post(`/${servicePath}/:contextId(${contextIdMatchRegexp})/individual-message/`, this.individualMessageHandler);
         router.post(`/${servicePath}/:contextId(${contextIdMatchRegexp})/channel-message/`, this.channelMessageHandler);
         router.post(`/${servicePath}/:contextId(${contextIdMatchRegexp})/multi-channel-message/`, this.multiChannelMessageHandler);
@@ -219,7 +212,7 @@ export class DataPushApiListener {
     };
 
     private async getApiCallContext(request: RequestContext): Promise<{ apiCallId: number, tokenInfo: TokenInfo, logger: ScopedLogger } | null> {
-        const {authTokenHeaderName, authTokenErrorResponseParams, tokenManager: {validateToken}, apiCallLogger} = this;
+        const {tokenManager: {validateToken}, apiCallLogger} = this;
         const {header, sendJson, headers, ipAddress, path, body} = request;
 
         const {id: apiCallId, logger} = await apiCallLogger.registerApiCall({headers, ipAddress, path, body});

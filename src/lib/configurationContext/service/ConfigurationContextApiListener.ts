@@ -10,13 +10,12 @@ import {UpdateConfigurationContextEvent} from "../event/UpdateConfigurationConte
 import {DeleteConfigurationContextEvent} from "../event/DeleteConfigurationContextEvent";
 import {ConfigurationContextApiConfig} from "../config/ConfigurationContextApiConfig";
 import {defaultProtocolId} from "../../defaultProtocol/data/defaultProtocolId";
+import {authTokenHeaderName} from "../../authorization/data/auth-credentials";
 
 @Injectable()
 export class ConfigurationContextApiListener {
 
     static readonly servicePath = "api/context-config";
-
-    private readonly apiKeyHeaderName = "X-API-KEY";
 
     constructor(httpRouter: HttpServerRouter,
                 private readonly contextProvider: ConfigurationContextProvider,
@@ -31,8 +30,8 @@ export class ConfigurationContextApiListener {
     }
 
     private readonly validateRequestHeaders: HttpRequestHandler = async ({sendText, header, next}) => {
-        const {apiKeyHeaderName, config: {apiKey}} = this;
-        const requestKey = header(apiKeyHeaderName);
+        const {config: {apiKey}} = this;
+        const requestKey = header(authTokenHeaderName);
 
         const notAuthorizedParams = {status: HttpStatusCode.Unauthorized, headers: {WWW_Authenticate: "Basic"}};
         if (!requestKey) {

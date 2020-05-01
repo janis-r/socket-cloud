@@ -7,13 +7,20 @@ info:
     email: jr@janisradins.com
   version: 1.0.0
 tags:
-  - name: Validation
+  - name: Validation request
+    description: Validation calls executed from Platform to Operator in order to get validation of some action.
+  - name: Information
+    description: Informative calls invoked to supply backwards data channel that would allow Operator to keep track of its data context.
+  - name: Connection
+    description: Opeartions related to client connection state.
 paths:
   /connection/:
     put:
-      summary: New connection hanshake request executed before it's added to connection pool.
+      summary: Connection hanshake request executed before it's added to connection pool.
       tags:
-        - Validation
+        - Validation request
+        - Information
+        - Connection
       requestBody:
         required: true
         description: All the data known about connection prior to handshake finish.
@@ -30,23 +37,36 @@ paths:
     post:
       summary: Connection authorization success notification.
       tags:
-        - Validation
+        - Information
+        - Connection
       requestBody:
         required: true
         description: All the data known about connection and external id, if present, received from connection valiation call.
         content:
           application/json:
             schema:
-              allOf:
-                - $ref: "#/components/schemas/ConnectionData"
-                - type: object
-                  properties:
-                    externalId:
-                      description: External id assigned to connection by Operator, if any.
-                      type: string
+              $ref: "#/components/schemas/EstablishedConnectionData"
       responses:
         200:
-          description: Success
+          description: No problem!
+
+  /connection/{connectionId}/:
+    delete:
+      summary: Informative call to identify that some connection, within operator scope, has been dropped.
+      tags:
+        - Information
+        - Connection
+      parameters:
+        - in: path
+          name: connectionId
+          description: Internal identifier of a connection.
+          required: true
+          schema:
+            type:
+              string
+      responses:
+        200:
+          description: No problem!
 
 components:
   schemas:
@@ -83,6 +103,17 @@ components:
         - ipAddress
         - host
         - url
+
+    EstablishedConnectionData:
+      description: Connection origin data with data entries attached to it within handshake.
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/ConnectionData"
+        - type: object
+          properties:
+            externalId:
+              description: External id assigned to connection by Operator, if any.
+              type: string
 
   responses:
     ConnectionValidated:

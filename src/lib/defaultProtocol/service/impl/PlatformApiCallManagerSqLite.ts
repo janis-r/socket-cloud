@@ -1,8 +1,8 @@
-import {DataPushApiCallManager} from "../DataPushApiCallManager";
+import {PlatformApiCallManager} from "../PlatformApiCallManager";
 import {SqLiteConnection} from "../../../sqLite/service/SqLiteConnection";
 import {ScopedLogger} from "../../util/ScopedLogger";
 
-export class DataPushApiCallManagerSqLite implements DataPushApiCallManager {
+export class PlatformApiCallManagerSqLite implements PlatformApiCallManager {
 
     private readonly db: SqLiteConnection;
 

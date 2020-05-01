@@ -1,5 +1,5 @@
 import {InjectionConfig, Injector, Module} from "quiver-framework";
-import {WebsocketListenerModule} from "../../lib/websocketListener/WebsocketListenerModule";
+import {websocketListenerModule} from "../../lib/websocketListener/WebsocketListenerModule";
 import {ConfigurationContextProvider} from "../../lib/configurationContext/service/ConfigurationContextProvider";
 import {SocketDescriptor} from "../../lib/websocketListener/data/SocketDescriptor";
 import {PermessageDeflateConfig} from "../../lib/permessageDeflateExtension/config/PermessageDeflateConfig";
@@ -11,7 +11,7 @@ import {HttpServerRouter} from "../../lib/httpServer/service/HttpServerRouter";
 
 @Module({
     requires: [
-        WebsocketListenerModule,
+        websocketListenerModule,
         PermessageDeflateExtensionModule,
     ],
     mappings: [
@@ -36,7 +36,7 @@ import {HttpServerRouter} from "../../lib/httpServer/service/HttpServerRouter";
     ]
 })
 export class EchoServerModule {
-    constructor(router: HttpServerRouter, i: Injector) {
+    constructor(router: HttpServerRouter) {
         router.get('/', ({sendFile}) => sendFile(`${__dirname}/index.html`));
         router.post('/validate-socket', ({body, sendJson}) => {
             console.log({body});

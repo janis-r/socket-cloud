@@ -1,13 +1,21 @@
 openapi: 3.0.1
 info:
-  title: Publish API
-  description: An API designed to enable data publishing via API calls.
+  title: Platform API
+  description: An API designed to execute actions within operator data scope via API calls.
   contact:
     name: Jānis Radiņš
     email: jr@janisradins.com
   version: 1.0.0
+servers:
+  - url: /api/platform/
 tags:
   - name: Publishing
+    description: Api to publish messages vai exteral calls
+  - name: Connection
+    description: An Api provided to allow operator interact with connections of its context.
+  - name: Channel
+    description: Data channel management Api.
+
 paths:
   /{contexId}/individual-message/:
     post:
@@ -107,6 +115,66 @@ paths:
           $ref: "#/components/responses/PayloadTooLarge"
       security:
         - ApiAuthKey: []
+
+  /{contexId}/connection/{connectionId}:
+    parameters:
+      - in: path
+        name: contexId
+        required: true
+        schema:
+          type:
+            string
+      - in: path
+        name: connectionId
+        required: true
+        schema:
+          type:
+            string
+    get:
+      summary: Retrieve connection runtime statistics
+      tags:
+        - Connection
+      responses:
+        200:
+          description: To be implemented
+    delete:
+      summary: Drop connection
+      tags:
+        - Connection
+      responses:
+        200:
+          description: To be implemented
+
+  /{contexId}/message-cache/{channel}:
+    parameters:
+      - in: path
+        name: contexId
+        required: true
+        schema:
+          type:
+            string
+      - in: path
+        name: channel
+        required: true
+        schema:
+          type:
+            string
+    get:
+      summary: Retrieve current message cache of a channel.
+      tags:
+        - Channel
+      responses:
+        200:
+          description: To be implemented
+
+    delete:
+      summary: Clear data channel message cache.
+      tags:
+        - Channel
+      responses:
+        200:
+          description: To be implemented
+
 components:
   schemas:
     ChannelMessage:

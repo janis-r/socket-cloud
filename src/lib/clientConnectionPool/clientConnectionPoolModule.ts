@@ -1,7 +1,7 @@
 import {ModuleConfig} from "quiver-framework";
 import {ClientConnectionPool} from "./model/ClientConnectionPool";
 
-export const ClientConnectionPoolModule: ModuleConfig = {
+export const clientConnectionPoolModule: ModuleConfig = {
     mappings: [
         ClientConnectionPool
     ]

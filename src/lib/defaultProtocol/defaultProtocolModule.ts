@@ -1,6 +1,6 @@
 import {Event, ModuleConfig} from "quiver-framework";
 import {ClientConnection} from "../clientConnectionPool/model/ClientConnection";
-import {ClientConnectionPoolModule} from "../clientConnectionPool/ClientConnectionPoolModule";
+import {clientConnectionPoolModule} from "../clientConnectionPool/clientConnectionPoolModule";
 import {ClientMessageEvent} from "../clientConnectionPool/event/ClientMessageEvent";
 import {ConnectionRemovedEvent} from "../clientConnectionPool/event/ConnectionRemovedEvent";
 import {NewConnectionEvent} from "../clientConnectionPool/event/NewConnectionEvent";
@@ -11,7 +11,7 @@ import {HandleRemovedConnection} from "./command/HandleRemovedConnection";
 import {defaultProtocolId} from "./data/defaultProtocolId";
 import {httpServerModule} from "../httpServer/httpServerModule";
 import {DataContextManagerProvider} from "./service/DataContextManagerProvider";
-import {DataPushApiListener} from "./service/DataPushApiListener";
+import {PlatformApiListener} from "./service/PlatformApiListener";
 import {IncomingClientMessageEvent} from "./event/IncomingClientMessageEvent";
 import {MessageType} from "./data/MessageType";
 import {UpdateClientSubscriptions} from "./command/UpdateClientSubscriptions";
@@ -21,29 +21,29 @@ import {BroadcastOutgoingMessage} from "./command/BroadcastOutgoingMessage";
 import {RestoreClientSubscription} from "./command/RestoreClientSubscription";
 import {MessageManager} from "./service/MessageManager";
 import {authorizationModule} from "../authorization/authorizationModule";
-import {DataPushApiCallManager} from "./service/DataPushApiCallManager";
-import {DataPushApiCallManagerSqLite} from "./service/impl/DataPushApiCallManagerSqLite";
+import {PlatformApiCallManager} from "./service/PlatformApiCallManager";
+import {PlatformApiCallManagerSqLite} from "./service/impl/PlatformApiCallManagerSqLite";
 import {MessageManagerSqLite} from "./service/impl/MessageManagerSqLite";
 
-const protocolGuard = ({data: {context: {protocol}}}: Event<ClientConnection>) => protocol === defaultProtocolId;
+const defaultProtocolGuard = ({data: {context: {protocol}}}: Event<ClientConnection>) => protocol === defaultProtocolId;
 
 export const defaultProtocolModule: ModuleConfig = {
     requires: [
-        ClientConnectionPoolModule,
+        clientConnectionPoolModule,
         configurationContextModule,
         httpServerModule,
         authorizationModule
     ],
     mappings: [
-        {map: DataPushApiListener, instantiate: true},
+        {map: PlatformApiListener, instantiate: true},
         DataContextManagerProvider,
         {map: MessageManager, useType: MessageManagerSqLite},
-        {map: DataPushApiCallManager, useType: DataPushApiCallManagerSqLite},
+        {map: PlatformApiCallManager, useType: PlatformApiCallManagerSqLite},
     ],
     commands: [
-        {event: NewConnectionEvent.TYPE, command: HandleNewConnection, guard: protocolGuard},
-        {event: ConnectionRemovedEvent.TYPE, command: HandleRemovedConnection, guard: protocolGuard},
-        {event: ClientMessageEvent.TYPE, command: HandleClientMessage, guard: protocolGuard},
+        {event: NewConnectionEvent.TYPE, command: HandleNewConnection, guard: defaultProtocolGuard},
+        {event: ConnectionRemovedEvent.TYPE, command: HandleRemovedConnection, guard: defaultProtocolGuard},
+        {event: ClientMessageEvent.TYPE, command: HandleClientMessage, guard: defaultProtocolGuard},
         {
             event: IncomingClientMessageEvent.TYPE,
             command: UpdateClientSubscriptions,

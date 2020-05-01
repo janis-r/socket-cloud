@@ -9,12 +9,11 @@ import {contextIdMatchRegexp} from "../../configurationContext/data/contextIdMat
 import {AccessTokenApiConfig} from "../config/AccessTokenApiConfig";
 import {accessConfigurationValidator} from "../data/AccessConfiguration";
 import {ConfigurationContextProvider} from "../../configurationContext/service/ConfigurationContextProvider";
+import {authTokenErrorResponseParams, authTokenHeaderName} from "../data/auth-credentials";
 
 @Injectable()
 export class AccessTokenApiListener {
     static readonly servicePath = "api/access-token";
-
-    private readonly apiKeyHeaderName = "X-API-KEY";
 
     constructor(httpRouter: HttpServerRouter,
                 private readonly config: AccessTokenApiConfig,
@@ -33,15 +32,14 @@ export class AccessTokenApiListener {
     }
 
     private readonly validateRequestHeaders: HttpRequestHandler = async ({sendText, header, next}) => {
-        const {apiKeyHeaderName, config: {apiKey}} = this;
-        const requestKey = header(apiKeyHeaderName);
+        const {config: {apiKey}} = this;
+        const requestKey = header(authTokenHeaderName);
 
-        const notAuthorizedParams = {status: 401, headers: {WWW_Authenticate: "Basic"}};
         if (!requestKey) {
-            sendText("API key not set", notAuthorizedParams);
+            sendText("API key not set", authTokenErrorResponseParams);
         } else if (requestKey !== apiKey) {
             // TODO: Log big fat error in here!
-            sendText("Not authorized", notAuthorizedParams);
+            sendText("Not authorized", authTokenErrorResponseParams);
         } else {
             next();
         }

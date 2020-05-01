@@ -11,7 +11,7 @@ import {SocketDescriptor} from "../../lib/websocketListener/data/SocketDescripto
 import {authorizationModule} from "../../lib/authorization/authorizationModule";
 import {PermessageDeflateExtensionModule} from "../../lib/permessageDeflateExtension/PermessageDeflateExtensionModule";
 import {defaultProtocolModule} from "../../lib/defaultProtocol/defaultProtocolModule";
-import {WebsocketListenerModule} from "../../lib/websocketListener/WebsocketListenerModule";
+import {websocketListenerModule} from "../../lib/websocketListener/WebsocketListenerModule";
 import {PermessageDeflateConfig} from "../../lib/permessageDeflateExtension/config/PermessageDeflateConfig";
 import {ConfigurationContextApiConfig} from "../../lib/configurationContext/config/ConfigurationContextApiConfig";
 import {AccessTokenApiConfig} from "../../lib/authorization/config/AccessTokenApiConfig";
@@ -25,7 +25,7 @@ export const devServerModule: ModuleConfig = {
         SwaggerApiDisplayModule,
         PermessageDeflateExtensionModule,
         defaultProtocolModule,
-        WebsocketListenerModule
+        websocketListenerModule
     ],
     mappings: [
         PermessageDeflateConfig,
@@ -35,12 +35,12 @@ export const devServerModule: ModuleConfig = {
                 basePath: "api",
                 docs: [
                     {
-                        name: "publish-api",
-                        configFile: `${__dirname}/../../../api/publish-api.yaml`
+                        name: "platform-api",
+                        configFile: `${__dirname}/../../../api/platform-api.yaml`
                     },
                     {
-                        name: "validation-api",
-                        configFile: `${__dirname}/../../../api/validation-api.yaml`
+                        name: "operator-api",
+                        configFile: `${__dirname}/../../../api/operator-api.yaml`
                     },
                     {
                         name: "internal-api",

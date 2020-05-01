@@ -1,6 +1,6 @@
 import {ScopedLogger} from "../util/ScopedLogger";
 
-export abstract class DataPushApiCallManager {
+export abstract class PlatformApiCallManager {
 
     /**
      * Create api call logger
