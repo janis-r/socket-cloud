@@ -7,12 +7,18 @@ export abstract class ConfigurationContext {
     protocol: string;
     // Maximum number of simultaneous connections
     maxConnectionCount?: number;
-    // Validation API configuration
-    validationApi?: {
-        // Url to external validation API
+    // Context operator API configuration
+    operatorApi?: {
+        // Url to operator API
         url: string;
-        // Whether to invoke external API to validate emerging client connections
-        validateNewConnections?: boolean;
+        connection?: {
+            // Whether to handshake emerging client connections with Operator before adding to connection pool
+            doHandshake?: boolean;
+            // Whether to perform informative call to Operator Api as new connection is established and added to connection pool
+            reportNew?: boolean;
+            // Whether to perform informative call to Operator Api as connection is dropped
+            reportDropped?: boolean;
+        }
     };
     // Number in milliseconds within which to send ping messages to client.
     // No messages will be sent is value is set to 0 or key is not present.
@@ -52,14 +58,14 @@ const cashingPolicyValidator = new Validator<ConfigurationContext["cachingPolicy
 const perChannelConfigValidator = new Validator<ConfigurationContext["channelConfig"][0]>({
     cachingPolicy: {
         optional: true,
-        validator: value => cashingPolicyValidator.validate(value) === true ? true : JSON.stringify(cashingPolicyValidator.lastError)
+        validator: cashingPolicyValidator
     }
 });
 
 const individualMessageConfigValidator = new Validator<ConfigurationContext["individualMessageConfig"]>({
     cachingPolicy: {
         optional: true,
-        validator: value => cashingPolicyValidator.validate(value) === true ? true : JSON.stringify(cashingPolicyValidator.lastError)
+        validator: cashingPolicyValidator
     }
 });
 
@@ -67,10 +73,18 @@ export const configurationContextValidator = new Validator<ConfigurationContext>
     id: {type: "string", notEmpty: true, validator: ({length}: string) => length >= 2 && length <= 50},
     protocol: {type: "string", notEmpty: true},
     maxConnectionCount: {type: "number", optional: true},
-    validationApi: {
-        validator: new Validator<ConfigurationContext["validationApi"]>({
+    operatorApi: {
+        validator: new Validator<ConfigurationContext["operatorApi"]>({
             url: {type: "string"},
-            validateNewConnections: {type: "boolean", optional: true}
+            connection: {
+                type: "object",
+                optional: true,
+                validator: new Validator<ConfigurationContext["operatorApi"]["connection"]>({
+                    doHandshake: {type: "boolean", optional: true},
+                    reportNew: {type: "boolean", optional: true},
+                    reportDropped: {type: "boolean", optional: true}
+                })
+            }
         }).validate,
         optional: true
     },
@@ -80,7 +94,7 @@ export const configurationContextValidator = new Validator<ConfigurationContext>
     compressData: {type: "boolean", optional: true},
     cachingPolicy: {
         optional: true,
-        validator: value => cashingPolicyValidator.validate(value) === true ? true : JSON.stringify(cashingPolicyValidator.lastError)
+        validator: cashingPolicyValidator
     },
     channelConfig: {
         optional: true,
@@ -94,6 +108,6 @@ export const configurationContextValidator = new Validator<ConfigurationContext>
     },
     individualMessageConfig: {
         optional: true,
-        validator: value => individualMessageConfigValidator.validate(value) === true ? true : JSON.stringify(individualMessageConfigValidator.lastError)
+        validator: individualMessageConfigValidator
     }
 });

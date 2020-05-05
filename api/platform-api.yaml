@@ -13,22 +13,17 @@ tags:
     description: Api to publish messages vai exteral calls
   - name: Connection
     description: An Api provided to allow operator interact with connections of its context.
-  - name: Channel
-    description: Data channel management Api.
+  - name: Message cache
+    description: Data channel message cache management Api.
 
 paths:
-  /{contexId}/individual-message/:
+  /{context}/individual-message/:
     post:
-      summary: Post message to individual connection (or connections), identified by connection id provided upon initialization.
+      summary: Post message to individual connection (or connections), identified by connection external id provided upon initialization.
       tags:
         - Publishing
       parameters:
-        - in: path
-          name: contexId
-          required: true
-          schema:
-            type:
-              string
+        - $ref: "#/components/parameters/context"
       requestBody:
         required: true
         description: Data to be transfered to one or multiple connections.
@@ -49,18 +44,13 @@ paths:
           $ref: "#/components/responses/PayloadTooLarge"
       security:
         - ApiAuthKey: []
-  /{contexId}/channel-message/:
+  /{context}/channel-message/:
     post:
-      summary: Post message to data channel (or channels).
+      summary: Post single message to data channel (or channels).
       tags:
         - Publishing
       parameters:
-        - in: path
-          name: contexId
-          required: true
-          schema:
-            type:
-              string
+        - $ref: "#/components/parameters/context"
       requestBody:
         description: Message data object to be delivered to recipients.
         required: true
@@ -81,18 +71,13 @@ paths:
           $ref: "#/components/responses/PayloadTooLarge"
       security:
         - ApiAuthKey: []
-  /{contexId}/multi-channel-message/:
+  /{context}/multi-channel-message/:
     post:
       summary: Post list of messages to data channels.
       tags:
         - Publishing
       parameters:
-        - in: path
-          name: contexId
-          required: true
-          schema:
-            type:
-              string
+        - $ref: "#/components/parameters/context"
       requestBody:
         description: List of message data objects to be delivered to recipients.
         required: true
@@ -116,14 +101,9 @@ paths:
       security:
         - ApiAuthKey: []
 
-  /{contexId}/connection/{connectionId}:
+  /{context}/connection/{connectionId}:
     parameters:
-      - in: path
-        name: contexId
-        required: true
-        schema:
-          type:
-            string
+      - $ref: "#/components/parameters/context"
       - in: path
         name: connectionId
         required: true
@@ -131,50 +111,100 @@ paths:
           type:
             string
     get:
-      summary: Retrieve connection runtime statistics
+      summary: Retrieve connection status and runtime statistics
       tags:
         - Connection
       responses:
         200:
-          description: To be implemented
+          description: Connection status data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  connectionId:
+                    type: string
+                    description: Internal id of a connection assigned by Platform.
+                  externalId:
+                    type: string
+                    description: Internal id of a connection assigned by Operator during handshake.
+                  uptime:
+                    type: number
+                    description: Seconds since connection is established.
+                  bytesUploaded:
+                    type: number
+                  bytesDownloaded:
+                    type: number
+                required:
+                  - connectionId
+                  - uptime
+                  - bytesUploaded
+                  - bytesDownloaded
+        404:
+          description: Connection could not be found.
+      security:
+        - ApiAuthKey: []
     delete:
-      summary: Drop connection
+      summary: Drop client connection
       tags:
         - Connection
       responses:
         200:
-          description: To be implemented
+          description: Connection found and dropped.
+        404:
+          description: Connection could not be found.
+      security:
+        - ApiAuthKey: []
 
-  /{contexId}/message-cache/{channel}:
+  /{context}/message-cache/{channel}:
     parameters:
-      - in: path
-        name: contexId
-        required: true
-        schema:
-          type:
-            string
-      - in: path
-        name: channel
-        required: true
-        schema:
-          type:
-            string
+      - $ref: "#/components/parameters/context"
+      - $ref: "#/components/parameters/channel"
     get:
-      summary: Retrieve current message cache of a channel.
+      summary: Retrieve message cache stats of a channel.
       tags:
-        - Channel
+        - Message cache
       responses:
         200:
-          description: To be implemented
+          description: Channel message cache stats.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  length:
+                    type: integer
+                    description: Number of messages in cache.
+                  sizeInBytes:
+                    type: integer
+                    description: Bytes taken by all messages in cache.
+                required:
+                  - length
+                  - sizeInBytes
+        404:
+          description: Required channel do not have message cache enabled.
 
+      security:
+        - ApiAuthKey: []
     delete:
       summary: Clear data channel message cache.
       tags:
-        - Channel
+        - Message cache
       responses:
         200:
-          description: To be implemented
-
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: integer
+                    description: Number of messages removed from cache due to this call.
+        404:
+          description: Required channel do not have message cache enabled.
+      security:
+        - ApiAuthKey: []
 components:
   schemas:
     ChannelMessage:
@@ -204,6 +234,23 @@ components:
       required:
         - connectionIds
         - payload
+  parameters:
+    context:
+      name: context
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: "^[a-zA-Z\\d\\.-]"
+      description: Configuration context id
+    channel:
+      name: channel
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: "^[a-zA-Z\\d\\.-]"
+      description: Data channel id
   responses:
     MessageDeliveryReport:
       description: Message delivery report.
@@ -252,7 +299,7 @@ components:
             properties:
               error:
                 type: string
-              name:
+              field:
                 type: string
                 description: Name of a data field that produced error.
             required:

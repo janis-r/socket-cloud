@@ -8,7 +8,7 @@ import {
     ValidationError
 } from "../../websocketListener/event/ValidateSocketConnectionEvent";
 import {ConnectionValidationError} from "../data/ConnectionValidationError";
-import {isOperatorData} from "../../websocketListener/data/OperatorData";
+import {isOperatorHandshakeResponse} from "../../websocketListener/data/OperatorHandshakeResponse";
 import {ClientConnectionPool} from "../../clientConnectionPool/model/ClientConnectionPool";
 
 export class ValidateNewConnection implements Command<void> {
@@ -46,16 +46,16 @@ export class ValidateNewConnection implements Command<void> {
             logger,
             event, event: {
                 descriptor,
-                context: {validationApi}
+                context: {operatorApi}
             }
         } = this;
 
-        if (!validationApi.validateNewConnections) {
+        if (!operatorApi?.connection?.doHandshake) {
             return true;
         }
 
-        const request = await fetch(validationApi.url + '/validate-connection', {
-            method: "POST",
+        const request = await fetch(operatorApi.url + '/connection', {
+            method: "PUT",
             headers: {
                 "Accept": "application/json",
                 "Content-Type": "application/json"
@@ -76,7 +76,7 @@ export class ValidateNewConnection implements Command<void> {
         }
 
         const response: Json = await request.json();
-        if (isOperatorData(response)) {
+        if (isOperatorHandshakeResponse(response)) {
             event.operatorData = response;
         }
 

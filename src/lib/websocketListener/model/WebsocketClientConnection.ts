@@ -3,7 +3,7 @@ import {ClientConnection} from "../../clientConnectionPool/model/ClientConnectio
 import {CloseReason} from "../../clientConnectionPool/data/CloseReason";
 import {WebsocketExtensionAgent} from "../../websocketExtension/service/WebsocketExtensionAgent";
 import {SocketDescriptor} from "../data/SocketDescriptor";
-import {OperatorData} from "../data/OperatorData";
+import {OperatorHandshakeResponse} from "../data/OperatorHandshakeResponse";
 import {WebsocketConnection} from "../../websocketConnection/model/WebsocketConnection";
 import {ClientConnectionEventBase} from "./ClientConnectionEventBase";
 import {ErrorEvent} from "../../clientConnectionPool/connectionEvent/ErrorEvent";
@@ -20,7 +20,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     readonly remoteAddress;
 
     constructor(socket: Socket, readonly context: ConfigurationContext, extensions: ReadonlyArray<WebsocketExtensionAgent>,
-                descriptor: SocketDescriptor, operatorData?: OperatorData) {
+                descriptor: SocketDescriptor, operatorData?: OperatorHandshakeResponse) {
         super();
 
         this.id = descriptor.connectionId;

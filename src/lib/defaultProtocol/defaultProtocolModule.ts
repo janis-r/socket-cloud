@@ -11,7 +11,6 @@ import {HandleRemovedConnection} from "./command/HandleRemovedConnection";
 import {defaultProtocolId} from "./data/defaultProtocolId";
 import {httpServerModule} from "../httpServer/httpServerModule";
 import {DataContextManagerProvider} from "./service/DataContextManagerProvider";
-import {PlatformApiListener} from "./service/PlatformApiListener";
 import {IncomingClientMessageEvent} from "./event/IncomingClientMessageEvent";
 import {MessageType} from "./data/MessageType";
 import {UpdateClientSubscriptions} from "./command/UpdateClientSubscriptions";
@@ -24,6 +23,7 @@ import {authorizationModule} from "../authorization/authorizationModule";
 import {PlatformApiCallManager} from "./service/PlatformApiCallManager";
 import {PlatformApiCallManagerSqLite} from "./service/impl/PlatformApiCallManagerSqLite";
 import {MessageManagerSqLite} from "./service/impl/MessageManagerSqLite";
+import {PublishingApiListener} from "./service/api/PublishingApiListener";
 
 const defaultProtocolGuard = ({data: {context: {protocol}}}: Event<ClientConnection>) => protocol === defaultProtocolId;
 
@@ -35,7 +35,7 @@ export const defaultProtocolModule: ModuleConfig = {
         authorizationModule
     ],
     mappings: [
-        {map: PlatformApiListener, instantiate: true},
+        {map: PublishingApiListener, instantiate: true},
         DataContextManagerProvider,
         {map: MessageManager, useType: MessageManagerSqLite},
         {map: PlatformApiCallManager, useType: PlatformApiCallManagerSqLite},

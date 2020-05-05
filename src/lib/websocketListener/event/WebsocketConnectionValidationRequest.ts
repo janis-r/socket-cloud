@@ -4,7 +4,7 @@ import {UpgradeRequest} from "../../httpServer/data/UpgradeRequest";
 import {SocketDescriptor} from "../data/SocketDescriptor";
 import {ConfigurationContext} from "../../configurationContext/data/ConfigurationContext";
 import {WebsocketExtensionAgent} from "../../websocketExtension/service/WebsocketExtensionAgent";
-import {OperatorData} from "../data/OperatorData";
+import {OperatorHandshakeResponse} from "../data/OperatorHandshakeResponse";
 
 /**
  * Event notification dispatched as new websocket connection is encountered and needs to be validated before it
@@ -18,7 +18,7 @@ export class WebsocketConnectionValidationRequest extends Event {
     private _socketDescriptor: SocketDescriptor;
     private _configurationContext: ConfigurationContext;
     private _extensions: ReadonlyArray<WebsocketExtensionAgent>;
-    private _operatorData: OperatorData;
+    private _operatorData: OperatorHandshakeResponse;
 
     constructor(readonly request: UpgradeRequest, readonly socket: Socket, readonly requestInfo: string) {
         super(WebsocketConnectionValidationRequest.TYPE);
@@ -59,11 +59,11 @@ export class WebsocketConnectionValidationRequest extends Event {
         this._extensions = value;
     }
 
-    get operatorData(): OperatorData {
+    get operatorData(): OperatorHandshakeResponse {
         return this._operatorData;
     }
 
-    set operatorData(value: OperatorData) {
+    set operatorData(value: OperatorHandshakeResponse) {
         if (this._operatorData) {
             throw new Error(`operatorData is one time set property`);
         }

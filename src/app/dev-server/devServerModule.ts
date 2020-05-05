@@ -64,7 +64,7 @@ export const devServerModule: ModuleConfig = {
 
         const router = injector.get(HttpServerRouter);
         router.get('/', ({sendFile}) => sendFile(`${__dirname}/index.html`));
-        router.post('/validationAPI/validate-connection', ({body, sendJson}) => {
+        router.put('/validationAPI/connection', ({body, sendJson}) => {
             const {query: {externalId}} = url.parse((body as SocketDescriptor).url, true);
             const response = {externalId: externalId ?? "externalId"};
             sendJson(response);

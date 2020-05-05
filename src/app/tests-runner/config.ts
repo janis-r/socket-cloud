@@ -13,9 +13,11 @@ export const defaultCacheTime = toMilliseconds(5, "seconds");
 export const configurationContext: ConfigurationContext = {
     id: "tests-runner",
     protocol: defaultProtocolId,
-    validationApi: {
+    operatorApi: {
         url: `${serverUrl}/validationAPI`,
-        validateNewConnections: true
+        connection: {
+            doHandshake: true
+        }
     },
     cachingPolicy: {
         cacheSize: defaultCacheSize,
