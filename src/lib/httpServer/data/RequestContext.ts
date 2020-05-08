@@ -2,13 +2,19 @@ import {NextFunction, Request, Response} from "express";
 import {Json} from "../../types/Json";
 import {StringParser} from "../util/StringParser";
 
-export class RequestContext {
+/**
+ * @template L Data type of local data passed along the middleware
+ */
+export class RequestContext<L = any> {
 
     readonly id = Math.floor(Math.random() * 0xFFFFFF).toString(16);
     private _fulfilled = false;
     private _ipAddress: string;
 
-    constructor(readonly request: Request, readonly response: Response, readonly next: NextFunction) {
+    constructor(readonly request: Request,
+                readonly response: Response,
+                readonly next: NextFunction) {
+
     }
 
     /**
@@ -47,6 +53,9 @@ export class RequestContext {
         return this.request.headers;
     }
 
+    get locals(): L {
+        return this.request.app.locals;
+    }
 
     /**
      * Get URL "get" variable value
@@ -65,6 +74,11 @@ export class RequestContext {
      * @param name
      */
     readonly header = (name: string) => this.request.header(name);
+
+    /**
+     * Set request custom data
+     */
+    readonly setLocals = (value: L) => this.request.app.locals = value;
 
     /**
      * Respond with html status

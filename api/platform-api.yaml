@@ -1,7 +1,8 @@
 openapi: 3.0.1
 info:
   title: Platform API
-  description: An API designed to execute actions within operator data scope via API calls.
+  description: |
+    An API designed to allow execution of actions within operator data scope via external calls.
   contact:
     name: Jānis Radiņš
     email: jr@janisradins.com
@@ -17,13 +18,11 @@ tags:
     description: Data channel message cache management Api.
 
 paths:
-  /{context}/individual-message/:
+  /individual-message/:
     post:
       summary: Post message to individual connection (or connections), identified by connection external id provided upon initialization.
       tags:
         - Publishing
-      parameters:
-        - $ref: "#/components/parameters/context"
       requestBody:
         required: true
         description: Data to be transfered to one or multiple connections.
@@ -44,13 +43,11 @@ paths:
           $ref: "#/components/responses/PayloadTooLarge"
       security:
         - ApiAuthKey: []
-  /{context}/channel-message/:
+  /channel-message/:
     post:
       summary: Post single message to data channel (or channels).
       tags:
         - Publishing
-      parameters:
-        - $ref: "#/components/parameters/context"
       requestBody:
         description: Message data object to be delivered to recipients.
         required: true
@@ -71,13 +68,11 @@ paths:
           $ref: "#/components/responses/PayloadTooLarge"
       security:
         - ApiAuthKey: []
-  /{context}/multi-channel-message/:
+  /multi-channel-message/:
     post:
       summary: Post list of messages to data channels.
       tags:
         - Publishing
-      parameters:
-        - $ref: "#/components/parameters/context"
       requestBody:
         description: List of message data objects to be delivered to recipients.
         required: true
@@ -101,9 +96,8 @@ paths:
       security:
         - ApiAuthKey: []
 
-  /{context}/connection/{connectionId}:
+  /connection/{connectionId}:
     parameters:
-      - $ref: "#/components/parameters/context"
       - in: path
         name: connectionId
         required: true
@@ -156,9 +150,8 @@ paths:
       security:
         - ApiAuthKey: []
 
-  /{context}/message-cache/{channel}:
+  /message-cache/{channel}:
     parameters:
-      - $ref: "#/components/parameters/context"
       - $ref: "#/components/parameters/channel"
     get:
       summary: Retrieve message cache stats of a channel.
@@ -235,21 +228,13 @@ components:
         - connectionIds
         - payload
   parameters:
-    context:
-      name: context
-      in: path
-      required: true
-      schema:
-        type: string
-        pattern: "^[a-zA-Z\\d\\.-]"
-      description: Configuration context id
     channel:
       name: channel
       in: path
       required: true
       schema:
         type: string
-        pattern: "^[a-zA-Z\\d\\.-]"
+        pattern: "[a-zA-Z\\d.-]+"
       description: Data channel id
   responses:
     MessageDeliveryReport:
@@ -318,6 +303,7 @@ components:
 
   securitySchemes:
     ApiAuthKey:
+      description: Api access key issued by Platform.
       type: apiKey
       in: header
       name: X-API-KEY

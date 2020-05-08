@@ -20,10 +20,7 @@ import {BroadcastOutgoingMessage} from "./command/BroadcastOutgoingMessage";
 import {RestoreClientSubscription} from "./command/RestoreClientSubscription";
 import {MessageManager} from "./service/MessageManager";
 import {authorizationModule} from "../authorization/authorizationModule";
-import {PlatformApiCallManager} from "./service/PlatformApiCallManager";
-import {PlatformApiCallManagerSqLite} from "./service/impl/PlatformApiCallManagerSqLite";
 import {MessageManagerSqLite} from "./service/impl/MessageManagerSqLite";
-import {PublishingApiListener} from "./service/api/PublishingApiListener";
 
 const defaultProtocolGuard = ({data: {context: {protocol}}}: Event<ClientConnection>) => protocol === defaultProtocolId;
 
@@ -35,10 +32,8 @@ export const defaultProtocolModule: ModuleConfig = {
         authorizationModule
     ],
     mappings: [
-        {map: PublishingApiListener, instantiate: true},
         DataContextManagerProvider,
-        {map: MessageManager, useType: MessageManagerSqLite},
-        {map: PlatformApiCallManager, useType: PlatformApiCallManagerSqLite},
+        {map: MessageManager, useType: MessageManagerSqLite}
     ],
     commands: [
         {event: NewConnectionEvent.TYPE, command: HandleNewConnection, guard: defaultProtocolGuard},

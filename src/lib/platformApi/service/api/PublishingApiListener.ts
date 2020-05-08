@@ -1,45 +1,36 @@
 import {EventDispatcher, Injectable} from "quiver-framework";
-import {HttpRequestHandler} from "../../../httpServer/data/HttpRequestHandler";
-import {HttpServerRouter} from "../../../httpServer/service/HttpServerRouter";
 import {HttpStatusCode} from "../../../httpServer/data/HttpStatusCode";
-import {OutgoingMessageEvent} from "../../event/OutgoingMessageEvent";
-import {channelMessageUtil} from "../../data/apiMessage/ChannelMessage";
-import {individualMessageUtil} from "../../data/apiMessage/IndividualMessage";
-import {MessageType} from "../../data/MessageType";
-import {PushToClientMessage} from "../../data/serverMessage/PushToClientMessage";
-import {MessageManager} from "../MessageManager";
-import {contextIdMatchRegexp} from "../../../configurationContext/data/contextIdMatchRegexp";
-import {channelIdFromExternalId} from "../../data/ChannelId";
-import {PlatformApiListener} from "../PlatformApiListener";
-
+import {OutgoingMessageEvent} from "../../../defaultProtocol/event/OutgoingMessageEvent";
+import {channelMessageUtil} from "../../../defaultProtocol/data/apiMessage/ChannelMessage";
+import {individualMessageUtil} from "../../../defaultProtocol/data/apiMessage/IndividualMessage";
+import {MessageType} from "../../../defaultProtocol/data/MessageType";
+import {PushToClientMessage} from "../../../defaultProtocol/data/serverMessage/PushToClientMessage";
+import {MessageManager} from "../../../defaultProtocol/service/MessageManager";
+import {channelIdFromExternalId} from "../../../defaultProtocol/data/ChannelId";
+import {RequestContext} from "../../../httpServer/data/RequestContext";
+import {Router} from "../../../httpServer/data/Router";
+import {PlatformApiHub} from "../PlatformApiHub";
+import {PlatformApiRequestContext} from "../../data/PlatformApiRequestContext";
 
 @Injectable()
-export class PublishingApiListener extends PlatformApiListener {
+export class PublishingApiListener {
 
-    constructor(router: HttpServerRouter,
-                private readonly messageManager: MessageManager,
-                private readonly eventDispatcher: EventDispatcher) {
+    constructor(private readonly messageManager: MessageManager,
+                private readonly eventDispatcher: EventDispatcher,
+                apiHub: PlatformApiHub) {
 
-        super();
-
-        const path = `/${this.servicePath}/:context(${contextIdMatchRegexp})`;
-
-        router.post(`${path}/individual-message/`, this.individualMessageHandler);
-        router.post(`${path}/channel-message/`, this.channelMessageHandler);
-        router.post(`${path}/multi-channel-message/`, this.multiChannelMessageHandler);
+        apiHub.registerSubRoutes(
+            new Router()
+                .post(`individual-message`, this.individualMessageHandler)
+                .post(`channel-message`, this.channelMessageHandler)
+                .post(`multi-channel-message`, this.multiChannelMessageHandler)
+        )
     }
 
-    private readonly individualMessageHandler: HttpRequestHandler = async request => {
-        const {BadRequest, MethodNotAllowed, PayloadTooLarge} = HttpStatusCode;
+    private readonly individualMessageHandler = async ({sendJson, body, locals: {tokenInfo, apiCallId, logger}}: RequestContext<PlatformApiRequestContext>) => {
         const {messageManager, eventDispatcher} = this;
+        const {BadRequest, MethodNotAllowed, PayloadTooLarge} = HttpStatusCode;
 
-        const context = await this.getApiCallContext(request);
-        if (!context) {
-            return;
-        }
-
-        const {tokenInfo, apiCallId, logger} = context;
-        const {sendJson, body} = request;
         const {context: {id: contextId, maxPayloadSize}, accessRights} = tokenInfo;
 
         // Check permissions
@@ -83,17 +74,10 @@ export class PublishingApiListener extends PlatformApiListener {
         logger.log({recipients}).commit();
     };
 
-    private readonly channelMessageHandler: HttpRequestHandler = async request => {
+    private readonly channelMessageHandler = async ({sendJson, body, locals: {tokenInfo, apiCallId, logger}}: RequestContext<PlatformApiRequestContext>) => {
         const {BadRequest, MethodNotAllowed, PayloadTooLarge} = HttpStatusCode;
         const {messageManager, eventDispatcher} = this;
 
-        const context = await this.getApiCallContext(request);
-        if (!context) {
-            return;
-        }
-
-        const {tokenInfo, apiCallId, logger} = context;
-        const {sendJson, body} = request;
         const {context: {id: contextId, maxPayloadSize}, accessRights} = tokenInfo;
 
         // Check permissions
@@ -136,17 +120,10 @@ export class PublishingApiListener extends PlatformApiListener {
         logger.log({recipients}).commit();
     };
 
-    private readonly multiChannelMessageHandler: HttpRequestHandler = async request => {
+    private readonly multiChannelMessageHandler = async ({sendJson, body, locals: {tokenInfo, apiCallId, logger}}: RequestContext<PlatformApiRequestContext>) => {
         const {BadRequest, MethodNotAllowed, PayloadTooLarge} = HttpStatusCode;
         const {messageManager, eventDispatcher} = this;
 
-        const context = await this.getApiCallContext(request);
-        if (!context) {
-            return;
-        }
-
-        const {tokenInfo, apiCallId, logger} = context;
-        const {sendJson, body} = request;
         const {context: {id: contextId, maxPayloadSize}, accessRights} = tokenInfo;
 
         // Check permissions

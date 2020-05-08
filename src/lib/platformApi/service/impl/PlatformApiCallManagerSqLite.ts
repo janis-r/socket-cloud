@@ -1,6 +1,6 @@
 import {PlatformApiCallManager} from "../PlatformApiCallManager";
 import {SqLiteConnection} from "../../../sqLite/service/SqLiteConnection";
-import {ScopedLogger} from "../../util/ScopedLogger";
+import {ScopedLogger} from "../../../logger/util/ScopedLogger";
 
 export class PlatformApiCallManagerSqLite implements PlatformApiCallManager {
 

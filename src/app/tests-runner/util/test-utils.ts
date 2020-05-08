@@ -7,7 +7,7 @@ import {ConfigurationContextApi} from "./ConfigurationContextApi";
 import {AccessTokenApiListener} from "../../../lib/authorization/service/AccessTokenApiListener";
 import {ConfigurationContextApiListener} from "../../../lib/configurationContext/service/ConfigurationContextApiListener";
 import {configurationContext, debug, serverUrl} from "../config";
-import {PlatformApiListener} from "../../../lib/defaultProtocol/service/PlatformApiListener";
+import {PlatformApiHub} from "../../../lib/platformApi/service/PlatformApiHub";
 import {authTokenHeaderName} from "../../../lib/authorization/data/auth-credentials";
 
 const contextId = configurationContext.id;
@@ -67,8 +67,9 @@ export const createPlatformApi = async (apiKey?: string) => {
             accessRights: "all"
         });
     }
-    const servicePath = `${serverUrl}/${PlatformApiListener.servicePath}`;
-    return new PlatformApi(servicePath, contextId, apiKey);
+    const {servicePath} = PlatformApiHub;
+    const path = `${serverUrl}${servicePath.startsWith('/') ? '' : '/'}${servicePath}`;
+    return new PlatformApi(path, apiKey);
 };
 
 export const createAccessTokenApi = (apiKey = accessTokenApiKey) => {
