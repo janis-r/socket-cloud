@@ -1,4 +1,5 @@
-import {ScopedLogger} from "../../logger/util/ScopedLogger";
+import {ScopedLogger} from "../../../logger/util/ScopedLogger";
+
 
 export abstract class PlatformApiCallManager {
 

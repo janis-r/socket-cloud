@@ -19,11 +19,13 @@ export const launchServer = (singleCore: boolean = true, showLogs = false, mode:
     serverProcess = exec(exePath);
     serverProcess.stderr.on("error", err => {
         showLogs && logToConsole(`>> stderr (error): ${err}`);
-        process.exit();
+        setTimeout(() => process.exit(), 1000);
+        // process.exit();
     });
     serverProcess.stderr.on("data", err => {
         showLogs && logToConsole(`>> stderr (data): ${err}`);
-        process.exit();
+        setTimeout(() => process.exit(), 1000);
+        // process.exit();
     });
 
     serverProcess.stdout.on("data", async chunk => {

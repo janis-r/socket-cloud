@@ -14,7 +14,7 @@ export class IpcMessenger {
         return new IpcMessenger({
             onMessage: listener => process.on("message", listener),
             sendMessage: message => process.send(message)
-        });
+        }, 'M');
     };
 
     static fromWorker = (worker: Worker) => {
@@ -23,11 +23,11 @@ export class IpcMessenger {
         }
         return new IpcMessenger({
             onMessage: listener => worker.on("message", listener),
-            sendMessage: message => worker.send(message)
-        });
+            sendMessage: message => worker.send(message),
+        }, `S${worker.id.toString().padStart(2, "0")}`);
     };
 
-    readonly iid = (cluster.isMaster ? "M" : "S") + "|" + Math.floor(Math.random() * 0xFFFF).toString(16);
+    readonly iid = (cluster.isMaster ? "M" : "S" + cluster.worker.id.toString().padStart(2, "0")) + "|";
 
     private readonly responseQueue = new Map<IpcMessageId, (data: any) => void>();
     private readonly onMessageCallback = new CallbackCollection<IpcMessage>();
@@ -36,11 +36,12 @@ export class IpcMessenger {
     private constructor(private readonly transport: {
         onMessage: (listener: MessageListener) => void,
         sendMessage: (message: any) => void
-    }) {
+    }, readonly target: string) {
         if (!transport) {
             throw new Error(`Transport is not provided for IpcMessenger. ${JSON.stringify(arguments)}`)
         }
         transport.onMessage(this.messageHandler);
+        this.iid += target;
     }
 
     private readonly messageHandler: MessageListener = message => {

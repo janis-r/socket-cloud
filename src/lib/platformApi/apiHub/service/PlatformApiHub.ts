@@ -1,9 +1,9 @@
 import {Injectable} from "quiver-framework";
-import {AccessTokenProvider} from "../../authorization/service/AccessTokenProvider";
-import {authTokenErrorResponseParams, authTokenHeaderName} from "../../authorization/data/auth-credentials";
-import {RequestContext} from "../../httpServer/data/RequestContext";
-import {HttpServerRouter} from "../../httpServer/service/HttpServerRouter";
-import {Router} from "../../httpServer/data/Router";
+import {AccessTokenProvider} from "../../../authorization/service/AccessTokenProvider";
+import {authTokenErrorResponseParams, authTokenHeaderName} from "../../../authorization/data/auth-credentials";
+import {RequestContext} from "../../../httpServer/data/RequestContext";
+import {HttpServerRouter} from "../../../httpServer/service/HttpServerRouter";
+import {Router} from "../../../httpServer/data/Router";
 import {PlatformApiCallManager} from "./PlatformApiCallManager";
 import {PlatformApiRequestContext} from "../data/PlatformApiRequestContext";
 

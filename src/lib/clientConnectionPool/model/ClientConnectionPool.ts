@@ -76,6 +76,8 @@ export class ClientConnectionPool {
         eventDispatcher.dispatchEvent(new NewConnectionEvent(connection));
     }
 
+    readonly getConnectionById = (connectionId: string) => this.byConnectionId.get(connectionId) ?? null;
+
     readonly getConnectionsByContext = (contextId: ContextId) => this.byContextId.get(contextId) || new Set([]);
 
     readonly getConnectionsByContextAndExternalId = (contextId: ContextId, externalId: ExternalId): Array<ClientConnection> => {

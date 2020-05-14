@@ -15,7 +15,7 @@ import {websocketListenerModule} from "../../lib/websocketListener/WebsocketList
 import {PermessageDeflateConfig} from "../../lib/permessageDeflateExtension/config/PermessageDeflateConfig";
 import {ConfigurationContextApiConfig} from "../../lib/configurationContext/config/ConfigurationContextApiConfig";
 import {AccessTokenApiConfig} from "../../lib/authorization/config/AccessTokenApiConfig";
-import {platformApiModule} from "../../lib/platformApi/platformApiModule";
+import {publishingApiModule} from "../../lib/platformApi/publishApi/publishingApiModule";
 
 export const configurationContextApiKey = "DEV::CONFIGURATION_CONTEXT_API_KEY";
 export const accessTokenApiKey = "DEV::ACCESS_TOKEN_MANAGER_KEY";
@@ -26,7 +26,7 @@ export const devServerModule: ModuleConfig = {
         SwaggerApiDisplayModule,
         PermessageDeflateExtensionModule,
         defaultProtocolModule,
-        platformApiModule,
+        publishingApiModule,
         websocketListenerModule
     ],
     mappings: [

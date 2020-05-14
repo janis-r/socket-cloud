@@ -1,7 +1,7 @@
 import {Command, Inject} from "quiver-framework";
-import {IpcMessage} from "../../ipcMessanger/data/IpcMessage";
-import {IpcMessageEvent} from "../../ipcMessanger/event/IpcMessageEvent";
-import {WorkerMessengerProvider} from "../../ipcMessanger/service/WorkerMessengerProvider";
+import {IpcMessage} from "../../ipcMessenger/data/IpcMessage";
+import {IpcMessageEvent} from "../../ipcMessenger/event/IpcMessageEvent";
+import {WorkerMessengerProvider} from "../../ipcMessenger/service/WorkerMessengerProvider";
 import {DataSyncMessage, DataSyncMessageType} from "../data/ipc/DataSyncMessage";
 import {WorkerManager} from "../../workerManager/service/WorkerManager";
 
@@ -23,17 +23,6 @@ export class ForwardDataSyncMessageToNodes implements Command {
             messengerProvider: {getMessenger},
             responses
         } = this;
-
-        const {scope, payload} = message;
-        /*if (scope !== defaultProtocolId) {
-            return;
-        }
-        if (!dataSyncMessageUtil.validate(payload)) {
-            return;
-        }
-        if (payload.type !== DataSyncMessageType.ForwardClientMessage) {
-            return;
-        }*/
 
         workerIds.filter(id => id !== workerId).map(id => getMessenger(id)).forEach(async ({sendAndReceive}) => {
             const {data} = await sendAndReceive<DataSyncMessage<number>>(message);

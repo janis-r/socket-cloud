@@ -15,6 +15,7 @@ import {unsubscribeMessageUtil} from "../../../lib/defaultProtocol/data/clientMe
 import {CallbackCollection} from "../../../lib/utils/CallbackCollection";
 import {ContextId} from "../../../lib/configurationContext/data/ContextId";
 import {WebsocketConnection} from "../../../lib/websocketConnection/model/WebsocketConnection";
+import {ConnectionState} from "../../../lib/clientConnectionPool/data/ConnectionState";
 
 const protocol = defaultProtocolId;
 
@@ -26,8 +27,10 @@ export class SocketClient {
 
     private readonly onMessageCallback = new CallbackCollection<PushToClientMessage>();
     private readonly onRestoreCallback = new CallbackCollection<RestoreChannelsResponseMessage>();
+    private readonly onCloseCallback = new CallbackCollection<void>();
     readonly onMessage = this.onMessageCallback.manage;
     readonly onRestore = this.onRestoreCallback.manage;
+    readonly onClose = this.onCloseCallback.manage;
 
     private _connection: WebsocketConnection;
     private _authKey: string;
@@ -64,6 +67,9 @@ export class SocketClient {
             }
 
         });
+
+        this._connection.onStateChange(() => this.onCloseCallback.execute())
+            .guard(({state}) => state === ConnectionState.Closed);
 
         return this;
     }

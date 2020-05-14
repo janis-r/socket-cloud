@@ -1,7 +1,7 @@
 import {ModuleConfig} from "quiver-framework";
 import {ForwardDataSyncMessageToNodes} from "./command/ForwardDataSyncMessageToNodes";
-import {IpcMessageEvent} from "../ipcMessanger/event/IpcMessageEvent";
-import {ipcMessengerInMasterModule} from "../ipcMessanger/ipcMessengerInMasterModule";
+import {IpcMessageEvent} from "../ipcMessenger/event/IpcMessageEvent";
+import {ipcMessengerInMasterModule} from "../ipcMessenger/ipcMessengerInMasterModule";
 import {defaultProtocolId} from "./data/defaultProtocolId";
 import {DataSyncMessageType, dataSyncMessageUtil} from "./data/ipc/DataSyncMessage";
 

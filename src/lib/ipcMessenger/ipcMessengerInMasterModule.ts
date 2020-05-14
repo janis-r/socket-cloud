@@ -11,7 +11,7 @@ export const ipcMessengerInMasterModule: ModuleConfig = {
         loggerModule
     ],
     mappings: [
-        WorkerMessengerProvider
+        {map: WorkerMessengerProvider, instantiate: true}
     ],
     commands: [
         {event: WorkerMessageEvent.TYPE, command: CreateIpcMessageEvent}

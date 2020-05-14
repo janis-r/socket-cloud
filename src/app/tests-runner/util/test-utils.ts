@@ -7,8 +7,8 @@ import {ConfigurationContextApi} from "./ConfigurationContextApi";
 import {AccessTokenApiListener} from "../../../lib/authorization/service/AccessTokenApiListener";
 import {ConfigurationContextApiListener} from "../../../lib/configurationContext/service/ConfigurationContextApiListener";
 import {configurationContext, debug, serverUrl} from "../config";
-import {PlatformApiHub} from "../../../lib/platformApi/service/PlatformApiHub";
 import {authTokenHeaderName} from "../../../lib/authorization/data/auth-credentials";
+import {PlatformApiHub} from "../../../lib/platformApi/apiHub/service/PlatformApiHub";
 
 const contextId = configurationContext.id;
 

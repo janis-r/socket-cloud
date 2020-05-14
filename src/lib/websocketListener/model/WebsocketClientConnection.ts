@@ -16,6 +16,7 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
     private readonly connection: WebsocketConnection;
 
     readonly id: ClientConnection['id'];
+    readonly created = new Date();
     readonly externalId: string;
     readonly remoteAddress;
 
@@ -37,6 +38,14 @@ export class WebsocketClientConnection extends ClientConnectionEventBase impleme
 
     get state() {
         return this.connection.state;
+    }
+
+    get bytesSent() {
+        return this.connection.bytesSent;
+    }
+
+    get bytesReceived() {
+        return this.connection.bytesReceived;
     }
 
     send(data: Buffer): Promise<void>;

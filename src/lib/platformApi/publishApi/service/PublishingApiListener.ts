@@ -9,8 +9,8 @@ import {MessageManager} from "../../../defaultProtocol/service/MessageManager";
 import {channelIdFromExternalId} from "../../../defaultProtocol/data/ChannelId";
 import {RequestContext} from "../../../httpServer/data/RequestContext";
 import {Router} from "../../../httpServer/data/Router";
-import {PlatformApiHub} from "../PlatformApiHub";
-import {PlatformApiRequestContext} from "../../data/PlatformApiRequestContext";
+import {PlatformApiHub} from "../../apiHub/service/PlatformApiHub";
+import {PlatformApiRequestContext} from "../../apiHub/data/PlatformApiRequestContext";
 
 @Injectable()
 export class PublishingApiListener {
@@ -34,7 +34,7 @@ export class PublishingApiListener {
         const {context: {id: contextId, maxPayloadSize}, accessRights} = tokenInfo;
 
         // Check permissions
-        if (accessRights !== "all" && !accessRights?.postIndividualMessages) {
+        if (accessRights !== "all" && !accessRights?.messages?.postToIndividual) {
             const error = "Action is not allowed";
             sendJson({error}, {status: MethodNotAllowed});
             logger.log({error}).commit();
@@ -81,7 +81,7 @@ export class PublishingApiListener {
         const {context: {id: contextId, maxPayloadSize}, accessRights} = tokenInfo;
 
         // Check permissions
-        if (accessRights !== "all" && !accessRights.postChannelMessages) {
+        if (accessRights !== "all" && !accessRights?.messages?.postToChannel) {
             const error = "Action is not allowed";
             sendJson({error}, {status: MethodNotAllowed});
             logger.log({error}).commit();
@@ -127,7 +127,7 @@ export class PublishingApiListener {
         const {context: {id: contextId, maxPayloadSize}, accessRights} = tokenInfo;
 
         // Check permissions
-        if (accessRights !== "all" && !accessRights.postMultiChannelMessages) {
+        if (accessRights !== "all" && !accessRights.messages?.postMultiChannel) {
             const error = "Action is not allowed";
             sendJson({error}, {status: MethodNotAllowed});
             logger.log({error}).commit();

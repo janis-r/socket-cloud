@@ -125,17 +125,23 @@ paths:
                   uptime:
                     type: number
                     description: Seconds since connection is established.
-                  bytesUploaded:
+                  bytesSent:
                     type: number
-                  bytesDownloaded:
+                    description: Bytes sent from server to client.
+                  bytesReceived:
                     type: number
+                    description: Bytes recevied from client connection.
                 required:
                   - connectionId
                   - uptime
                   - bytesUploaded
                   - bytesDownloaded
+        401:
+          $ref: "#/components/responses/Unauthorized"
         404:
           description: Connection could not be found.
+        405:
+          $ref: "#/components/responses/ActionProhibited"
       security:
         - ApiAuthKey: []
     delete:
@@ -234,7 +240,7 @@ components:
       required: true
       schema:
         type: string
-        pattern: "[a-zA-Z\\d.-]+"
+        pattern: "^[a-zA-Z\\d.-]+$"
       description: Data channel id
   responses:
     MessageDeliveryReport:

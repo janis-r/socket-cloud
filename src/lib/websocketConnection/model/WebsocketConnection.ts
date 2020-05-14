@@ -17,6 +17,8 @@ export const debug = false;
 
 export class WebsocketConnection {
     private _state = ConnectionState.Connecting;
+    private _bytesSent = 0;
+    private _bytesReceived = 0;
 
     private readonly keepAliveManager: KeepAliveManager;
     private readonly incomingMessageBuffer: IncomingMessageBuffer;
@@ -50,6 +52,7 @@ export class WebsocketConnection {
         incomingMessageBuffer.onData(parsedDataHandler);
         incomingMessageBuffer.onError(({code, message}) => this.close(code, message, code !== CloseCode.InternalServerError));
 
+        socket.on("data", data => this._bytesReceived += data.byteLength);
         socket.on("data", incomingMessageBuffer.write);
         socket.once("error", this.socketErrorHandler);
         socket.on("close", this.socketCloseHandler);
@@ -59,6 +62,14 @@ export class WebsocketConnection {
 
     get state(): ConnectionState {
         return this._state;
+    }
+
+    get bytesSent(): number {
+        return this._bytesSent;
+    }
+
+    get bytesReceived(): number {
+        return this._bytesReceived;
     }
 
     async close(code: CloseCode = CloseCode.NormalClosure, message?: string, immediate?: boolean): Promise<boolean> {
@@ -94,6 +105,7 @@ export class WebsocketConnection {
         const {TextFrame, BinaryFrame} = DataFrameType;
         const [type, payload] = typeof data === "string" ? [TextFrame, Buffer.from(data)] : [BinaryFrame, data];
         await this.sendDataFrame(spawnFrameData(type, {payload}));
+        this._bytesSent += Buffer.byteLength(data);
     }
 
     async sendDataFrame(data: DataFrame): Promise<void> {

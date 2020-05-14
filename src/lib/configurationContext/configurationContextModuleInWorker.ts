@@ -3,7 +3,7 @@ import {configurationContextModule} from "./configurationContextModule";
 import {DeleteConfigurationContextEvent} from "./event/DeleteConfigurationContextEvent";
 import {UpdateConfigurationContextEvent} from "./event/UpdateConfigurationContextEvent";
 import {ForwardConfigurationContextMessageToMaster} from "./command/ipc/ForwardConfigurationContextMessageToMaster";
-import {IpcMessageEvent} from "../ipcMessanger/event/IpcMessageEvent";
+import {IpcMessageEvent} from "../ipcMessenger/event/IpcMessageEvent";
 import {configurationContextIpcScope} from "./data/ipc/configurationContextIpcScope";
 import {ForwardConfigurationContextMessageWithinWorker} from "./command/ipc/ForwardConfigurationContextMessageWithinWorker";
 
