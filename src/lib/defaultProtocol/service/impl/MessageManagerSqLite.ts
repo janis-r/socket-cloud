@@ -1,13 +1,13 @@
-import {Inject} from "quiver-framework";
-import {toSeconds} from "ugd10a";
-import {CachingPolicy} from "../../../configurationContext/data/CachingPolicy";
-import {ConfigurationContextProvider} from "../../../configurationContext/service/ConfigurationContextProvider";
-import {ContextId} from "../../../configurationContext/data/ContextId";
-import {ChannelId, externalIdFromChannelId} from "../../data/ChannelId";
-import {CachedMessage} from "../../data/cache/CachedMessage";
-import {MessageManager} from "../MessageManager";
-import {CacheFilter} from "../../data/cache/CacheFilter";
-import {SqLiteConnection} from "../../../sqLite/service/SqLiteConnection";
+import { Inject } from "quiver-framework";
+import { toSeconds } from "ugd10a";
+import { CachingPolicy } from "../../../configurationContext/data/CachingPolicy";
+import { ConfigurationContextProvider } from "../../../configurationContext/service/ConfigurationContextProvider";
+import { ContextId } from "../../../configurationContext/data/ContextId";
+import { ChannelId, externalIdFromChannelId } from "../../data/ChannelId";
+import { CachedMessage } from "../../data/cache/CachedMessage";
+import { MessageManager } from "../MessageManager";
+import { CacheFilter } from "../../data/cache/CacheFilter";
+import { SqLiteConnection } from "../../../sqLite/service/SqLiteConnection";
 
 export class MessageManagerSqLite implements MessageManager {
 
@@ -49,10 +49,10 @@ export class MessageManagerSqLite implements MessageManager {
     }
 
     async registerMessage(contextId: ContextId, payload: string, origin: { connectionId: string } | { apiCallId: string }, channels: string[]): Promise<string> {
-        const {db: {run, prepare}} = this;
+        const { db: { run, prepare } } = this;
 
         const useCache = await this.shouldCacheMessage(contextId, channels);
-        const {lastID: messageId} = await run(`
+        const { lastID: messageId } = await run(`
                     INSERT INTO messages (context_id, payload, origin, size)
                     VALUES (?, ?, ?, ?)
             `,
@@ -69,16 +69,16 @@ export class MessageManagerSqLite implements MessageManager {
         return messageId.toString(32);
     }
 
-    async getCachedMessages(contextId: ContextId, channelId: ChannelId, filter: CacheFilter): Promise<Array<CachedMessage> | null> {
-        const {db: {all}} = this;
+    async getCachedMessages(contextId: ContextId, channelId: ChannelId, filter: CacheFilter = {}): Promise<Array<CachedMessage> | null> {
+        const { db: { all } } = this;
         const cachingPolicy = await this.getChannelCachingPolicy(contextId, channelId);
         if (!cachingPolicy) {
             // Caching is not enabled for this channel
             return null;
         }
 
-        const {cacheTime, cacheSize} = cachingPolicy;
-        const {maxAge, maxLength, messageId} = filter || {};
+        const { cacheTime, cacheSize } = cachingPolicy;
+        const { maxAge, maxLength, messageId } = filter;
 
         const queryMaxAge = cacheTime && maxAge ? Math.min(cacheTime, maxAge) : cacheTime ?? maxAge;
         const queryLimit = cacheSize && maxAge ? Math.min(cacheSize, maxLength) : cacheSize ?? maxLength;
@@ -105,7 +105,7 @@ export class MessageManagerSqLite implements MessageManager {
             }
         );
 
-        return messages.reverse().map(({id, time, payload, channel}) => ({
+        return messages.reverse().map(({ id, time, payload, channel }) => ({
             messageId: id.toString(32),
             time: new Date(time).getTime(),
             payload,
@@ -113,10 +113,38 @@ export class MessageManagerSqLite implements MessageManager {
         }));
     }
 
+    async deleteChannelCache(contextId: ContextId, channelId: ChannelId): Promise<number | null> {
+        const { db: { run } } = this;
+
+        const messages = await this.getCachedMessages(contextId, channelId);
+        if (messages === null) {
+            // Caching is not enabled for this channel
+            return null;
+        }
+
+        const messageIds = messages.map(({ messageId }) => messageId);
+        if (!messageIds.length) {
+            // Channel can be cached and exists but there are no messages in it to be deleted
+            return 0; 
+        }
+
+        await run(
+            `DELETE FROM messages WHERE id IN($messageIds)`,
+            {$messageIds: messageIds}
+        );
+        // TODO: Not sure if sqlite would allow two queries with same inputs to be run within same call ...
+        await run(
+            `DELETE FROM message_recipients WHERE message_id IN($messageIds)`,
+            {$messageIds: messageIds}
+        );
+
+        return messageIds.length;
+    }
+
     async clearMessageCache(): Promise<void> {
         // TODO: This method is way too big!
         console.log('>> clearMessageCache');
-        const {db: {all}} = this;
+        const { db: { all } } = this;
 
         type DbRow = { id: number, time: string, context_id: string, channel: string };
         const cachedMessages = await all<DbRow>(`
@@ -135,14 +163,14 @@ export class MessageManagerSqLite implements MessageManager {
         const groupedById = new Map<DbRow["id"], Set<Omit<DbRow, "id">>>();
         const groupedByContextAndChannel = new Map<string, Set<DbRow>>();
         for (const message of cachedMessages) {
-            const {id, ...data} = message;
+            const { id, ...data } = message;
             if (!groupedById.has(id)) {
                 groupedById.set(id, new Set<Omit<DbRow, "id">>([data]));
             } else {
                 groupedById.get(id).add(data);
             }
 
-            const {context_id, channel} = message;
+            const { context_id, channel } = message;
             const contextAndChannel = `${context_id}-${channel}`;
             if (!groupedByContextAndChannel.has(contextAndChannel)) {
                 groupedByContextAndChannel.set(contextAndChannel, new Set<DbRow>([message]));
@@ -155,7 +183,7 @@ export class MessageManagerSqLite implements MessageManager {
 
         for (const [messageId, messages] of groupedById) {
             const cachingPolicies = (await Promise.all(
-                [...messages].map(({context_id, channel}) => this.getChannelCachingPolicy(context_id, channel))
+                [...messages].map(({ context_id, channel }) => this.getChannelCachingPolicy(context_id, channel))
             )).filter(entry => !!entry);
 
             if (!cachingPolicies.length) {
@@ -164,8 +192,8 @@ export class MessageManagerSqLite implements MessageManager {
                 continue;
             }
 
-            const {cacheTime, cacheSize} = cachingPolicies.filter(entry => !!entry)
-                .reduce(({cacheSize, cacheTime}, {cacheSize: c_cacheSize, cacheTime: c_cacheTime}) => ({
+            const { cacheTime, cacheSize } = cachingPolicies.filter(entry => !!entry)
+                .reduce(({ cacheSize, cacheTime }, { cacheSize: c_cacheSize, cacheTime: c_cacheTime }) => ({
                     cacheSize: cacheSize && c_cacheSize ? Math.max(cacheSize, c_cacheSize) : cacheSize ?? c_cacheSize,
                     cacheTime: cacheTime && c_cacheTime ? Math.max(cacheTime, c_cacheTime) : cacheTime ?? c_cacheTime
                 }));
@@ -176,7 +204,7 @@ export class MessageManagerSqLite implements MessageManager {
                 continue;
             }
 
-            const {time} = [...messages][0];
+            const { time } = [...messages][0];
             if (cacheTime && new Date(time).getTime() + cacheTime < Date.now()) {
                 messagesToClear.add(messageId);
             }
@@ -189,10 +217,10 @@ export class MessageManagerSqLite implements MessageManager {
         }
 
         for (const messages of groupedByContextAndChannel.values()) {
-            const {context_id, channel} = [...messages][0];
-            const {cacheSize} = await this.getChannelCachingPolicy(context_id, channel) || {};
+            const { context_id, channel } = [...messages][0];
+            const { cacheSize } = await this.getChannelCachingPolicy(context_id, channel) || {};
             if (cacheSize && messages.size > cacheSize) {
-                [...messages].slice(0, messages.size - cacheSize).forEach(({id}) => messagesToClear.add(id));
+                [...messages].slice(0, messages.size - cacheSize).forEach(({ id }) => messagesToClear.add(id));
             }
         }
 
@@ -214,8 +242,8 @@ export class MessageManagerSqLite implements MessageManager {
      * @param channels
      */
     private async shouldCacheMessage(contextId: ContextId, channels: ChannelId[]): Promise<boolean> {
-        const {contextProvider: {getConfigurationContext}} = this;
-        const {cachingPolicy, channelConfig, individualMessageConfig} = await getConfigurationContext(contextId);
+        const { contextProvider: { getConfigurationContext } } = this;
+        const { cachingPolicy, channelConfig, individualMessageConfig } = await getConfigurationContext(contextId);
 
         if (channels && channels.length) {
             const channelHasCachingEnabled = channel => {
@@ -237,8 +265,8 @@ export class MessageManagerSqLite implements MessageManager {
     }
 
     private async getChannelCachingPolicy(contextId: ContextId, channel: ChannelId): Promise<CachingPolicy | null> {
-        const {contextProvider: {getConfigurationContext}} = this;
-        const {cachingPolicy, channelConfig} = await getConfigurationContext(contextId);
+        const { contextProvider: { getConfigurationContext } } = this;
+        const { cachingPolicy, channelConfig } = await getConfigurationContext(contextId);
         const config = channelConfig[channel]?.cachingPolicy ?? cachingPolicy;
         return config && Object.keys(config).length ? config : null;
     }

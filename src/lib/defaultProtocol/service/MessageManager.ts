@@ -1,7 +1,7 @@
-import {ContextId} from "../../configurationContext/data/ContextId";
-import {ChannelId} from "../data/ChannelId";
-import {CachedMessage} from "../data/cache/CachedMessage";
-import {CacheFilter} from "../data/cache/CacheFilter";
+import { ContextId } from "../../configurationContext/data/ContextId";
+import { ChannelId } from "../data/ChannelId";
+import { CachedMessage } from "../data/cache/CachedMessage";
+import { CacheFilter } from "../data/cache/CacheFilter";
 
 export abstract class MessageManager {
     /**
@@ -23,7 +23,14 @@ export abstract class MessageManager {
      * @param channelId
      * @param filter
      */
-    abstract getCachedMessages(contextId: ContextId, channelId: ChannelId, filter: CacheFilter): Promise<Array<CachedMessage> | null>;
+    abstract getCachedMessages(contextId: ContextId, channelId: ChannelId, filter?: CacheFilter): Promise<Array<CachedMessage> | null>;
+    
+    /**
+     * Delete all messages within data channel
+     * @param contextId 
+     * @param channelId 
+     */
+    abstract deleteChannelCache(contextId: ContextId, channelId: ChannelId): Promise<number | null>;
 
     /**
      * Clear message storage of overdue messages.

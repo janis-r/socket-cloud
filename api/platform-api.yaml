@@ -8,7 +8,10 @@ info:
     email: jr@janisradins.com
   version: 1.0.0
 servers:
-  - url: /api/platform/
+  - url: https://localhost:8001/api/platform/
+    description: Development server
+# schemes:
+#   - https
 tags:
   - name: Publishing
     description: Api to publish messages vai exteral calls
@@ -16,7 +19,6 @@ tags:
     description: An Api provided to allow operator interact with connections of its context.
   - name: Message cache
     description: Data channel message cache management Api.
-
 paths:
   /individual-message/:
     post:
@@ -37,10 +39,14 @@ paths:
           $ref: "#/components/responses/BadRequestData"
         401:
           $ref: "#/components/responses/Unauthorized"
-        405:
+        403:
           $ref: "#/components/responses/ActionProhibited"
         413:
           $ref: "#/components/responses/PayloadTooLarge"
+        415:
+          $ref: "#/components/responses/UnsupportedMediaType"
+        429:
+          $ref: "#/components/responses/TooManyRequests"
       security:
         - ApiAuthKey: []
   /channel-message/:
@@ -62,10 +68,14 @@ paths:
           $ref: "#/components/responses/BadRequestData"
         401:
           $ref: "#/components/responses/Unauthorized"
-        405:
+        403:
           $ref: "#/components/responses/ActionProhibited"
         413:
           $ref: "#/components/responses/PayloadTooLarge"
+        415:
+          $ref: "#/components/responses/UnsupportedMediaType"
+        429:
+          $ref: "#/components/responses/TooManyRequests"
       security:
         - ApiAuthKey: []
   /multi-channel-message/:
@@ -80,6 +90,8 @@ paths:
           application/json:
             schema:
               type: array
+              minItems: 1
+              maxItems: 50
               items:
                 $ref: "#/components/schemas/ChannelMessage"
       responses:
@@ -89,21 +101,20 @@ paths:
           $ref: "#/components/responses/BadRequestData"
         401:
           $ref: "#/components/responses/Unauthorized"
-        405:
+        403:
           $ref: "#/components/responses/ActionProhibited"
         413:
           $ref: "#/components/responses/PayloadTooLarge"
+        415:
+          $ref: "#/components/responses/UnsupportedMediaType"
+        429:
+          $ref: "#/components/responses/TooManyRequests"
       security:
         - ApiAuthKey: []
 
   /connection/{connectionId}:
     parameters:
-      - in: path
-        name: connectionId
-        required: true
-        schema:
-          type:
-            string
+      - $ref:  "#/components/parameters/connectionId"
     get:
       summary: Retrieve connection status and runtime statistics
       tags:
@@ -115,6 +126,7 @@ paths:
             application/json:
               schema:
                 type: object
+                additionalProperties: false
                 properties:
                   connectionId:
                     type: string
@@ -134,14 +146,16 @@ paths:
                 required:
                   - connectionId
                   - uptime
-                  - bytesUploaded
-                  - bytesDownloaded
+                  - bytesSent
+                  - bytesReceived
         401:
           $ref: "#/components/responses/Unauthorized"
         404:
           description: Connection could not be found.
-        405:
+        403:
           $ref: "#/components/responses/ActionProhibited"
+        429:
+          $ref: "#/components/responses/TooManyRequests"
       security:
         - ApiAuthKey: []
     delete:
@@ -151,8 +165,14 @@ paths:
       responses:
         200:
           description: Connection found and dropped.
+        401:
+          $ref: "#/components/responses/Unauthorized"
         404:
           description: Connection could not be found.
+        403:
+          $ref: "#/components/responses/ActionProhibited"
+        429:
+          $ref: "#/components/responses/TooManyRequests"
       security:
         - ApiAuthKey: []
 
@@ -180,9 +200,14 @@ paths:
                 required:
                   - length
                   - sizeInBytes
+        401:
+          $ref: "#/components/responses/Unauthorized"
         404:
           description: Required channel do not have message cache enabled.
-
+        403:
+          $ref: "#/components/responses/ActionProhibited"
+        429:
+          $ref: "#/components/responses/TooManyRequests"
       security:
         - ApiAuthKey: []
     delete:
@@ -200,40 +225,71 @@ paths:
                   messages:
                     type: integer
                     description: Number of messages removed from cache due to this call.
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          $ref: "#/components/responses/ActionProhibited"
         404:
           description: Required channel do not have message cache enabled.
+        429:
+          $ref: "#/components/responses/TooManyRequests"
       security:
         - ApiAuthKey: []
 components:
   schemas:
     ChannelMessage:
       description: Message data format to be delivered to data cahnnel.
+      additionalProperties: false
       type: object
       properties:
         channels:
           description: List of data channel names to which message should be delivered.
           type: array
+          minItems: 1
+          maxItems: 100 #TODO: This maximums is not based on calculation nor it's respected in implementation
           items:
-            type: string
+            $ref: "#/components/schemas/ChannelId"
         payload:
           type: string
       required:
-        - channel
+        - channels
         - payload
     IndividualMessage:
       description: Message data format to be delivered to indiviual connection.
       type: object
+      additionalProperties: false
       properties:
         connectionIds:
           type: array
+          minItems: 1
+          maxItems: 100 #TODO: This maximums is not based on calculation nor it's respected in implementation
           items:
             type: string
+
         payload:
           type: string
       required:
         - connectionIds
         - payload
+    ChannelId:
+      type: string
+      pattern: "[a-zA-Z\\d]+" # TODO: ........
+      minLength: 2
+      maxLength: 50
+    ConnectionId:
+      description: Client connection internal id
+      type: string
+      pattern: "[a-zA-Z0-9&%+=]+" # TODO: ........
+      minLength: 24
+      maxLength: 24
   parameters:
+    connectionId:
+      name: connectionId
+      in: path
+      required: true
+      schema:
+        $ref:  "#/components/schemas/ConnectionId"
+      description: Client connection internal id
     channel:
       name: channel
       in: path
@@ -241,6 +297,7 @@ components:
       schema:
         type: string
         pattern: "^[a-zA-Z\\d.-]+$"
+        maxLength: 50
       description: Data channel id
   responses:
     MessageDeliveryReport:
@@ -252,7 +309,8 @@ components:
             properties:
               recipients:
                 description: Number of recipients for whom message was sent.
-                type: number
+                type: integer
+                format: int32
             required:
               - recipients
     Unauthorized:
@@ -287,6 +345,7 @@ components:
         application/json:
           schema:
             type: object
+            additionalProperties: false
             properties:
               error:
                 type: string
@@ -301,12 +360,36 @@ components:
         application/json:
           schema:
             type: object
+            additionalProperties: false
             properties:
               error:
                 type: string
             required:
               - error
-
+    TooManyRequests:
+      description: Too many incoming requests.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 600
+          description: Seconds to await before next request is allowed.
+      content: 
+        text/plain:
+           schema:
+            type: string
+            enum:
+              - Too many incoming requests
+    UnsupportedMediaType:
+      description: Unsupported media type
+      content: 
+         text/plain:
+           schema:
+            type: string
+            enum:
+              - Unsupported media type
   securitySchemes:
     ApiAuthKey:
       description: Api access key issued by Platform.

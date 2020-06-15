@@ -6,6 +6,8 @@ export type AccessRights = AccessRightsConstant | {
         postToIndividual?: boolean,
         postToChannel?: boolean,
         postMultiChannel?: boolean,
+        requestChannelCacheStats?: boolean,
+        clearChannelCache?: boolean,
     },
     connection?: {
         retrieveStatus?: boolean,
@@ -22,6 +24,8 @@ const accessPermissionsValidator = new Validator<AccessRightsList>({
             postToIndividual: {type: "boolean", optional: true},
             postToChannel: {type: "boolean", optional: true},
             postMultiChannel: {type: "boolean", optional: true},
+            requestChannelCacheStats: {type: "boolean", optional: true},
+            clearChannelCache: {type: "boolean", optional: true},
         })
     },
     connection: {

@@ -1,12 +1,8 @@
 import cluster, {Worker} from "cluster";
 import {cpus} from 'os';
-import {EventDispatcher, Inject} from "quiver-framework";
-import {WorkerMessageEvent} from "../event/WorkerMessageEvent";
 import {CallbackCollection} from "../../utils/CallbackCollection";
 
 export class WorkerManager {
-    @Inject()
-    private readonly eventDispatcher: EventDispatcher;
 
     private readonly maxWorkers: number;
 
