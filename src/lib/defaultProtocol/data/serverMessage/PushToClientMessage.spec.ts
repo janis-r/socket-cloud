@@ -1,5 +1,5 @@
-import {PushToClientMessage, pushToClientUtil} from "./PushToClientMessage";
-import {MessageType} from "../MessageType";
+import { PushToClientMessage, pushToClientUtil } from "./PushToClientMessage";
+import { MessageType } from "../MessageType";
 
 describe('PushToClientMessage', () => {
     it('Can serialize and deserialize', () => {

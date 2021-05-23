@@ -17,9 +17,18 @@ export const launchServer = (singleCore: boolean = true, showLogs = false, mode:
 
     const time = new Timer();
     serverProcess = exec(exePath);
-    serverProcess.stderr.on("data", err => {
-        throw err;
+    serverProcess.stderr.on("error", err => {
+        showLogs && logToConsole(`>> stderr (error): ${err}`);
+        // exec('taskkill /f /im node.exe');
+        setTimeout(() => process.exit(), 1000);
+        // process.exit();
     });
+    serverProcess.stderr.on("data", err => {
+        showLogs && logToConsole(`>> stderr (data): ${err}`);
+        setTimeout(() => process.exit(), 1000);
+        // process.exit();
+    });
+
     serverProcess.stdout.on("data", async chunk => {
         const text = typeof chunk === "string" ? chunk : (chunk instanceof Buffer ? chunk.toString("utf8") : null);
         if (text && text.includes(singleCore ? 'Http server running on port' : 'All workers started')) {
@@ -56,5 +65,5 @@ function killProcessTree(pid: number, signal = 'SIGKILL'): void {
 }
 
 function logToConsole(...entries: Array<any>): void {
-    console.log(...entries.map(value => chalk.white(chalk.bgBlack(value))));
+    console.log(...entries.map(value => chalk.white(chalk.bgBlackBright(value))));
 }

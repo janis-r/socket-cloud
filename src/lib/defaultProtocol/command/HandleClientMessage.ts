@@ -1,9 +1,10 @@
-import {Command, EventDispatcher, Inject} from "quiver-framework";
-import {ClientMessageEvent, CloseReason} from "../../clientConnectionPool";
-import {deserializeClientMessage, MessageType} from "../data";
-import {IncomingClientMessageEvent} from "../event/IncomingClientMessageEvent";
-import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
-import chalk from "chalk";
+import { Command, EventDispatcher, Inject } from "quiver-framework";
+import { ClientMessageEvent } from "../../clientConnectionPool/event/ClientMessageEvent";
+import { CloseReason } from "../../clientConnectionPool/data/CloseReason";
+import { deserializeClientMessage } from "../data/clientMessage/ClientMessage";
+import { MessageType } from "../data/MessageType";
+import { IncomingClientMessageEvent } from "../event/IncomingClientMessageEvent";
+import { DataContextManagerProvider } from "../service/DataContextManagerProvider";
 
 export class HandleClientMessage implements Command {
 
@@ -16,8 +17,8 @@ export class HandleClientMessage implements Command {
 
     async execute(): Promise<void> {
         const {
-            event: {message, connection, connection: {context: {id: contextId}}},
-            dataContextManagerProvider: {getContextManager},
+            event: { message, connection, connection: { context: { id: contextId } } },
+            dataContextManagerProvider: { getContextManager },
             eventDispatcher
         } = this;
 
@@ -34,7 +35,7 @@ export class HandleClientMessage implements Command {
         }
 
         if (parsedMessage.type === MessageType.PushToServer) {
-            const {context: {maxPayloadSize}} = await getContextManager(contextId);
+            const { context: { maxPayloadSize } } = await getContextManager(contextId);
             if (maxPayloadSize && maxPayloadSize < Buffer.byteLength(parsedMessage.payload)) {
                 connection.close(CloseReason.MessageTooBig, `Payload size exceeded!`);
                 return;

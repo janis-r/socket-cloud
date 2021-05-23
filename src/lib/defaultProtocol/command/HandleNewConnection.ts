@@ -1,6 +1,7 @@
-import {Command, Inject} from "quiver-framework";
-import {ClientConnectionPool, NewConnectionEvent} from "../../clientConnectionPool";
-import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
+import { Command, Inject } from "quiver-framework";
+import { ClientConnectionPool } from "../../clientConnectionPool/model/ClientConnectionPool";
+import { NewConnectionEvent } from "../../clientConnectionPool/event/NewConnectionEvent";
+import { DataContextManagerProvider } from "../service/DataContextManagerProvider";
 
 export class HandleNewConnection implements Command {
 
@@ -13,8 +14,8 @@ export class HandleNewConnection implements Command {
 
     async execute(): Promise<void> {
         const {
-            event: {connection, connection: {context: {id: contextId}}},
-            dataContextManagerProvider: {getContextManager}
+            event: { connection, connection: { context: { id: contextId } } },
+            dataContextManagerProvider: { getContextManager }
         } = this;
 
         const manager = await getContextManager(contextId);

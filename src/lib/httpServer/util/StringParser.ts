@@ -1,12 +1,12 @@
-import {uniqueValues} from "ugd10a";
+import { uniqueValues } from "ugd10a";
 
 export class StringParser {
 
     constructor(private readonly inputValue: string) {
     }
 
-    asInt<F>({fallback, allowNegative = false}: { fallback?: F, allowNegative?: boolean }): number | F {
-        const {inputValue} = this;
+    asInt<F>({ fallback, allowNegative = false }: { fallback?: F, allowNegative?: boolean }): number | F {
+        const { inputValue } = this;
         if (inputValue) {
             const value = parseInt(inputValue);
             if (!isNaN(value) && (value >= 0 || allowNegative)) {
@@ -16,8 +16,8 @@ export class StringParser {
         return fallback !== undefined ? fallback : NaN;
     }
 
-    asFloat<T>({fallback, allowNegative = false}: { fallback?: T, allowNegative?: boolean }): number | T {
-        const {inputValue} = this;
+    asFloat<T>({ fallback, allowNegative = false }: { fallback?: T, allowNegative?: boolean }): number | T {
+        const { inputValue } = this;
         if (inputValue) {
             const value = parseFloat(inputValue);
             if (!isNaN(value) && (value >= 0 || allowNegative)) {
@@ -27,8 +27,8 @@ export class StringParser {
         return fallback !== undefined ? fallback : NaN;
     }
 
-    asIntList({separator = ',', unique = false}: { separator?: string, unique?: boolean }): Array<number> {
-        const {inputValue} = this;
+    asIntList({ separator = ',', unique = false }: { separator?: string, unique?: boolean }): Array<number> {
+        const { inputValue } = this;
         if (!inputValue) {
             return [];
         }
@@ -40,8 +40,8 @@ export class StringParser {
         return unique ? uniqueValues(entries) : entries;
     }
 
-    asFloatList({separator = ',', unique = false}: { separator?: string, unique?: boolean }): Array<number> {
-        const {inputValue} = this;
+    asFloatList({ separator = ',', unique = false }: { separator?: string, unique?: boolean }): Array<number> {
+        const { inputValue } = this;
         if (!inputValue) {
             return [];
         }

@@ -1,5 +1,5 @@
-import {uniqueValues} from "ugd10a";
-import {FieldConfiguration, Validator} from "ugd10a/validator";
+import { uniqueValues } from "ugd10a";
+import { FieldConfiguration, Validator } from "ugd10a/validator";
 
 export class MessageValidator<T> {
 
@@ -19,7 +19,7 @@ export class MessageValidator<T> {
         const fieldDeserializers = new Map<string, Configuration<T>["itemDeserializer"]>();
 
         config.map(value => {
-            const {field, optional} = value;
+            const { field, optional } = value;
             configMap.set(field.toString(), value);
             if (value.itemSerializer) {
                 fieldSerializers.set(field.toString(), value.itemSerializer);
@@ -27,8 +27,8 @@ export class MessageValidator<T> {
             if (value.itemDeserializer) {
                 fieldDeserializers.set(field.toString(), value.itemDeserializer);
             }
-            return {field: field.toString(), optional};
-        }).forEach(({field, optional}) => {
+            return { field: field.toString(), optional };
+        }).forEach(({ field, optional }) => {
             allFields.push(field);
             if (optional) {
                 requiredFields.push(field);
@@ -45,17 +45,19 @@ export class MessageValidator<T> {
         return this.validator.lastError;
     }
 
+    readonly getLastError = () => this.validator.getLastError();
+
     readonly validate = (value: unknown): value is T => this.validator.validate(value);
 
     readonly serialize = (value: T): string | null => {
-        const {validate, allFields, fieldSerializers} = this;
+        const { validate, allFields, fieldSerializers } = this;
         if (!validate(value)) {
             return null;
         }
         return JSON.stringify(allFields.map(field => {
             if (fieldSerializers.has(field)) {
                 const entrySerializer = fieldSerializers.get(field);
-                const {type} = this.configMap.get(field);
+                const { type } = this.configMap.get(field);
                 if (type === "array" || type === "string[]") {
                     return value[field].map(entrySerializer);
                 }
@@ -66,13 +68,13 @@ export class MessageValidator<T> {
     };
 
     readonly deserialize = (value: string | Array<any>): T | null => {
-        const {allFields, fieldDeserializers, configMap} = this;
+        const { allFields, fieldDeserializers, configMap } = this;
         let data;
         if (typeof value === "string") {
             try {
                 data = JSON.parse(value);
             } catch (e) {
-                console.log(`Error while deserialize`, {value, e});
+                console.log(`Error while deserialize`, { value, e });
                 return null;
             }
         } else {
@@ -90,7 +92,7 @@ export class MessageValidator<T> {
             let parsedValue;
             if (fieldDeserializers.has(field)) {
                 const entryDeserializer = fieldDeserializers.get(field);
-                const {type} = this.configMap.get(field);
+                const { type } = this.configMap.get(field);
                 if (type === "array" || type === "string[]") {
                     parsedValue = rawValue.map(entryDeserializer);
                 } else {
@@ -111,7 +113,7 @@ export class MessageValidator<T> {
             return parsed;
         }
 
-        console.log(`Error while deserialize - validation has failed`, {value, parsed});
+        console.log(`Error while deserialize - validation has failed`, { value, parsed });
 
         return null;
     };

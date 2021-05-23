@@ -1,6 +1,7 @@
-import {Module} from "quiver-framework";
-import {WebsocketExtensionModule, WebsocketExtensionRegistry} from "../websocketExtension";
-import {PermessageDeflateExtension} from "./service/PermessageDeflateExtension";
+import { Module } from "quiver-framework";
+import { WebsocketExtensionModule } from "../websocketExtension/WebsocketExtensionModule";
+import { WebsocketExtensionRegistry } from "../websocketExtension/service/WebsocketExtensionRegistry";
+import { PermessageDeflateExtension } from "./service/PermessageDeflateExtension";
 
 @Module({
     requires: [WebsocketExtensionModule],

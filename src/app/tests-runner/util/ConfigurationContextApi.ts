@@ -1,6 +1,10 @@
 import fetch from "node-fetch";
-import {ConfigurationContext, configurationContextValidator, ContextId} from "../../../lib/configurationContext";
-import {HttpStatusCode} from "../../../lib/httpServer";
+import {
+    ConfigurationContext,
+    configurationContextValidator
+} from "../../../lib/configurationContext/data/ConfigurationContext";
+import {ContextId} from "../../../lib/configurationContext/data/ContextId";
+import {HttpStatusCode} from "../../../lib/httpServer/data/HttpStatusCode";
 import {createHeaders} from "./test-utils";
 
 type ConfigurationContextWithOptionalProtocol =

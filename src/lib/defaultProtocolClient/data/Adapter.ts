@@ -1,6 +1,6 @@
-import {ConnectionState} from "../../clientConnectionPool/data/ConnectionState";
-import {Callback} from "../../utils/CallbackCollection";
-import {CloseCode} from "../../websocketConnection/data/CloseCode";
+import { ConnectionState } from "../../clientConnectionPool/data/ConnectionState";
+import { Callback } from "../../utils/CallbackCollection";
+import { CloseCode } from "../../websocketConnection/data/CloseCode";
 
 /**
  * Interface to be implemented by any socket connection client either browser built in WebSocket or custom

@@ -1,9 +1,10 @@
+import { ConfigurationContext } from "../data/ConfigurationContext";
+import { ContextId } from "../data/ContextId";
+
 /**
  * Data model that abstracts retrieval and saving of configuration context into external storage,
  * whatever implemented.
  */
-import {ConfigurationContext, ContextId} from "..";
-
 export abstract class ConfigurationContextModel {
     /**
      * Save configuration context

@@ -1,7 +1,7 @@
-import {Command, Inject, Optional} from "quiver-framework";
-import {WebsocketConnectionValidationRequest} from "../../event/WebsocketConnectionValidationRequest";
-import {Logger} from "../../../logger";
-import {WebsocketExtensionRegistry} from "../../../websocketExtension";
+import { Command, Inject, Optional } from "quiver-framework";
+import { WebsocketConnectionValidationRequest } from "../../event/WebsocketConnectionValidationRequest";
+import { Logger } from "../../../logger/service/Logger";
+import { WebsocketExtensionRegistry } from "../../../websocketExtension/service/WebsocketExtensionRegistry";
 
 export class PrepareWebsocketExtensions implements Command<boolean> {
 
@@ -17,7 +17,7 @@ export class PrepareWebsocketExtensions implements Command<boolean> {
 
     execute() {
         const {
-            logger: {error: logError},
+            logger: { error: logError },
             websocketExtensionRegistry,
             event,
             event: {
@@ -26,7 +26,7 @@ export class PrepareWebsocketExtensions implements Command<boolean> {
                         'sec-websocket-extensions': secWebsocketExtensions,
                     }
                 },
-                configurationContext: {compressData},
+                configurationContext: { compressData },
                 socket
             }
         } = this;
@@ -43,7 +43,7 @@ export class PrepareWebsocketExtensions implements Command<boolean> {
 
         try {
             event.extensions = websocketExtensionRegistry.getExtensionAgentsForConfiguration(secWebsocketExtensions);
-        } catch ({error, stack}) {
+        } catch ({ error, stack }) {
             logError(`PrepareWebsocketExtensions err while validating configuration offer ${JSON.stringify({
                 error,
                 stack

@@ -1,22 +1,24 @@
-import {Socket} from "net";
-import {spawnFrameData} from "../util/websocket-utils";
-import {DataFrame} from "../data/DataFrame";
-import {DataFrameType} from "../data/DataFrameType";
-import {ConnectionState, connectionStateToString} from "../../clientConnectionPool";
-import {WebsocketExtensionAgent} from "../../websocketExtension";
-import {ConfigurationContext} from "../../configurationContext";
-import {CloseCode, isValidWebsocketCloseCode} from "../data/CloseCode";
-import {OutgoingMessageBuffer} from "./helper/OutgoingMessageBuffer";
-import {KeepAliveManager} from "./clientExtensions/KeepAliveManager";
-import {IncomingMessageBuffer} from "./helper/IncomingMessageBuffer";
+import { Socket } from "net";
+import { spawnFrameData } from "../util/websocket-utils";
+import { DataFrame } from "../data/DataFrame";
+import { DataFrameType } from "../data/DataFrameType";
+import { ConnectionState, connectionStateToString } from "../../clientConnectionPool/data/ConnectionState";
+import { WebsocketExtensionAgent } from "../../websocketExtension/service/WebsocketExtensionAgent";
+import { ConfigurationContext } from "../../configurationContext/data/ConfigurationContext";
+import { CloseCode, isValidWebsocketCloseCode } from "../data/CloseCode";
+import { OutgoingMessageBuffer } from "./helper/OutgoingMessageBuffer";
+import { KeepAliveManager } from "./clientExtensions/KeepAliveManager";
+import { IncomingMessageBuffer } from "./helper/IncomingMessageBuffer";
 import chalk from "chalk";
-import {isValidUTF8} from "../util/isValidUTF8";
-import {CallbackCollection} from "../../utils/CallbackCollection";
+import { isValidUTF8 } from "../util/isValidUTF8";
+import { CallbackCollection } from "../../utils/CallbackCollection";
 
 export const debug = false;
 
 export class WebsocketConnection {
     private _state = ConnectionState.Connecting;
+    private _bytesSent = 0;
+    private _bytesReceived = 0;
 
     private readonly keepAliveManager: KeepAliveManager;
     private readonly incomingMessageBuffer: IncomingMessageBuffer;
@@ -33,23 +35,24 @@ export class WebsocketConnection {
     readonly onStateChange = this.stateChangeCallback.manage;
 
     constructor(private readonly socket: Socket,
-                readonly context: ConfigurationContext,
-                private readonly extensions?: ReadonlyArray<WebsocketExtensionAgent>) {
-        debug && console.log({context});
+        readonly context: ConfigurationContext,
+        private readonly extensions?: ReadonlyArray<WebsocketExtensionAgent>) {
+        debug && console.log({ context });
 
         this.keepAliveManager = new KeepAliveManager(this);
-        this.incomingMessageBuffer = new IncomingMessageBuffer(extensions?.filter(({incomingDataPipe: pipe}) => !!pipe) || []);
+        this.incomingMessageBuffer = new IncomingMessageBuffer(extensions?.filter(({ incomingDataPipe: pipe }) => !!pipe) || []);
         this.outgoingMessageBuffer = new OutgoingMessageBuffer(
             socket,
-            extensions?.filter(({outgoingDataPipe: pipe}) => !!pipe) || [],
-            context.outgoingMessageFragmentSize
+            extensions?.filter(({ outgoingDataPipe: pipe }) => !!pipe) || [],
+            context?.outgoingMessageFragmentSize || 2 ** 14 // TODO: Default outgoingMessageFragmentSize could be stored in some more meaningful location
         );
 
-        const {incomingMessageBuffer, parsedDataHandler} = this;
+        const { incomingMessageBuffer, parsedDataHandler } = this;
 
         incomingMessageBuffer.onData(parsedDataHandler);
-        incomingMessageBuffer.onError(({code, message}) => this.close(code, message, code !== CloseCode.InternalServerError));
+        incomingMessageBuffer.onError(({ code, message }) => this.close(code, message, code !== CloseCode.InternalServerError));
 
+        socket.on("data", data => this._bytesReceived += data.byteLength);
         socket.on("data", incomingMessageBuffer.write);
         socket.once("error", this.socketErrorHandler);
         socket.on("close", this.socketCloseHandler);
@@ -61,9 +64,17 @@ export class WebsocketConnection {
         return this._state;
     }
 
+    get bytesSent(): number {
+        return this._bytesSent;
+    }
+
+    get bytesReceived(): number {
+        return this._bytesReceived;
+    }
+
     async close(code: CloseCode = CloseCode.NormalClosure, message?: string, immediate?: boolean): Promise<boolean> {
-        const {state, socket} = this;
-        debug && console.log('>> close', {code, reason: message, immediate});
+        const { state, socket } = this;
+        debug && console.log('>> close', { code, reason: message, immediate });
         if (state >= ConnectionState.Closing) {
             return false;
         }
@@ -72,7 +83,7 @@ export class WebsocketConnection {
         payload.writeUInt16BE(code, 0);
         if (message) {
             payload = Buffer.concat([payload, Buffer.from(message)]);
-            this.errorCallback.execute({message, code})
+            this.errorCallback.execute({ message, code })
         }
 
         if (immediate) {
@@ -81,7 +92,7 @@ export class WebsocketConnection {
             return true;
         }
 
-        const closeMessageSent = this.sendDataFrame(spawnFrameData(DataFrameType.ConnectionClose, {payload}));
+        const closeMessageSent = this.sendDataFrame(spawnFrameData(DataFrameType.ConnectionClose, { payload }));
         this.setState(ConnectionState.Closing);
         await closeMessageSent;
         socket.end();
@@ -91,9 +102,10 @@ export class WebsocketConnection {
     send(data: Buffer): Promise<void>;
     send(data: string): Promise<void>;
     async send(data: string | Buffer): Promise<void> {
-        const {TextFrame, BinaryFrame} = DataFrameType;
+        const { TextFrame, BinaryFrame } = DataFrameType;
         const [type, payload] = typeof data === "string" ? [TextFrame, Buffer.from(data)] : [BinaryFrame, data];
-        await this.sendDataFrame(spawnFrameData(type, {payload}));
+        await this.sendDataFrame(spawnFrameData(type, { payload }));
+        this._bytesSent += Buffer.byteLength(data);
     }
 
     async sendDataFrame(data: DataFrame): Promise<void> {
@@ -109,9 +121,9 @@ export class WebsocketConnection {
     }
 
     private readonly parsedDataHandler = async (dataFrame: DataFrame) => {
-        const {TextFrame, ConnectionClose, Ping, Pong, BinaryFrame} = DataFrameType;
+        const { TextFrame, ConnectionClose, Ping, Pong, BinaryFrame } = DataFrameType;
         debug && console.log('>> parsedDataHandler', chalk.red(connectionStateToString(this._state)), dataFrame);
-        const {type, payload} = dataFrame;
+        const { type, payload } = dataFrame;
 
         if (this._state >= ConnectionState.Closing && type !== ConnectionClose) {
             debug && console.log('>> parsedDataHandler', chalk.red('stop'));
@@ -138,8 +150,8 @@ export class WebsocketConnection {
 
     };
 
-    private processConnectionCloseFrame({payload}: DataFrame): void {
-        const {ProtocolError, AbnormalClosure, NormalClosure, NoStatusRcvd} = CloseCode;
+    private processConnectionCloseFrame({ payload }: DataFrame): void {
+        const { ProtocolError, AbnormalClosure, NormalClosure, NoStatusRcvd } = CloseCode;
 
         if (this.state >= ConnectionState.Closing) {
             // We're already in closed state. No need to respond.
@@ -166,7 +178,7 @@ export class WebsocketConnection {
 
         // NoStatusRcvd & AbnormalClosure are not allowed to appear in data requests
         if (code !== null && ([NoStatusRcvd, AbnormalClosure].includes(code) || !isValidWebsocketCloseCode(code))) {
-            this.close(ProtocolError, `Invalid close code received: ${{code}}`);
+            this.close(ProtocolError, `Invalid close code received: ${JSON.stringify(code)}`);
             return;
         }
 
@@ -174,7 +186,7 @@ export class WebsocketConnection {
         this.close(code ?? NormalClosure);
     }
 
-    private async processPingFrame({payload}: DataFrame): Promise<void> {
+    private async processPingFrame({ payload }: DataFrame): Promise<void> {
         if (this._state >= ConnectionState.Closing) {
             return;
         }
@@ -183,11 +195,11 @@ export class WebsocketConnection {
             this.close(CloseCode.ProtocolError, `Ping payload exceed 125 byte limit`);
             return;
         }
-        this.sendDataFrame(spawnFrameData(DataFrameType.Pong, {payload}));
+        this.sendDataFrame(spawnFrameData(DataFrameType.Pong, { payload }));
     }
 
     private setState(newState: ConnectionState) {
-        const {state: currentState} = this;
+        const { state: currentState } = this;
         debug && console.log('>> setState', {
             currentState: connectionStateToString(currentState),
             newState: connectionStateToString(newState)
@@ -197,10 +209,10 @@ export class WebsocketConnection {
         }
 
         this._state = newState;
-        this.stateChangeCallback.execute({state: newState, prevState: currentState})
+        this.stateChangeCallback.execute({ state: newState, prevState: currentState })
     }
 
-    private readonly socketErrorHandler = ({message}: Error) => this.close(CloseCode.AbnormalClosure, `Socket error: ${message}`);
+    private readonly socketErrorHandler = ({ message }: Error) => this.close(CloseCode.AbnormalClosure, `Socket error: ${message}`);
 
     private readonly socketCloseHandler = () => {
         this.setState(ConnectionState.Closed);

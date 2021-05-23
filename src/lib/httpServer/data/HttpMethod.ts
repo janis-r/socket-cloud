@@ -1,4 +1,4 @@
-import {valueBelongsToEnum} from "ugd10a";
+import { valueBelongsToEnum } from "ugd10a";
 
 export enum HttpMethod {
     GET = 'GET',

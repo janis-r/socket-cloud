@@ -1,4 +1,5 @@
 import {Database, OPEN_CREATE, OPEN_READWRITE, verbose} from "sqlite3";
+import {QueryResponse} from "../data/QueryResponse";
 
 // TODO: This should be enabled only in dev/debug mode
 verbose();
@@ -115,11 +116,8 @@ export class SqLiteConnection {
             }
         })
     );
+
+    readonly prepare = (sql: string) => this.db.prepare(sql); // TODO: Statement should be converted to async syntax as well
 }
 
-type QueryResponse = {
-    // The value of the last inserted row ID
-    readonly lastID?: number;
-    // Number of rows affected by query
-    readonly changes?: number;
-}
+

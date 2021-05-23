@@ -6,6 +6,8 @@ info:
     name: Jānis Radiņš
     email: jr@janisradins.com
   version: 1.0.0
+servers:
+  - url: /api/
 tags:
   - name: Context config API
   - name: Access token API

@@ -1,3 +1,3 @@
-import {ConfigurationContext} from "../index";
+import { ConfigurationContext } from "./ConfigurationContext";
 
 export type ContextId = ConfigurationContext['id'];

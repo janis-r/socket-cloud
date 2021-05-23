@@ -1,5 +1,5 @@
-import {RestoreChannelsResponseMessage, restoreResponseUtil} from "./RestoreChannelsResponseMessage";
-import {MessageType} from "../MessageType";
+import { RestoreChannelsResponseMessage, restoreResponseUtil } from "./RestoreChannelsResponseMessage";
+import { MessageType } from "../MessageType";
 import chalk from "chalk";
 
 describe('RestoreChannelsResponseMessage', () => {

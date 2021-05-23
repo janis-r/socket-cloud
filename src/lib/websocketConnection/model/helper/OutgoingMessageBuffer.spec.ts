@@ -1,7 +1,7 @@
-import {OutgoingMessageBuffer} from "./OutgoingMessageBuffer";
-import {Socket} from "net";
-import {decomposeWebSocketFrame, spawnFrameData} from "../../util/websocket-utils";
-import {DataFrameType} from "../../data/DataFrameType";
+import { OutgoingMessageBuffer } from "./OutgoingMessageBuffer";
+import { Socket } from "net";
+import { decomposeWebSocketFrame, spawnFrameData } from "../../util/websocket-utils";
+import { DataFrameType } from "../../data/DataFrameType";
 
 describe("websocket outgoing data buffer", () => {
 
@@ -16,13 +16,13 @@ describe("websocket outgoing data buffer", () => {
     it("Messages will be written in correct order", async () => {
         const payloads = ["1", "2", "3"].map(value => Buffer.from(value));
         for (const payload of payloads) {
-            await dataBuffer.write(spawnFrameData(DataFrameType.TextFrame, {payload}));
+            await dataBuffer.write(spawnFrameData(DataFrameType.TextFrame, { payload }));
         }
 
         expect(
             socket.chunksWritten
                 .map(chunk => decomposeWebSocketFrame(chunk))
-                .map(({payload}) => payload)
+                .map(({ payload }) => payload)
         ).toMatchObject(payloads);
     });
 

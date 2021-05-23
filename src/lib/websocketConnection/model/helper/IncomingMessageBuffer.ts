@@ -1,11 +1,11 @@
-import {DataFrame} from "../../data/DataFrame";
-import {DataFrameType} from "../../data/DataFrameType";
-import {CallbackCollection} from "../../../utils/CallbackCollection";
-import {WebsocketDataBuffer} from "../../util/WebsocketDataBuffer";
-import {WebsocketExtensionAgent} from "../../../websocketExtension";
-import {ExecutionQueue} from "ugd10a";
-import {isPromise} from "ugd10a/validator";
-import {CloseCode} from "../../data/CloseCode";
+import { DataFrame } from "../../data/DataFrame";
+import { DataFrameType } from "../../data/DataFrameType";
+import { CallbackCollection } from "../../../utils/CallbackCollection";
+import { WebsocketDataBuffer } from "../../util/WebsocketDataBuffer";
+import { WebsocketExtensionAgent } from "../../../websocketExtension/service/WebsocketExtensionAgent";
+import { ExecutionQueue } from "ugd10a";
+import { isPromise } from "ugd10a/validator";
+import { CloseCode } from "../../data/CloseCode";
 
 const isValidUTF8: (data: Buffer) => boolean = require('utf-8-validate');
 
@@ -26,7 +26,7 @@ export class IncomingMessageBuffer {
     }
 
     readonly write = (chunk: Buffer) => {
-        const {dataBuffer, errorCallback} = this;
+        const { dataBuffer, errorCallback } = this;
         try {
             dataBuffer.write(chunk);
         } catch (e) {
@@ -39,11 +39,11 @@ export class IncomingMessageBuffer {
     }
 
     private readonly validateDataFrame = (dataFrame: DataFrame): void => {
-        const {queue, errorCallback: {execute: dispatchError}} = this;
-        const {ContinuationFrame, TextFrame, BinaryFrame, ConnectionClose, Ping, Pong} = DataFrameType;
-        const {ProtocolError} = CloseCode;
+        const { queue, errorCallback: { execute: dispatchError } } = this;
+        const { ContinuationFrame, TextFrame, BinaryFrame, ConnectionClose, Ping, Pong } = DataFrameType;
+        const { ProtocolError } = CloseCode;
 
-        const {type, isFinal, rsv1, rsv2, rsv3} = dataFrame;
+        const { type, isFinal, rsv1, rsv2, rsv3 } = dataFrame;
         const controlFrame = isControlFrame(type);
 
         if (![ContinuationFrame, TextFrame, BinaryFrame, ConnectionClose, Ping, Pong].includes(dataFrame.type)) {
@@ -105,7 +105,7 @@ export class IncomingMessageBuffer {
         const aggregatedFrameData = {
             ...queue[0],
             isFinal: true,
-            payload: Buffer.concat(queue.map(({payload}) => payload))
+            payload: Buffer.concat(queue.map(({ payload }) => payload))
         };
 
         queue.length = 0;
@@ -114,15 +114,15 @@ export class IncomingMessageBuffer {
 
     private async postProcessFrame(dataFrame: DataFrame): Promise<void> {
         const {
-            dataCallback: {execute: dispatchFrame},
-            errorCallback: {execute: dispatchError},
-            postProcessingQueue: {enqueue}
+            dataCallback: { execute: dispatchFrame },
+            errorCallback: { execute: dispatchError },
+            postProcessingQueue: { enqueue }
         } = this;
-        const {ProtocolError, InvalidFramePayloadData, InternalServerError} = CloseCode;
+        const { ProtocolError, InvalidFramePayloadData, InternalServerError } = CloseCode;
 
         try {
             const processedFrame = await enqueue(() => this.extendIncomingData(dataFrame));
-            const {type, payload, rsv1, rsv2, rsv3} = processedFrame;
+            const { type, payload, rsv1, rsv2, rsv3 } = processedFrame;
             if ([rsv1, rsv2, rsv3].includes(true)) {
                 dispatchError({
                     message: `RSV fields must be empty: ${dumpDataFrame(dataFrame)}`,
@@ -149,7 +149,7 @@ export class IncomingMessageBuffer {
     }
 
     private async extendIncomingData(data: DataFrame): Promise<DataFrame> {
-        const {extensions} = this;
+        const { extensions } = this;
         if (!extensions || extensions.length === 0) {
             return data;
         }

@@ -1,4 +1,4 @@
-import {Event} from "quiver-framework";
+import { Event } from "quiver-framework";
 
 /**
  * Event subclass that incorporate event response data.

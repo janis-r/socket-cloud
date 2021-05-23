@@ -1,6 +1,6 @@
-import {Command, Inject} from "quiver-framework";
-import {WebsocketConnectionValidationRequest} from "../../event/WebsocketConnectionValidationRequest";
-import {Logger} from "../../../logger";
+import { Command, Inject } from "quiver-framework";
+import { WebsocketConnectionValidationRequest } from "../../event/WebsocketConnectionValidationRequest";
+import { Logger } from "../../../logger/service/Logger";
 
 export class ValidateConnectionHeaders implements Command<boolean> {
 
@@ -12,7 +12,7 @@ export class ValidateConnectionHeaders implements Command<boolean> {
 
     execute() {
         const {
-            logger: {error},
+            logger: { error },
             event: {
                 request: {
                     headers: {

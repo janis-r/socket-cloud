@@ -1,14 +1,17 @@
-import {CallbackCollection} from "../../utils/CallbackCollection";
-import {Adapter} from "../data/Adapter";
-import {RestoreChannelsResponseMessage} from "@defaultProtocol/data/serverMessage/RestoreChannelsResponseMessage";
-import {deserializeServerMessage} from "@defaultProtocol/data/serverMessage/ServerMessage";
-import {MessageType} from "@defaultProtocol/data/MessageType";
-import {subscribeMessageUtil} from "@defaultProtocol/data/clientMessage/SubscribeMessage";
-import {unsubscribeMessageUtil} from "@defaultProtocol/data/clientMessage/UnsubscribeMessage";
-import {restoreRequestUtil, RestoreTarget} from "@defaultProtocol/data/clientMessage/RestoreChannelsRequestMessage";
-import {globalMessageChannel} from "@defaultProtocol/data/globalMessageChannel";
-import {pushToServerUtil} from "@defaultProtocol/data/clientMessage/PushToServerMessage";
-import {PushToClientMessage} from "@defaultProtocol/data/serverMessage/PushToClientMessage";
+import { CallbackCollection } from "../../utils/CallbackCollection";
+import { Adapter } from "../data/Adapter";
+import { RestoreChannelsResponseMessage } from "../../defaultProtocol/data/serverMessage/RestoreChannelsResponseMessage";
+import { deserializeServerMessage } from "../../defaultProtocol/data/serverMessage/ServerMessage";
+import { MessageType } from "../../defaultProtocol/data/MessageType";
+import { subscribeMessageUtil } from "../../defaultProtocol/data/clientMessage/SubscribeMessage";
+import { unsubscribeMessageUtil } from "../../defaultProtocol/data/clientMessage/UnsubscribeMessage";
+import {
+    restoreRequestUtil,
+    RestoreTarget
+} from "../../defaultProtocol/data/clientMessage/RestoreChannelsRequestMessage";
+import { globalMessageChannel } from "../../defaultProtocol/data/globalMessageChannel";
+import { pushToServerUtil } from "../../defaultProtocol/data/clientMessage/PushToServerMessage";
+import { PushToClientMessage } from "../../defaultProtocol/data/serverMessage/PushToClientMessage";
 
 /**
  * A socket client connector that'll take socket connection wrapped as Adapter and wrap it into implementation
@@ -29,7 +32,7 @@ export class SocketClient {
     };
 
     private readonly messageHandler = (data: string) => {
-        const {onMessageCallback, onRestoreCallback} = this;
+        const { onMessageCallback, onRestoreCallback } = this;
         const message = deserializeServerMessage(data);
         switch (message.type) {
             case MessageType.PushToClient:
@@ -58,7 +61,7 @@ export class SocketClient {
      * @param channels Channel or list of channels to subscribe to
      */
     subscribe(...channels: string[]): void {
-        this.connection.send(subscribeMessageUtil.serialize({type: MessageType.Subscribe, channels}));
+        this.connection.send(subscribeMessageUtil.serialize({ type: MessageType.Subscribe, channels }));
     }
 
     /**
@@ -66,7 +69,7 @@ export class SocketClient {
      * @param channels Channel or list of channels to unsubscribe from
      */
     unsubscribe(...channels: string[]): void {
-        this.connection.send(unsubscribeMessageUtil.serialize({type: MessageType.Unsubscribe, channels}));
+        this.connection.send(unsubscribeMessageUtil.serialize({ type: MessageType.Unsubscribe, channels }));
     }
 
     /**
@@ -75,7 +78,7 @@ export class SocketClient {
      * cache filter definitions.
      */
     restore(...channels: RestoreTarget[]): void {
-        this.connection.send(restoreRequestUtil.serialize({type: MessageType.RestoreRequest, channels}));
+        this.connection.send(restoreRequestUtil.serialize({ type: MessageType.RestoreRequest, channels }));
     }
 
     /**

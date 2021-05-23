@@ -16,12 +16,7 @@
       "es2015",
       "dom"
     ],
-    "outDir": "dist",
-    "baseUrl": "./src",
-    "paths": {
-      "@defaultProtocol/*": ["lib/defaultProtocol/*"],
-      "@defaultProtocolClient/*": ["lib/defaultProtocolClient/*"]
-    }
+    "outDir": "dist"
   },
   "include": [
     "./src/"

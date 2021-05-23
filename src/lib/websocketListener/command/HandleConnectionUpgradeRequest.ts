@@ -1,7 +1,7 @@
-import {Command, EventDispatcher, Inject} from "quiver-framework";
-import {HttpConnectionUpgradeEvent} from "../../httpServer";
-import {WebsocketConnectionValidationRequest} from "../event/WebsocketConnectionValidationRequest";
-import {Logger} from "../../logger";
+import { Command, EventDispatcher, Inject } from "quiver-framework";
+import { HttpConnectionUpgradeEvent } from "../../httpServer/event/HttpConnectionUpgradeEvent";
+import { WebsocketConnectionValidationRequest } from "../event/WebsocketConnectionValidationRequest";
+import { Logger } from "../../logger/service/Logger";
 
 export class HandleConnectionUpgradeRequest implements Command {
 
@@ -16,14 +16,14 @@ export class HandleConnectionUpgradeRequest implements Command {
         const {
             event: {
                 request,
-                request: {url, method, headers, connection: {remoteAddress}},
+                request: { url, method, headers, connection: { remoteAddress } },
                 socket
             },
             eventDispatcher,
-            logger: {console}
+            logger: { console }
         } = this;
 
-        const requestInfo = {remoteAddress, url, method, headers};
+        const requestInfo = { remoteAddress, url, method, headers };
         console('>> requestInfo:', requestInfo);
 
         eventDispatcher.dispatchEvent(new WebsocketConnectionValidationRequest(

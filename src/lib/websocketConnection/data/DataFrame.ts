@@ -1,4 +1,4 @@
-import {DataFrameType} from "./DataFrameType";
+import { DataFrameType } from "./DataFrameType";
 
 export type DataFrame = {
     type: DataFrameType;

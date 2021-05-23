@@ -1,9 +1,10 @@
-import {AppContext, Injectable, InjectionConfig} from "quiver-framework";
-import {Logger, loggerModule} from "../../lib/logger";
-import {EchoServerModule} from "./EchoServerModule";
+import { AppContext, Injectable, InjectionConfig } from "quiver-framework";
+import { Logger } from "../../lib/logger/service/Logger";
+import { loggerModule } from "../../lib/logger/loggerModule";
+import { EchoServerModule } from "./EchoServerModule";
 import cluster from "cluster";
-import {LoggerImpl} from "../../lib/logger/impl/LoggerImpl";
-import {Chalk} from "chalk";
+import { LoggerImpl } from "../../lib/logger/impl/LoggerImpl";
+import { Chalk } from "chalk";
 
 @Injectable()
 class CustomLogger extends LoggerImpl {
@@ -23,7 +24,7 @@ if (cluster.isMaster) {
         });
     }
 } else {
-    const {injector} = new AppContext()
+    const { injector } = new AppContext()
         .configure(
             loggerModule,
             {

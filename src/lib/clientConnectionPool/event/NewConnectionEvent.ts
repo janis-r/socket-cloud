@@ -1,5 +1,6 @@
-import {Event} from "quiver-framework";
-import {ClientConnection} from "..";
+import { Event } from "quiver-framework";
+import { ClientConnection } from "../model/ClientConnection";
+
 
 /**
  * Event notification dispatched in global scope as new client connection is encountered, validated and ready to be

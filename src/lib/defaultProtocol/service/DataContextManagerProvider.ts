@@ -1,6 +1,8 @@
-import {Inject, Injector} from "quiver-framework";
-import {ConfigurationContext, ConfigurationContextProvider, ContextId} from "../../configurationContext";
-import {DataContextManager} from "./DataContextManager";
+import { Inject, Injector } from "quiver-framework";
+import { ConfigurationContextProvider } from "../../configurationContext/service/ConfigurationContextProvider";
+import { ConfigurationContext } from "../../configurationContext/data/ConfigurationContext";
+import { ContextId } from "../../configurationContext/data/ContextId";
+import { DataContextManager } from "./DataContextManager";
 
 export class DataContextManagerProvider {
 
@@ -14,7 +16,7 @@ export class DataContextManagerProvider {
     private readonly entityPromise = new Map<ContextId, Promise<void>>();
 
     readonly getContextManager = async (contextId: ContextId): Promise<DataContextManager> => {
-        const {entities, entityPromise, configurationContextProvider: {getConfigurationContext}, injector} = this;
+        const { entities, entityPromise, configurationContextProvider: { getConfigurationContext }, injector } = this;
         if (!entities.has(contextId) && entityPromise.has(contextId)) {
             await entityPromise.get(contextId);
         } else if (!entities.has(contextId)) {
@@ -32,7 +34,7 @@ export class DataContextManagerProvider {
     };
 
     readonly resetContextManager = (contextId: ContextId) => {
-        const {entities} = this;
+        const { entities } = this;
         if (entities.has(contextId)) {
             entities.delete(contextId);
             return true;

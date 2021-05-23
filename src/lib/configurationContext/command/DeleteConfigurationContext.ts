@@ -1,6 +1,6 @@
-import {Command, Inject} from "quiver-framework";
-import {DeleteConfigurationContextEvent} from "../event/DeleteConfigurationContextEvent";
-import {ConfigurationContextProvider} from "..";
+import { Command, Inject } from "quiver-framework";
+import { DeleteConfigurationContextEvent } from "../event/DeleteConfigurationContextEvent";
+import { ConfigurationContextProvider } from "../service/ConfigurationContextProvider";
 
 export class DeleteConfigurationContext implements Command {
 
@@ -11,8 +11,8 @@ export class DeleteConfigurationContext implements Command {
 
     async execute(): Promise<void> {
         const {
-            contextProvider: {resetConfiguration},
-            event: {contextId}
+            contextProvider: { resetConfiguration },
+            event: { contextId }
         } = this;
         resetConfiguration(contextId);
     }

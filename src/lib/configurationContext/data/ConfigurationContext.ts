@@ -1,4 +1,4 @@
-import {Validator} from "ugd10a/validator";
+import { Validator } from "ugd10a/validator";
 
 export abstract class ConfigurationContext {
     // Unique id of configuration context
@@ -7,12 +7,18 @@ export abstract class ConfigurationContext {
     protocol: string;
     // Maximum number of simultaneous connections
     maxConnectionCount?: number;
-    // Validation API configuration
-    validationApi?: {
-        // Url to external validation API
+    // Context operator API configuration
+    operatorApi?: {
+        // Url to operator API
         url: string;
-        // Whether to invoke external API to validate emerging client connections
-        validateNewConnections?: boolean;
+        connection?: {
+            // Whether to handshake emerging client connections with Operator before adding to connection pool
+            doHandshake?: boolean;
+            // Whether to perform informative call to Operator Api as new connection is established and added to connection pool
+            reportNew?: boolean;
+            // Whether to perform informative call to Operator Api as connection is dropped
+            reportDropped?: boolean;
+        }
     };
     // Number in milliseconds within which to send ping messages to client.
     // No messages will be sent is value is set to 0 or key is not present.
@@ -24,8 +30,8 @@ export abstract class ConfigurationContext {
     maxPayloadSize?: number;
     // Whether to compress data
     compressData?: boolean;
-    // General instructions on how to cache outgoing messages applicable to all channels unless channel
-    // specific instructions are provided
+    // General instructions on how to cache outgoing messages applicable to all channels and individual messages unless
+    // channel or individual message specific instructions are provided
     cachingPolicy?: {
         // Number of milliseconds for which to keep outgoing messages in cache
         cacheTime?: number;
@@ -38,48 +44,70 @@ export abstract class ConfigurationContext {
             cachingPolicy?: ConfigurationContext["cachingPolicy"]
         }
     };
+    // Individual message configuration. If omitted global configuration within cachingPolicy will be used.
+    individualMessageConfig?: {
+        cachingPolicy?: ConfigurationContext["cachingPolicy"]
+    }
 }
 
 const cashingPolicyValidator = new Validator<ConfigurationContext["cachingPolicy"]>({
-    cacheTime: {type: "number", optional: true},
-    cacheSize: {type: "number", optional: true}
+    cacheTime: { type: "number", optional: true },
+    cacheSize: { type: "number", optional: true }
 });
 
 const perChannelConfigValidator = new Validator<ConfigurationContext["channelConfig"][0]>({
     cachingPolicy: {
         optional: true,
-        validator: value => cashingPolicyValidator.validate(value) ? true : JSON.stringify(cashingPolicyValidator.lastError)
+        validator: cashingPolicyValidator
+    }
+});
+
+const individualMessageConfigValidator = new Validator<ConfigurationContext["individualMessageConfig"]>({
+    cachingPolicy: {
+        optional: true,
+        validator: cashingPolicyValidator
     }
 });
 
 export const configurationContextValidator = new Validator<ConfigurationContext>({
-    id: {type: "string", notEmpty: true, validator: ({length}: string) => length >= 2 && length <= 50},
-    protocol: {type: "string", notEmpty: true},
-    maxConnectionCount: {type: "number", optional: true},
-    validationApi: {
-        validator: new Validator<ConfigurationContext["validationApi"]>({
-            url: {type: "string"},
-            validateNewConnections: {type: "boolean", optional: true}
+    id: { type: "string", notEmpty: true, validator: ({ length }: string) => length >= 2 && length <= 50 },
+    protocol: { type: "string", notEmpty: true },
+    maxConnectionCount: { type: "number", optional: true },
+    operatorApi: {
+        validator: new Validator<ConfigurationContext["operatorApi"]>({
+            url: { type: "string" },
+            connection: {
+                type: "object",
+                optional: true,
+                validator: new Validator<ConfigurationContext["operatorApi"]["connection"]>({
+                    doHandshake: { type: "boolean", optional: true },
+                    reportNew: { type: "boolean", optional: true },
+                    reportDropped: { type: "boolean", optional: true }
+                })
+            }
         }).validate,
         optional: true
     },
-    pingTimeout: {type: "number", optional: true},
-    outgoingMessageFragmentSize: {type: "number", optional: true},
-    maxPayloadSize: {type: "number", optional: true},
-    compressData: {type: "boolean", optional: true},
+    pingTimeout: { type: "number", optional: true },
+    outgoingMessageFragmentSize: { type: "number", optional: true },
+    maxPayloadSize: { type: "number", optional: true },
+    compressData: { type: "boolean", optional: true },
     cachingPolicy: {
         optional: true,
-        validator: value => cashingPolicyValidator.validate(value) ? true : JSON.stringify(cashingPolicyValidator.lastError)
+        validator: cashingPolicyValidator
     },
     channelConfig: {
-        type: "object",
         optional: true,
         validator: value => {
-            const error = Object.keys(value).find(channelId => !perChannelConfigValidator.validate(value[channelId]));
+            const error = Object.keys(value).find(channelId => perChannelConfigValidator.validate(value[channelId]) !== true);
             if (error) {
                 return `Invalid per channel caching policy entry encountered - ${JSON.stringify(error)}, error - ${JSON.stringify(perChannelConfigValidator.lastError)}`;
             }
             return true;
         }
     },
+    individualMessageConfig: {
+        optional: true,
+        validator: individualMessageConfigValidator
+    }
 });

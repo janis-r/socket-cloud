@@ -1,15 +1,17 @@
-import {InjectionConfig, Injector, Module} from "quiver-framework";
-import {WebsocketListenerModule} from "../../lib/websocketListener";
-import {ConfigurationContextProvider} from "../../lib/configurationContext";
-import {SocketDescriptor} from "../../lib/websocketListener/data/SocketDescriptor";
-import {PermessageDeflateConfig, PermessageDeflateExtensionModule} from "../../lib/permessageDeflateExtension";
-import {ClientMessageEvent} from "../../lib/clientConnectionPool";
-import {EchoMessageCommand} from "./EchoMessageCommand";
-import {HttpServerConfig, HttpServerRouter} from "../../lib/httpServer";
+import { InjectionConfig, Module } from "quiver-framework";
+import { ClientMessageEvent } from "../../lib/clientConnectionPool/event/ClientMessageEvent";
+import { ConfigurationContextProvider } from "../../lib/configurationContext/service/ConfigurationContextProvider";
+import { HttpServerConfig } from "../../lib/httpServer/config/HttpServerConfig";
+import { HttpServerRouter } from "../../lib/httpServer/service/HttpServerRouter";
+import { PermessageDeflateConfig } from "../../lib/permessageDeflateExtension/config/PermessageDeflateConfig";
+import { PermessageDeflateExtensionModule } from "../../lib/permessageDeflateExtension/PermessageDeflateExtensionModule";
+import { SocketDescriptor } from "../../lib/websocketListener/data/SocketDescriptor";
+import { websocketListenerModule } from "../../lib/websocketListener/WebsocketListenerModule";
+import { EchoMessageCommand } from "./EchoMessageCommand";
 
 @Module({
     requires: [
-        WebsocketListenerModule,
+        websocketListenerModule,
         PermessageDeflateExtensionModule,
     ],
     mappings: [
@@ -34,7 +36,7 @@ import {HttpServerConfig, HttpServerRouter} from "../../lib/httpServer";
     ]
 })
 export class EchoServerModule {
-    constructor(router: HttpServerRouter, i: Injector) {
+    constructor(router: HttpServerRouter) {
         router.get('/', ({sendFile}) => sendFile(`${__dirname}/index.html`));
         router.post('/validate-socket', ({body, sendJson}) => {
             console.log({body});

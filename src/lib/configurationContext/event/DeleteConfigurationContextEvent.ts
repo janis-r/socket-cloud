@@ -1,5 +1,5 @@
-import {Event} from "quiver-framework";
-import {ContextId} from "..";
+import { Event } from "quiver-framework";
+import { ContextId } from "../data/ContextId";
 
 export class DeleteConfigurationContextEvent extends Event<string> {
 

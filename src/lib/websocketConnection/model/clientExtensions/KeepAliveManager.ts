@@ -1,10 +1,10 @@
 import * as crypto from "crypto";
-import {ConnectionState} from "../../../clientConnectionPool";
-import {CloseCode} from "../../data/CloseCode";
-import {spawnFrameData} from "../../util/websocket-utils";
-import {DataFrameType} from "../../data/DataFrameType";
-import {DataFrame} from "../../data/DataFrame";
-import {WebsocketConnection} from "../WebsocketConnection";
+import { ConnectionState } from "../../../clientConnectionPool/data/ConnectionState";
+import { CloseCode } from "../../data/CloseCode";
+import { spawnFrameData } from "../../util/websocket-utils";
+import { DataFrameType } from "../../data/DataFrameType";
+import { DataFrame } from "../../data/DataFrame";
+import { WebsocketConnection } from "../WebsocketConnection";
 
 export class KeepAliveManager {
 
@@ -22,9 +22,9 @@ export class KeepAliveManager {
     }
 
     private start(): void {
-        const {connection, handleIncomingMessage, stop, sendPing, pingTimeout} = this;
+        const { connection, handleIncomingMessage, stop, sendPing, pingTimeout } = this;
         connection.onData(data => handleIncomingMessage(data));
-        connection.onStateChange(({state}) => {
+        connection.onStateChange(({ state }) => {
             if (state >= ConnectionState.Closing) {
                 stop();
             }
@@ -45,17 +45,17 @@ export class KeepAliveManager {
     };
 
     private sendPing = async (): Promise<void> => {
-        const {connection, pingTimeout, handleLostConnection} = this;
+        const { connection, pingTimeout, handleLostConnection } = this;
 
         const payload = crypto.randomBytes(4);
-        this.pingInProgress = {id: payload.toString("hex"), time: Date.now()};
+        this.pingInProgress = { id: payload.toString("hex"), time: Date.now() };
         console.log('>> ping', this.pingInProgress);
-        await connection.sendDataFrame(spawnFrameData(DataFrameType.Ping, {payload}));
+        await connection.sendDataFrame(spawnFrameData(DataFrameType.Ping, { payload }));
         this.connectivityErrorTimoutId = setTimeout(handleLostConnection, pingTimeout);
     };
 
-    private readonly handleIncomingMessage = ({type, payload}: DataFrame): void => {
-        const {pingInProgress, sendPing, pingTimeout} = this;
+    private readonly handleIncomingMessage = ({ type, payload }: DataFrame): void => {
+        const { pingInProgress, sendPing, pingTimeout } = this;
         if (type === DataFrameType.Pong && payload && payload.length > 0) {
             const pingId = payload.toString("hex");
             if (pingId === pingInProgress?.id) {

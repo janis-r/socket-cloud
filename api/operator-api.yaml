@@ -1,0 +1,138 @@
+openapi: 3.0.1
+info:
+  title: Operator API
+  description: Data API implemented by Operator in order to provide validation for data context actions.
+  contact:
+    name: Jānis Radiņš
+    email: jr@janisradins.com
+  version: 1.0.0
+tags:
+  - name: Validation request
+    description: Validation calls executed from Platform to Operator in order to get validation of some action.
+  - name: Information
+    description: Informative calls invoked to supply backwards data channel that would allow Operator to keep track of its data context.
+  - name: Connection
+    description: Opeartions related to client connection state.
+paths:
+  /connection/:
+    put:
+      summary: Connection hanshake request executed before it's added to connection pool.
+      tags:
+        - Validation request
+        - Information
+        - Connection
+      requestBody:
+        required: true
+        description: All the data known about connection prior to handshake finish.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConnectionData"
+      responses:
+        200:
+          $ref: "#/components/responses/ConnectionValidated"
+        405:
+          $ref: "#/components/responses/ActionProhibited"
+
+    post:
+      summary: Connection authorization success notification.
+      tags:
+        - Information
+        - Connection
+      requestBody:
+        required: true
+        description: All the data known about connection and external id, if present, received from connection valiation call.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EstablishedConnectionData"
+      responses:
+        200:
+          description: No problem!
+
+  /connection/{connectionId}/:
+    delete:
+      summary: Informative call to identify that some connection, within operator scope, has been dropped.
+      tags:
+        - Information
+        - Connection
+      parameters:
+        - in: path
+          name: connectionId
+          description: Internal identifier of a connection.
+          required: true
+          schema:
+            type:
+              string
+      responses:
+        200:
+          description: No problem!
+
+components:
+  schemas:
+    ConnectionData:
+      description: Connection data - evenrything that is known about connection before handshake is actually finished.
+      type: object
+      properties:
+        connectionId:
+          type: string
+          description: Internal identifier of a connection.
+        remoteAddress:
+          type: string
+          description: Remote address of a connection.
+        forwardedFor:
+          type: array
+          description: List of hosts described in x-forwarded-for header to identify originating IP address of a client connection.
+          items:
+            type: string
+        ipAddress:
+          type: string
+          description: IP address of a connection - either remote address or value from forwardedFor, if it's present.
+        host:
+          type: string
+          description: Host name client is connected to.
+        url:
+          type: string
+          description: Exact client connection URL
+        origin:
+          type: string
+          description: Origin of connection declared via headers.
+      required:
+        - connectionId
+        - remoteAddress
+        - ipAddress
+        - host
+        - url
+
+    EstablishedConnectionData:
+      description: Connection origin data with data entries attached to it within handshake.
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/ConnectionData"
+        - type: object
+          properties:
+            externalId:
+              description: External id assigned to connection by Operator, if any.
+              type: string
+
+  responses:
+    ConnectionValidated:
+      description: Success response to new connection validation request indicating that connection handshake can be carried on.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              externalId:
+                description: External id to be assigned to connection so it can be referenced via Operator to Platform API calls.
+                type: string
+
+    ActionProhibited:
+      description: Action is not allowed due to reasons explained within error message.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string

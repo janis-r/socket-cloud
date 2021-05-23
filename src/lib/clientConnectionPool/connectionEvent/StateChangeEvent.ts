@@ -1,6 +1,6 @@
-import {Event} from "quiver-framework";
-import {ClientConnection} from "../model/ClientConnection";
-import {ConnectionState} from "..";
+import { Event } from "quiver-framework";
+import { ClientConnection } from "../model/ClientConnection";
+import { ConnectionState } from "../data/ConnectionState";
 
 export class StateChangeEvent extends Event<ConnectionState> {
     static readonly TYPE = "state-change";

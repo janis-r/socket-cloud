@@ -1,6 +1,7 @@
-import {Command, Inject} from "quiver-framework";
-import {IpcMessageEvent, WorkerMessengerProvider} from "../../../ipcMessanger";
-import {WorkerManager} from "../../../workerManager";
+import { Command, Inject } from "quiver-framework";
+import { IpcMessageEvent } from "../../../ipcMessenger/event/IpcMessageEvent";
+import { WorkerMessengerProvider } from "../../../ipcMessenger/service/WorkerMessengerProvider";
+import { WorkerManager } from "../../../workerManager/service/WorkerManager";
 
 export class ForwardConfigurationContextMessageToNodes implements Command {
 
@@ -13,11 +14,11 @@ export class ForwardConfigurationContextMessageToNodes implements Command {
 
     execute(): void {
         const {
-            event: {message, workerId},
-            workerManager: {workerIds},
-            messengerProvider: {getMessenger}
+            event: { message, workerId },
+            workerManager: { workerIds },
+            messengerProvider: { getMessenger }
         } = this;
-        workerIds.filter(id => id !== workerId).map(id => getMessenger(id)).forEach(({send}) => send(message));
+        workerIds.filter(id => id !== workerId).map(id => getMessenger(id)).forEach(({ send }) => send(message));
     }
 }
 

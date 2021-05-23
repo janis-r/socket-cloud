@@ -1,7 +1,9 @@
-import {Command, EventDispatcher, Inject} from "quiver-framework";
-import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
-import {IpcMessage, IpcMessageEvent, ipcMessageUtil, IpcMessenger} from "../../ipcMessanger";
-import {DataSyncMessage, DataSyncMessageType, dataSyncMessageUtil} from "../data/ipc/DataSyncMessage";
+import { Command, EventDispatcher, Inject } from "quiver-framework";
+import { OutgoingMessageEvent } from "../event/OutgoingMessageEvent";
+import { IpcMessage, ipcMessageUtil } from "../../ipcMessenger/data/IpcMessage";
+import { IpcMessageEvent } from "../../ipcMessenger/event/IpcMessageEvent";
+import { IpcMessenger } from "../../ipcMessenger/service/IpcMessenger";
+import { DataSyncMessage, DataSyncMessageType, dataSyncMessageUtil } from "../data/ipc/DataSyncMessage";
 
 export class HandleForwardedMessage implements Command {
 
@@ -13,13 +15,13 @@ export class HandleForwardedMessage implements Command {
     private readonly messenger: IpcMessenger;
 
     async execute(): Promise<void> {
-        const {eventDispatcher, event: {message}, messenger: {send}} = this;
+        const { eventDispatcher, event: { message }, messenger: { send } } = this;
 
         if (!ipcMessageUtil.validate(message)) {
             throw new Error('Invalid IPC message');
         }
 
-        const {payload} = message;
+        const { payload } = message;
         if (!dataSyncMessageUtil.validate(payload)) {
             throw new Error('Invalid IPC data sync message');
         }

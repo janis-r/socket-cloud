@@ -1,13 +1,12 @@
-import {Event} from "quiver-framework";
-import {ContextId} from "../../configurationContext";
-import {ExternalId} from "../../clientConnectionPool";
-import {PushToClientMessage} from "../data/serverMessage/PushToClientMessage";
+import { Event } from "quiver-framework";
+import { ContextId } from "../../configurationContext/data/ContextId";
+import { PushToClientMessage } from "../data/serverMessage/PushToClientMessage";
 
 export class OutgoingMessageEvent extends Event {
     static readonly TYPE = Symbol("outgoing-message");
 
-    static serialize({contextId, message, externalIds}: OutgoingMessageEvent): ConstructorParameters<typeof OutgoingMessageEvent> {
-        return [contextId, message, externalIds];
+    static serialize({ contextId, message }: OutgoingMessageEvent): ConstructorParameters<typeof OutgoingMessageEvent> {
+        return [contextId, message];
     }
 
     static unserialize(params: ConstructorParameters<typeof OutgoingMessageEvent>): OutgoingMessageEvent {
@@ -19,9 +18,7 @@ export class OutgoingMessageEvent extends Event {
 
     private _isForwarded = false;
 
-    constructor(readonly contextId: ContextId,
-                readonly message: PushToClientMessage,
-                readonly externalIds?: ExternalId[]) {
+    constructor(readonly contextId: ContextId, readonly message: PushToClientMessage) {
         super(OutgoingMessageEvent.TYPE);
     }
 

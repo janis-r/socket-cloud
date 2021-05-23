@@ -1,7 +1,9 @@
-import {Command, Event, Inject} from "quiver-framework";
-import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
-import {MessageType, SubscribeMessage, UnsubscribeMessage} from "../data";
-import {ClientConnection} from "../../clientConnectionPool";
+import { Command, Event, Inject } from "quiver-framework";
+import { DataContextManagerProvider } from "../service/DataContextManagerProvider";
+import { MessageType } from "../data/MessageType";
+import { SubscribeMessage } from "../data/clientMessage/SubscribeMessage";
+import { UnsubscribeMessage } from "../data/clientMessage/UnsubscribeMessage";
+import { ClientConnection } from "../../clientConnectionPool/model/ClientConnection";
 
 export class UpdateClientSubscriptions implements Command {
 
@@ -15,11 +17,11 @@ export class UpdateClientSubscriptions implements Command {
             event: {
                 data: {
                     connection,
-                    connection: {context: {id: contextId}},
+                    connection: { context: { id: contextId } },
                     message
                 },
             },
-            dataContextManagerProvider: {getContextManager}
+            dataContextManagerProvider: { getContextManager }
         } = this;
 
         const contextManager = await getContextManager(contextId);

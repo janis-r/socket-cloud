@@ -1,5 +1,5 @@
-import {WebsocketExtensionConfig} from "../../websocketExtension";
-import {PermessageDeflateParam} from "./PermessageDeflateParam";
+import { WebsocketExtensionConfig } from "../../websocketExtension/config/WebsocketExtensionConfig";
+import { PermessageDeflateParam } from "./PermessageDeflateParam";
 
 export type PermessageDeflateExtensionConfig = Omit<WebsocketExtensionConfig, "values"> & {
     values: {

@@ -1,7 +1,9 @@
-import {Event, EventDispatcher, EventListener, EventMapping} from "quiver-framework";
-import {ClientConnection} from "../../clientConnectionPool";
-import {ErrorEvent, MessageEvent, StateChangeEvent} from "../../clientConnectionPool/connectionEvent";
-import {DataFrame} from "../../websocketConnection";
+import { Event, EventDispatcher, EventListener, EventMapping } from "quiver-framework";
+import { ClientConnection } from "../../clientConnectionPool/model/ClientConnection";
+import { ErrorEvent } from "../../clientConnectionPool/connectionEvent/ErrorEvent";
+import { MessageEvent } from "../../clientConnectionPool/connectionEvent/MessageEvent";
+import { StateChangeEvent } from "../../clientConnectionPool/connectionEvent/StateChangeEvent";
+import { DataFrame } from "../../websocketConnection/data/DataFrame";
 
 type ClientConnectionBroadcastingNature = Pick<ClientConnection, "addEventListener" | "removeEventListener" | "removeAllEventListeners">;
 

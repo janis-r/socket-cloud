@@ -1,6 +1,6 @@
 // describe("Data inflate/deflate utils", async () => {
 //
-import {getDeflator, getInflator} from "./indeflate-utils";
+import { getDeflator, getInflator } from "./indeflate-utils";
 
 describe('Data inflate/deflate', () => {
 

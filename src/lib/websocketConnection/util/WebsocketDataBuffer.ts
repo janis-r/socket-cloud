@@ -1,4 +1,4 @@
-import {DataFrame} from "../data/DataFrame";
+import { DataFrame } from "../data/DataFrame";
 import {
     applyXorMask,
     decomposeHeader,
@@ -7,8 +7,9 @@ import {
     read64BitPayloadLength
 } from "./websocket-utils";
 import chalk from "chalk";
-import {CallbackCollection} from "../../utils/CallbackCollection";
-import {debug} from "..";
+import { CallbackCollection } from "../../utils/CallbackCollection";
+import { debug } from "../model/WebsocketConnection";
+
 
 /**
  * Utility class to buffer up websocket data until they make up full data frame.
@@ -68,7 +69,7 @@ export class WebsocketDataBuffer {
             // Return empty buffer of required length if this instance is destroyed
             return Buffer.alloc(bytes);
         }
-        const {chunks} = this;
+        const { chunks } = this;
 
         const output = Buffer.alloc(bytes);
         let bytesWritten = 0;
@@ -102,8 +103,8 @@ export class WebsocketDataBuffer {
     };
 
     private async processNextFrame(): Promise<void> {
-        const {read, dataCallback: {execute: dispatchFrame}} = this;
-        const {type, isFinal, rsv1, rsv2, rsv3, masked, payloadLength} = decomposeHeader(await read(2));
+        const { read, dataCallback: { execute: dispatchFrame } } = this;
+        const { type, isFinal, rsv1, rsv2, rsv3, masked, payloadLength } = decomposeHeader(await read(2));
 
         let extendedPayloadLength: number;
         if (payloadLength === 126) {
@@ -119,7 +120,7 @@ export class WebsocketDataBuffer {
             return;
         }
 
-        dispatchFrame({type, isFinal, rsv1, rsv2, rsv3, payload, masked});
+        dispatchFrame({ type, isFinal, rsv1, rsv2, rsv3, payload, masked });
         this.processNextFrame();
     }
 }

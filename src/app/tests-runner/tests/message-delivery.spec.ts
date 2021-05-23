@@ -1,4 +1,4 @@
-import {MessageType} from "../../../lib/defaultProtocol/data";
+import {MessageType} from "../../../lib/defaultProtocol/data/MessageType";
 import {
     connections,
     createConnections,

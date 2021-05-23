@@ -1,7 +1,7 @@
-import {valueBelongsToEnum} from "ugd10a";
-import {MessageType} from "../MessageType";
-import {PushToClientMessage, pushToClientUtil} from "./PushToClientMessage";
-import {RestoreChannelsResponseMessage, restoreResponseUtil} from "./RestoreChannelsResponseMessage";
+import { valueBelongsToEnum } from "ugd10a";
+import { MessageType } from "../MessageType";
+import { PushToClientMessage, pushToClientUtil } from "./PushToClientMessage";
+import { RestoreChannelsResponseMessage, restoreResponseUtil } from "./RestoreChannelsResponseMessage";
 
 export type ServerMessage = PushToClientMessage | RestoreChannelsResponseMessage;
 
@@ -24,12 +24,12 @@ export const deserializeServerMessage = (value: string): ServerMessage | null =>
     try {
         rawData = JSON.parse(value);
     } catch (e) {
-        console.log(`Error while deserialize ServerMessage`, {value, e});
+        console.log(`Error while deserialize ServerMessage`, { value, e });  // TODO: Log to error log instead
         return null;
     }
 
     if (!Array.isArray(rawData) || !rawData.length || !valueBelongsToEnum(MessageType, rawData[0])) {
-        console.log(`Error while deserialize ServerMessage 2 `, rawData);
+        console.log(`Error while deserialize ServerMessage 2 `, rawData); // TODO: Log to error log instead
         return null;
     }
 

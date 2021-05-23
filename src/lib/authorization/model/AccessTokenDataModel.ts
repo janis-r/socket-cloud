@@ -1,6 +1,6 @@
-import {TokenData} from "../data/TokenData";
-import {ContextId} from "../../configurationContext/data/ContextId";
-import {AccessConfiguration} from "../data/AccessConfiguration";
+import { TokenData } from "../data/TokenData";
+import { ContextId } from "../../configurationContext/data/ContextId";
+import { AccessConfiguration } from "../data/AccessConfiguration";
 
 /**
  * Data model that abstracts retrieval and saving of access token configuration into external storage,

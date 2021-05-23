@@ -1,6 +1,7 @@
-import {MessageType} from "../MessageType";
-import {MessageValidator} from "../../util/MessageValidator";
-import {CacheFilter, cacheFilterUtil} from "../cache/CacheFilter";
+import { MessageType } from "../MessageType";
+import { MessageValidator } from "../../util/MessageValidator";
+import { CacheFilter, cacheFilterUtil } from "../cache/CacheFilter";
+import { ChannelId, isChannelId } from "../ChannelId";
 
 export type RestoreChannelsRequestMessage = {
     type: MessageType.RestoreRequest,
@@ -8,12 +9,13 @@ export type RestoreChannelsRequestMessage = {
 }
 
 export type RestoreTarget = {
-    channel: string,
+    channel: ChannelId,
     filter?: CacheFilter
 }
 const restoreTargetUtil = new MessageValidator<RestoreTarget>([
-    {field: "channel", type: "string"},
-    {field: "filter", optional: true, type: "object",
+    { field: "channel", type: "string", validator: isChannelId },
+    {
+        field: "filter", optional: true, type: "object",
         validator: cacheFilterUtil.validate,
         itemSerializer: cacheFilterUtil.serialize,
         itemDeserializer: cacheFilterUtil.deserialize,
@@ -21,7 +23,7 @@ const restoreTargetUtil = new MessageValidator<RestoreTarget>([
 ]);
 
 export const restoreRequestUtil = new MessageValidator<RestoreChannelsRequestMessage>([
-    {field: "type", exactValue: MessageType.RestoreRequest},
+    { field: "type", exactValue: MessageType.RestoreRequest },
     {
         field: "channels",
         type: "array",

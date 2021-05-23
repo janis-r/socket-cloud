@@ -1,8 +1,9 @@
-import {Module, Optional} from "quiver-framework"
-import {httpServerModule, HttpServerService} from "../httpServer";
+import { Module, Optional } from "quiver-framework"
+import { httpServerModule } from "../httpServer/httpServerModule";
+import { HttpServerService } from "../httpServer/service/HttpServerService";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
-import {SwaggerApiConfig} from "./config/SwaggerApiConfig";
+import { SwaggerApiConfig } from "./config/SwaggerApiConfig";
 
 @Module({
     requires: [
@@ -10,15 +11,15 @@ import {SwaggerApiConfig} from "./config/SwaggerApiConfig";
     ]
 })
 export class SwaggerApiDisplayModule {
-    constructor(@Optional() config: SwaggerApiConfig, {expressApp}: HttpServerService) {
+    constructor(@Optional() config: SwaggerApiConfig, { expressApp }: HttpServerService) {
         if (!config) {
             return;
         }
 
-        const {basePath, docs} = config;
+        const { basePath, docs } = config;
         expressApp.use(`/${basePath}`, swaggerUi.serve);
 
-        docs.forEach(({name, configFile}) => {
+        docs.forEach(({ name, configFile }) => {
             const swaggerDocument = configFile.match(/\.yaml$/i) ? YAML.load(configFile) : require(configFile);
             expressApp.get(
                 `/${basePath}/${name}`,
@@ -42,7 +43,7 @@ export class SwaggerApiDisplayModule {
                 </style>
             </head>
             <body>
-                ${docs.map(({name}) => `<a href='${name}'>${name}</a>`).join('<br />')}
+                ${docs.map(({ name }) => `<a href='${name}'>${name}</a>`).join('<br />')}
             </body>
         </html>
         `));

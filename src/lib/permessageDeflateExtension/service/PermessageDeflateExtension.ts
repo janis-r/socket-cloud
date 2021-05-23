@@ -1,10 +1,12 @@
-import {Inject} from "quiver-framework";
-import {valueBelongsToEnum} from "ugd10a";
-import {PermessageDeflateConfig} from "../config/PermessageDeflateConfig";
-import {WebsocketExtension, WebsocketExtensionAgent, WebsocketExtensionConfig} from "../../websocketExtension";
-import {PermessageDeflateParam} from "../data/PermessageDeflateParam";
-import {PermessageDeflateAgent} from "./PermessageDeflateAgent";
-import {PermessageDeflateExtensionConfig} from "../data/PermessageDeflateExtensionConfig";
+import { Inject } from "quiver-framework";
+import { valueBelongsToEnum } from "ugd10a";
+import { PermessageDeflateConfig } from "../config/PermessageDeflateConfig";
+import { WebsocketExtension } from "../../websocketExtension/service/WebsocketExtension";
+import { WebsocketExtensionAgent } from "../../websocketExtension/service/WebsocketExtensionAgent";
+import { WebsocketExtensionConfig } from "../../websocketExtension/config/WebsocketExtensionConfig";
+import { PermessageDeflateParam } from "../data/PermessageDeflateParam";
+import { PermessageDeflateAgent } from "./PermessageDeflateAgent";
+import { PermessageDeflateExtensionConfig } from "../data/PermessageDeflateExtensionConfig";
 import * as zlib from "zlib";
 
 export class PermessageDeflateExtension implements WebsocketExtension {
@@ -19,9 +21,9 @@ export class PermessageDeflateExtension implements WebsocketExtension {
             throw new Error(`Empty configs provided to permessage-deflate extension`);
         }
 
-        const {constants: {Z_DEFAULT_WINDOWBITS}} = zlib;
+        const { constants: { Z_DEFAULT_WINDOWBITS } } = zlib;
 
-        const {configuration} = this;
+        const { configuration } = this;
         const permessageDeflateExtensionConfigs = configs.map(config => {
             const validatedConfig = validateConfiguration(config);
             if (!validatedConfig) {
@@ -35,7 +37,7 @@ export class PermessageDeflateExtension implements WebsocketExtension {
          */
         const acceptableConfig = permessageDeflateExtensionConfigs[0];
 
-        const {values: clientConfigOffer} = acceptableConfig;
+        const { values: clientConfigOffer } = acceptableConfig;
         const configOfferResponseValues: PermessageDeflateExtensionConfig['values'] = {};
 
         // Missing client_max_window_bits key indicate that client is not supporting this property, so it will be left
@@ -92,7 +94,7 @@ const validateConfiguration = (config: WebsocketExtensionConfig): PermessageDefl
     const keys = Object.keys(config.values);
     const keyIsSet = key => keys.includes(key);
     const getValue = key => config.values[key];
-    const {ClientMaxWindowBits, ServerMaxWindowBits, ClientNoContextTakeover, ServerNoContextTakeover} = PermessageDeflateParam;
+    const { ClientMaxWindowBits, ServerMaxWindowBits, ClientNoContextTakeover, ServerNoContextTakeover } = PermessageDeflateParam;
     console.log(config);
 
     const configValues: PermessageDeflateExtensionConfig['values'] = {};
@@ -135,5 +137,5 @@ const validateConfiguration = (config: WebsocketExtensionConfig): PermessageDefl
         }
     }
 
-    return {...config, values: configValues};
+    return { ...config, values: configValues };
 };

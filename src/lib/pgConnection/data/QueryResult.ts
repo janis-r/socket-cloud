@@ -1,3 +1,3 @@
-import {QueryResult as PgQueryResult} from "pg";
+import { QueryResult as PgQueryResult } from "pg";
 
 export type QueryResult<T = any> = Omit<PgQueryResult, "rows"> & { rows: T[] };

@@ -1,7 +1,7 @@
-import {InjectionConfig, ModuleConfig} from "quiver-framework";
-import {Logger} from "./service/Logger";
-import {LoggerImpl} from "./impl/LoggerImpl";
-import {LoggerConfig} from "./data/LoggerConfig";
+import { InjectionConfig, ModuleConfig } from "quiver-framework";
+import { Logger } from "./service/Logger";
+import { LoggerImpl } from "./impl/LoggerImpl";
+import { LoggerConfig } from "./data/LoggerConfig";
 
 export const loggerModule: ModuleConfig = {
     mappings: [
@@ -13,15 +13,15 @@ export const loggerModule: ModuleConfig = {
                 logFileMode: "one-file-per-level"
             }
         } as InjectionConfig<LoggerConfig>,
-        {map: Logger, useType: LoggerImpl},
+        { map: Logger, useType: LoggerImpl },
     ],
     setup: injector => {
-        const {error} = injector.get(Logger);
+        const { error } = injector.get(Logger);
         // Subscribe for system errors, if we're in node.js environment
         if (!!process?.versions?.node) {
             process.on(
                 "uncaughtException",
-                ({message, stack}) => {
+                ({ message, stack }) => {
                     error(`uncaughtException: message: ${message}\nstack: ${stack}`);
                     console.log(">> exit");
                     process.exit();

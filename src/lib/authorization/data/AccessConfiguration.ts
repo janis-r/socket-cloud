@@ -1,5 +1,5 @@
-import {Validator} from "ugd10a/validator";
-import {AccessRights, accessRightsValidator} from "./AccessRights";
+import { Validator } from "ugd10a/validator";
+import { AccessRights, accessRightsValidator } from "./AccessRights";
 
 export type AccessConfiguration = {
     accessRights?: AccessRights,
