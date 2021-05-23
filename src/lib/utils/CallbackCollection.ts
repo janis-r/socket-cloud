@@ -11,9 +11,9 @@ export class CallbackCollection<T> {
      * @param callback
      */
     readonly add = (callback: CallbackFunction<T>): CallbackManager<T> => {
-        const {callbacks} = this;
+        const { callbacks } = this;
         if (callbacks.has(callback)) {
-            return {success: false};
+            return { success: false };
         }
 
         const callbackProps: CallbackProperties<T> = {};
@@ -22,16 +22,16 @@ export class CallbackCollection<T> {
         const onComplete = (callback: OnCompleteCallback) => callbackProps.onComplete = callback;
         const times = (count: number) => {
             callbackProps.executionLimit = count;
-            return {onComplete};
+            return { onComplete };
         };
         const once = () => times(1);
         const twice = () => times(2);
         const guard = (func: GuardFunction<T>) => {
             callbackProps.guard = func;
-            return {once, twice, times};
+            return { once, twice, times };
         };
 
-        return {success: true, guard, once, twice, times};
+        return { success: true, guard, once, twice, times };
     };
     /**
      * Check if collection has registered callback
@@ -43,7 +43,7 @@ export class CallbackCollection<T> {
      * @param callback
      */
     readonly remove = (callback: CallbackFunction<T>): boolean => {
-        const {callbacks} = this;
+        const { callbacks } = this;
         if (callbacks.has(callback)) {
             callbacks.delete(callback);
             return true;
@@ -68,8 +68,8 @@ export class CallbackCollection<T> {
         if (callback) {
             return this.add(callback);
         }
-        const {has, remove, clear} = this;
-        return {has, remove, clear};
+        const { has, remove, clear } = this;
+        return { has, remove, clear };
     }
 
     /**
@@ -77,7 +77,7 @@ export class CallbackCollection<T> {
      * @param data
      */
     readonly execute = (data: T): number => {
-        const {callbacks} = this;
+        const { callbacks } = this;
         let executed = 0;
         for (const [callback, properties] of callbacks) {
             if (properties.guard && !properties.guard(data)) {
@@ -141,6 +141,6 @@ export type CallbackManager<T> = {
     guard?: (func: GuardFunction<T>) => Pick<CallbackManager<T>, "once" | "twice" | "times">;
 };
 
-type AddCallback<T> =  (callback: CallbackFunction<T>) => CallbackManager<T>;
+type AddCallback<T> = (callback: CallbackFunction<T>) => CallbackManager<T>;
 type ManageCallbacks<T> = () => Pick<CallbackCollection<T>, "has" | "remove" | "clear">;
-export type Callback<T> =  AddCallback<T> | ManageCallbacks<T>;
+export type Callback<T> = AddCallback<T> | ManageCallbacks<T>;

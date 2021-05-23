@@ -1,6 +1,6 @@
-import {MessageType} from "../MessageType";
-import {MessageValidator} from "../../util/MessageValidator";
-import {CachedMessage, cachedMessageUtil} from "../cache/CachedMessage";
+import { MessageType } from "../MessageType";
+import { MessageValidator } from "../../util/MessageValidator";
+import { CachedMessage, cachedMessageUtil } from "../cache/CachedMessage";
 
 export type RestoreChannelsResponseMessage = {
     type: MessageType.RestoreResponse,
@@ -8,7 +8,7 @@ export type RestoreChannelsResponseMessage = {
 }
 
 export const restoreResponseUtil = new MessageValidator<RestoreChannelsResponseMessage>([
-    {field: "type", exactValue: MessageType.RestoreResponse},
+    { field: "type", exactValue: MessageType.RestoreResponse },
     {
         field: "payload",
         type: "array",

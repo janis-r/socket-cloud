@@ -1,5 +1,5 @@
-import {ConfigurationContext} from "../../configurationContext/data/ConfigurationContext";
-import {TokenData} from "./TokenData";
+import { ConfigurationContext } from "../../configurationContext/data/ConfigurationContext";
+import { TokenData } from "./TokenData";
 
 /**
  * Access token data reshaped into format most suitable for public use

@@ -1,7 +1,7 @@
-import {AsyncValidationEvent} from "quiver-framework";
-import {ConfigurationContext} from "../../configurationContext/data/ConfigurationContext";
-import {SocketDescriptor} from "../data/SocketDescriptor";
-import {OperatorHandshakeResponse} from "../data/OperatorHandshakeResponse";
+import { AsyncValidationEvent } from "quiver-framework";
+import { ConfigurationContext } from "../../configurationContext/data/ConfigurationContext";
+import { SocketDescriptor } from "../data/SocketDescriptor";
+import { OperatorHandshakeResponse } from "../data/OperatorHandshakeResponse";
 
 /**
  * Event notification dispatched as new socket connection is encountered and before it is ready to be added to

@@ -11,10 +11,11 @@ export abstract class MessageManager {
      * @param origin String identifying message origin.
      * @param channels List of information channels this message is sent to, if any
      */
-    abstract registerMessage(contextId: ContextId,
-                             payload: string,
-                             origin: { connectionId: string } | { apiCallId: number | string },
-                             channels: string[]
+    abstract registerMessage(
+        contextId: ContextId,
+        payload: string,
+        origin: { connectionId: string } | { apiCallId: number | string },
+        channels: string[]
     ): Promise<string>;
 
     /**
@@ -24,7 +25,7 @@ export abstract class MessageManager {
      * @param filter
      */
     abstract getCachedMessages(contextId: ContextId, channelId: ChannelId, filter?: CacheFilter): Promise<Array<CachedMessage> | null>;
-    
+
     /**
      * Delete all messages within data channel
      * @param contextId 

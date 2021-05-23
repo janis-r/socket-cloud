@@ -1,12 +1,12 @@
-import {Injectable} from "quiver-framework";
-import {currentDateToObject} from "ugd10a";
+import { Injectable } from "quiver-framework";
+import { currentDateToObject } from "ugd10a";
 import * as fs from "fs";
-import chalk, {Chalk} from "chalk";
-import {createLogFileName} from "../util/createLogFileName";
-import {Logger} from "../service/Logger";
-import {LoggerConfig} from "../data/LoggerConfig";
-import {LoggerEntity} from "../data/LoggerEntity";
-import {LogLevel} from "../data/LogLevel";
+import chalk, { Chalk } from "chalk";
+import { createLogFileName } from "../util/createLogFileName";
+import { Logger } from "../service/Logger";
+import { LoggerConfig } from "../data/LoggerConfig";
+import { LoggerEntity } from "../data/LoggerEntity";
+import { LogLevel } from "../data/LogLevel";
 
 @Injectable()
 export class LoggerImpl extends Logger {
@@ -17,7 +17,7 @@ export class LoggerImpl extends Logger {
     private readonly logFileMode: LoggerConfig["logFileMode"];
     private readonly entities = new Map<string, LoggerEntity>();
 
-    constructor({logDir, logToConsole, logFileMode}: LoggerConfig) {
+    constructor({ logDir, logToConsole, logFileMode }: LoggerConfig) {
         super();
 
         this.logDir = logDir;
@@ -32,7 +32,7 @@ export class LoggerImpl extends Logger {
     spawnEntity(level: LogLevel, logTime?: boolean, format?: Chalk): LoggerEntity;
     spawnEntity(name: string, logTime?: boolean, format?: Chalk): LoggerEntity;
     spawnEntity(name: LogLevel | string, logTime = true, format?: Chalk): LoggerEntity {
-        const {entities, logToConsole} = this;
+        const { entities, logToConsole } = this;
         if (!entities.has(name)) {
             entities.set(
                 name,
@@ -57,7 +57,7 @@ export class LoggerImpl extends Logger {
     readonly console = (...message: any[]) => this.spawnEntity(LogLevel.Console).log(...message);
 
     protected prepareMessage(message: any[], logLevel: string, logTime: boolean, format: Chalk): void {
-        const {logToConsole, context} = this;
+        const { logToConsole, context } = this;
         if (context) {
             message.unshift(`(#${context})`);
         }
@@ -75,7 +75,7 @@ export class LoggerImpl extends Logger {
         if (!this.logDir) {
             return;
         }
-        const {getFilePath, logErrorHandler, logFileMode} = this;
+        const { getFilePath, logErrorHandler, logFileMode } = this;
 
         const unifiedMessage = message.map(entry => ["string", "number"].includes(typeof entry) ? entry : JSON.stringify(entry)).join(' ');
         const filePath = getFilePath(logFileMode === "one-file-per-level" ? logFileName : "log");
@@ -85,13 +85,13 @@ export class LoggerImpl extends Logger {
     }
 
     private readonly getFilePath = (type: string) => this.logDir + createLogFileName(type);
-    private readonly logErrorHandler = (file: string, {message = null}: { message: string }) => {
-        message && console.warn(`Could not write to log file: ${{file, message}}`);
+    private readonly logErrorHandler = (file: string, { message = null }: { message: string }) => {
+        message && console.warn(`Could not write to log file: ${{ file, message }}`);
     };
 }
 
 function getTimestamp(): string {
-    const {date, month, year, hours, minutes, seconds} = currentDateToObject();
+    const { date, month, year, hours, minutes, seconds } = currentDateToObject();
     const dateParts = [date, month, year].map(v => v.toString().padStart(2, '0'));
     const timeParts = [hours, minutes, seconds].map(v => v.toString().padStart(2, '0'));
     return `${dateParts.join("/")}-${timeParts.join(":")}`;

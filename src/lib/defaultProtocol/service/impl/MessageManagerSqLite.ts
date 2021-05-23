@@ -125,17 +125,17 @@ export class MessageManagerSqLite implements MessageManager {
         const messageIds = messages.map(({ messageId }) => messageId);
         if (!messageIds.length) {
             // Channel can be cached and exists but there are no messages in it to be deleted
-            return 0; 
+            return 0;
         }
 
         await run(
             `DELETE FROM messages WHERE id IN($messageIds)`,
-            {$messageIds: messageIds}
+            { $messageIds: messageIds }
         );
         // TODO: Not sure if sqlite would allow two queries with same inputs to be run within same call ...
         await run(
             `DELETE FROM message_recipients WHERE message_id IN($messageIds)`,
-            {$messageIds: messageIds}
+            { $messageIds: messageIds }
         );
 
         return messageIds.length;

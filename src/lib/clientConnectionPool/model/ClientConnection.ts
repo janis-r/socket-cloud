@@ -1,10 +1,10 @@
-import {EventListener, EventMapping} from "quiver-framework";
-import {ConnectionState} from "../data/ConnectionState";
-import {ConfigurationContext} from "../../configurationContext/data/ConfigurationContext";
-import {ErrorEvent} from "../connectionEvent/ErrorEvent";
-import {MessageEvent} from "../connectionEvent/MessageEvent";
-import {StateChangeEvent} from "../connectionEvent/StateChangeEvent";
-import {CloseReason} from "../data/CloseReason";
+import { EventListener, EventMapping } from "quiver-framework";
+import { ConnectionState } from "../data/ConnectionState";
+import { ConfigurationContext } from "../../configurationContext/data/ConfigurationContext";
+import { ErrorEvent } from "../connectionEvent/ErrorEvent";
+import { MessageEvent } from "../connectionEvent/MessageEvent";
+import { StateChangeEvent } from "../connectionEvent/StateChangeEvent";
+import { CloseReason } from "../data/CloseReason";
 
 export interface ClientConnection {
 

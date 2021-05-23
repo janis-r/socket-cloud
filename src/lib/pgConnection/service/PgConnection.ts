@@ -1,10 +1,10 @@
-import {Inject} from "quiver-framework";
-import {Timer} from "ugd10a";
-import {Logger} from "../../logger/service/Logger";
-import {Pool, PoolClient, PoolConfig, QueryConfig} from "pg";
-import {PgConfig} from "../data/PgConfig";
-import {Query} from "../data/Query";
-import {QueryResult} from "../data/QueryResult";
+import { Inject } from "quiver-framework";
+import { Timer } from "ugd10a";
+import { Logger } from "../../logger/service/Logger";
+import { Pool, PoolClient, PoolConfig, QueryConfig } from "pg";
+import { PgConfig } from "../data/PgConfig";
+import { Query } from "../data/Query";
+import { QueryResult } from "../data/QueryResult";
 
 /**
  * Postgres connection service
@@ -31,8 +31,8 @@ export class PgConnection {
         }
 
         this.initPromise = new Promise<boolean>(async resolve => {
-            const {config: {host, database, port, user, password}, logger: {error}} = this;
-            const partialConfig: PoolConfig = {host, database, port, user, password};
+            const { config: { host, database, port, user, password }, logger: { error } } = this;
+            const partialConfig: PoolConfig = { host, database, port, user, password };
 
             const time = new Timer();
             this.connection = new Pool(partialConfig);
@@ -80,8 +80,8 @@ export class PgConnection {
             throw new Error("DataBase query method invoked before DB is connected!");
         }
 
-        const {values, text} = queryConfig;
-        const {connection, logger: {error: logError, console: logToConsole, notice: logNotice}, config: {slowQueryThreshold}} = this;
+        const { values, text } = queryConfig;
+        const { connection, logger: { error: logError, console: logToConsole, notice: logNotice }, config: { slowQueryThreshold } } = this;
 
         const time = new Timer();
         const cleanQuery = text.replace(/\s+/g, ' ').replace(/^\s+/, '');
@@ -96,7 +96,7 @@ export class PgConnection {
                 logNotice(`[${queryId}] [SQL slow] Time: ${time.elapsed}ms, Query: ${cleanQuery}, Values: ${queryValues}`)
             }
             return result;
-        } catch ({message}) {
+        } catch ({ message }) {
             const errorMessage = message.match(/^.*$/)[0];
             logError(`[${queryId}] Could not execute query! Query: ${cleanQuery}, Values: ${queryValues}, Error: ${errorMessage}`);
         }

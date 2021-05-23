@@ -1,11 +1,11 @@
-import {Command, Inject} from "quiver-framework";
-import {IpcMessageEvent} from "../../../ipcMessenger/event/IpcMessageEvent";
-import {IpcMessenger} from "../../../ipcMessenger/service/IpcMessenger";
-import {ClientConnectionPool} from "../../../clientConnectionPool/model/ClientConnectionPool";
-import {DropConnectionApiIpcMessage} from "../data/ipc/DropConnectionApiIpcMessage";
-import {CloseReason} from "../../../clientConnectionPool/data/CloseReason";
-import {ConnectionState} from "../../../clientConnectionPool/data/ConnectionState";
-import {IpcMessage} from "../../../ipcMessenger/data/IpcMessage";
+import { Command, Inject } from "quiver-framework";
+import { IpcMessageEvent } from "../../../ipcMessenger/event/IpcMessageEvent";
+import { IpcMessenger } from "../../../ipcMessenger/service/IpcMessenger";
+import { ClientConnectionPool } from "../../../clientConnectionPool/model/ClientConnectionPool";
+import { DropConnectionApiIpcMessage } from "../data/ipc/DropConnectionApiIpcMessage";
+import { CloseReason } from "../../../clientConnectionPool/data/CloseReason";
+import { ConnectionState } from "../../../clientConnectionPool/data/ConnectionState";
+import { IpcMessage } from "../../../ipcMessenger/data/IpcMessage";
 
 /**
  * Handle forwarded drop connection IPC message
@@ -20,15 +20,19 @@ export class HandleForwardedDropConnectionIpcMessage implements Command {
     private readonly clientConnectionPool: ClientConnectionPool;
 
     execute(): Promise<void> | void {
-        const {event: {message}, messenger: {send}, clientConnectionPool: {getConnectionById}} = this;
-        const {payload, payload: {connectionId, reason}} = message;
+        const { event: { message }, messenger: { send }, clientConnectionPool: { getConnectionById } } = this;
+        const { payload, payload: { connectionId, reason } } = message;
 
         const connection = getConnectionById(connectionId);
-        if (connection && [ConnectionState.Connecting, ConnectionState.Open].includes(connection.state)) {
-            connection.close(CloseReason.NormalClosure, reason);
+        if (connection) {
+            if ([ConnectionState.Connecting, ConnectionState.Open].includes(connection.state)) {
+                connection.close(CloseReason.NormalClosure, reason);
+            }
+            // TODO: Might be good idea to send back something that indicate that connection was found
+            // but it's state required no action
             const response: IpcMessage<DropConnectionApiIpcMessage> = {
                 ...message,
-                payload: {...payload, success: true}
+                payload: { ...payload, success: true }
             }
             send(response);
         } else {

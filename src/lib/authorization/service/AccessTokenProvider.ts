@@ -1,7 +1,7 @@
-import {Inject} from "quiver-framework";
-import {TokenInfo} from "../data/TokenInfo";
-import {AccessTokenDataModel} from "../model/AccessTokenDataModel";
-import {ConfigurationContextProvider} from "../../configurationContext/service/ConfigurationContextProvider";
+import { Inject } from "quiver-framework";
+import { TokenInfo } from "../data/TokenInfo";
+import { AccessTokenDataModel } from "../model/AccessTokenDataModel";
+import { ConfigurationContextProvider } from "../../configurationContext/service/ConfigurationContextProvider";
 
 export class AccessTokenProvider {
 
@@ -17,8 +17,8 @@ export class AccessTokenProvider {
      */
     readonly validateToken = async (token: string): Promise<TokenInfo | null> => {
         const {
-            tokenDataModel: {getTokenData},
-            contextProvider: {getConfigurationContext}
+            tokenDataModel: { getTokenData },
+            contextProvider: { getConfigurationContext }
         } = this;
 
         const tokenData = await getTokenData(token);
@@ -31,8 +31,7 @@ export class AccessTokenProvider {
             return null;
         }
 
-        const {token: tid, contextId, ...tokenExport} = tokenData;
-        return {...tokenExport, context};
+        const { token: tid, contextId, ...tokenExport } = tokenData;
+        return { ...tokenExport, context };
     };
 }
-

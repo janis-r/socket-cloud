@@ -1,6 +1,6 @@
-import {ModuleConfig} from "quiver-framework";
-import {PublishingApiListener} from "./service/PublishingApiListener";
-import {apiHubModule} from "../apiHub/apiHubModule";
+import { ModuleConfig } from "quiver-framework";
+import { PublishingApiListener } from "./service/PublishingApiListener";
+import { apiHubModule } from "../apiHub/apiHubModule";
 
 
 export const publishingApiModule: ModuleConfig = {
@@ -8,6 +8,6 @@ export const publishingApiModule: ModuleConfig = {
         apiHubModule
     ],
     mappings: [
-        {map: PublishingApiListener, instantiate: true},
+        { map: PublishingApiListener, instantiate: true },
     ]
 }

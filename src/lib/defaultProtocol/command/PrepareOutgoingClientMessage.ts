@@ -1,10 +1,10 @@
-import {Command, Event, EventDispatcher, Inject} from "quiver-framework";
-import {MessageType} from "../data/MessageType";
-import {PushToServerMessage} from "../data/clientMessage/PushToServerMessage";
-import {ClientConnection} from "../../clientConnectionPool/model/ClientConnection";
-import {MessageManager} from "../service/MessageManager";
-import {OutgoingMessageEvent} from "../event/OutgoingMessageEvent";
-import {PushToClientMessage} from "../data/serverMessage/PushToClientMessage";
+import { Command, Event, EventDispatcher, Inject } from "quiver-framework";
+import { MessageType } from "../data/MessageType";
+import { PushToServerMessage } from "../data/clientMessage/PushToServerMessage";
+import { ClientConnection } from "../../clientConnectionPool/model/ClientConnection";
+import { MessageManager } from "../service/MessageManager";
+import { OutgoingMessageEvent } from "../event/OutgoingMessageEvent";
+import { PushToClientMessage } from "../data/serverMessage/PushToClientMessage";
 
 export class PrepareOutgoingClientMessage implements Command {
 
@@ -19,15 +19,15 @@ export class PrepareOutgoingClientMessage implements Command {
         const {
             event: {
                 data: {
-                    message: {channels, payload},
-                    connection: {id: connectionId, context: {id: contextId}}
+                    message: { channels, payload },
+                    connection: { id: connectionId, context: { id: contextId } }
                 }
             },
             messageManager,
             eventDispatcher
         } = this;
 
-        const messageId = await messageManager.registerMessage(contextId, payload, {connectionId}, channels);
+        const messageId = await messageManager.registerMessage(contextId, payload, { connectionId }, channels);
 
         const message: PushToClientMessage = {
             type: MessageType.PushToClient,

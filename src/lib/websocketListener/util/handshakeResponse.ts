@@ -1,4 +1,4 @@
-import {createHash} from "crypto";
+import { createHash } from "crypto";
 
 /**
  * Generate Websocket connection handshake response

@@ -1,4 +1,4 @@
-import {WebsocketExtensionConfig} from "../config/WebsocketExtensionConfig";
+import { WebsocketExtensionConfig } from "../config/WebsocketExtensionConfig";
 
 /**
  * Parse sec-websocket-extensions header value

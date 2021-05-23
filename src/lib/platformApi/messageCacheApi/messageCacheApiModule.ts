@@ -7,6 +7,6 @@ export const messageCacheApiModule: ModuleConfig = {
         apiHubModule
     ],
     mappings: [
-        {map: MessageCacheApiListener, instantiate: true}
+        { map: MessageCacheApiListener, instantiate: true }
     ]
 }

@@ -1,21 +1,21 @@
 import * as http from "http";
 import * as https from "https";
-import express, {Express, NextFunction, Request, Response} from "express";
+import express, { Express, NextFunction, Request, Response } from "express";
 import fs from "fs";
 import bodyParser from "body-parser";
 import compression from "compression";
-import {Socket} from "net";
-import {EventDispatcher, Injectable} from "quiver-framework";
-import {Logger} from "../../logger/service/Logger";
-import {HttpServerConfig} from "../config/HttpServerConfig";
-import {HttpConnectionUpgradeEvent} from "../event/HttpConnectionUpgradeEvent";
-import {UpgradeRequest} from "../data/UpgradeRequest";
-import {HttpRequestHandler} from "../data/HttpRequestHandler";
-import {HttpServerRouter} from "./HttpServerRouter";
-import {RequestContext} from "../data/RequestContext";
-import {Router} from "../data/Router";
-import {HttpMethod} from "../data/HttpMethod";
-import {isSingleRouter} from "../util/isSingleRouter";
+import { Socket } from "net";
+import { EventDispatcher, Injectable } from "quiver-framework";
+import { Logger } from "../../logger/service/Logger";
+import { HttpServerConfig } from "../config/HttpServerConfig";
+import { HttpConnectionUpgradeEvent } from "../event/HttpConnectionUpgradeEvent";
+import { UpgradeRequest } from "../data/UpgradeRequest";
+import { HttpRequestHandler } from "../data/HttpRequestHandler";
+import { HttpServerRouter } from "./HttpServerRouter";
+import { RequestContext } from "../data/RequestContext";
+import { Router } from "../data/Router";
+import { HttpMethod } from "../data/HttpMethod";
+import { isSingleRouter } from "../util/isSingleRouter";
 
 @Injectable()
 export class HttpServerService implements HttpServerRouter {
@@ -24,10 +24,10 @@ export class HttpServerService implements HttpServerRouter {
     private readonly server: http.Server | https.Server;
 
     constructor(private readonly config: HttpServerConfig,
-                private readonly logger: Logger,
-                private readonly eventDispatcher: EventDispatcher
+        private readonly logger: Logger,
+        private readonly eventDispatcher: EventDispatcher
     ) {
-        const {config: {port, httpsCredentials}} = this;
+        const { config: { port, httpsCredentials } } = this;
 
         this.expressApp = express();
         this.expressApp.use(bodyParser.json());
@@ -38,7 +38,7 @@ export class HttpServerService implements HttpServerRouter {
         } else {
             const key = fs.readFileSync(httpsCredentials.privateKey, "utf8");
             const cert = fs.readFileSync(httpsCredentials.certificate, "utf8");
-            this.server = https.createServer({key, cert}, this.expressApp);
+            this.server = https.createServer({ key, cert }, this.expressApp);
         }
 
         this.server.on("upgrade", this.upgradeListener);
@@ -84,7 +84,7 @@ export class HttpServerService implements HttpServerRouter {
         return this;
     }
 
-    private addRouter(path: string, {routes}: Router): void {
+    private addRouter(path: string, { routes }: Router): void {
         for (const [method, handlerMap] of routes) {
             for (const [handlerPath, handlers] of handlerMap) {
                 const mergedPath = `${path}${handlerPath.startsWith('/') ? '' : '/'}${handlerPath}`;
@@ -117,5 +117,5 @@ const requestContextFactory = (req: Request, res: Response, next: NextFunction) 
 
 const handlersToRequestContextFactory = (handlers: HttpRequestHandler[]) =>
     handlers.map(
-        handler => (req, res, next) => handler(requestContextFactory(req, res, next))
+        handler => (req: Request, res: Response, next: NextFunction) => handler(requestContextFactory(req, res, next))
     );

@@ -1,13 +1,13 @@
-import {Inject, MacroCommand, referenceToString, SubCommand} from "quiver-framework";
-import {isPromise} from "ugd10a/validator";
-import {WebsocketConnectionValidationRequest} from "../event/WebsocketConnectionValidationRequest";
-import {Logger} from "../../logger/service/Logger";
-import {AuthorizeConnectionContext} from "./microCommand/AuthorizeConnectionContext";
-import {ValidateConnectionHeaders} from "./microCommand/ValidateConnectionHeaders";
-import {WebsocketClientConnection} from "../model/WebsocketClientConnection";
-import {PrepareWebsocketExtensions} from "./microCommand/PrepareWebsocketExtensions";
-import {RespondToHandshake} from "./microCommand/RespondToHandshake";
-import {ClientConnectionPool} from "../../clientConnectionPool/model/ClientConnectionPool";
+import { Inject, MacroCommand, referenceToString, SubCommand } from "quiver-framework";
+import { isPromise } from "ugd10a/validator";
+import { WebsocketConnectionValidationRequest } from "../event/WebsocketConnectionValidationRequest";
+import { Logger } from "../../logger/service/Logger";
+import { AuthorizeConnectionContext } from "./microCommand/AuthorizeConnectionContext";
+import { ValidateConnectionHeaders } from "./microCommand/ValidateConnectionHeaders";
+import { WebsocketClientConnection } from "../model/WebsocketClientConnection";
+import { PrepareWebsocketExtensions } from "./microCommand/PrepareWebsocketExtensions";
+import { RespondToHandshake } from "./microCommand/RespondToHandshake";
+import { ClientConnectionPool } from "../../clientConnectionPool/model/ClientConnectionPool";
 
 export class ValidateNewWebsocket<T extends boolean> extends MacroCommand<T> {
 
@@ -27,10 +27,10 @@ export class ValidateNewWebsocket<T extends boolean> extends MacroCommand<T> {
 
         const {
             event: {
-                request: {socket},
+                request: { socket },
                 requestInfo, configurationContext, extensions, socketDescriptor, operatorData
             },
-            logger: {debug},
+            logger: { debug },
             clientConnectionPool
         } = this;
 
@@ -51,7 +51,7 @@ export class ValidateNewWebsocket<T extends boolean> extends MacroCommand<T> {
     }
 
     protected async executeSubCommand(command: SubCommand<T>): Promise<T> {
-        const {logger: {console}} = this;
+        const { logger: { console } } = this;
         const result = super.executeSubCommand(command);
 
         const value = isPromise(result) ? await result : result;
@@ -68,6 +68,3 @@ export class ValidateNewWebsocket<T extends boolean> extends MacroCommand<T> {
     }
 
 }
-
-
-

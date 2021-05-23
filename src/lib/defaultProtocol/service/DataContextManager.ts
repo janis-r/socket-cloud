@@ -1,10 +1,10 @@
-import {Inject} from "quiver-framework";
-import {CachingPolicy} from "../../configurationContext/data/CachingPolicy";
-import {ConfigurationContext} from "../../configurationContext/data/ConfigurationContext";
-import {ClientConnection} from "../../clientConnectionPool/model/ClientConnection";
-import {ChannelId} from "../data/ChannelId";
-import {Logger} from "../../logger/service/Logger";
-import {globalMessageChannel} from "../data/globalMessageChannel";
+import { Inject } from "quiver-framework";
+import { CachingPolicy } from "../../configurationContext/data/CachingPolicy";
+import { ConfigurationContext } from "../../configurationContext/data/ConfigurationContext";
+import { ClientConnection } from "../../clientConnectionPool/model/ClientConnection";
+import { ChannelId } from "../data/ChannelId";
+import { Logger } from "../../logger/service/Logger";
+import { globalMessageChannel } from "../data/globalMessageChannel";
 
 export class DataContextManager {
 
@@ -25,12 +25,12 @@ export class DataContextManager {
     }
 
     addConnection(connection: ClientConnection): void {
-        const {contextChannelsByConnection} = this;
+        const { contextChannelsByConnection } = this;
         contextChannelsByConnection.set(connection, new Set<ChannelId>());
     }
 
     removeConnection(connection: ClientConnection): void {
-        const {contextChannels, contextChannelsByConnection} = this;
+        const { contextChannels, contextChannelsByConnection } = this;
 
         contextChannelsByConnection.get(connection).forEach(channelId => {
             const collection = contextChannels.get(channelId);
@@ -44,7 +44,7 @@ export class DataContextManager {
     }
 
     subscribeToChannel(channels: ChannelId[], connection: ClientConnection): void {
-        const {contextChannels, contextChannelsByConnection} = this;
+        const { contextChannels, contextChannelsByConnection } = this;
         for (const channelId of channels) {
             if (!contextChannels.has(channelId)) {
                 contextChannels.set(channelId, new Set<ClientConnection>([connection]));
@@ -56,7 +56,7 @@ export class DataContextManager {
     }
 
     unsubscribeFromChannel(channels: ChannelId[], connection: ClientConnection): void {
-        const {logger, contextChannels, contextChannelsByConnection} = this;
+        const { logger, contextChannels, contextChannelsByConnection } = this;
         for (const channelId of channels) {
             if (!contextChannels.has(channelId)) {
                 logger.debug(`DataContextManager inconsistency - connection id ${connection.id} is not present in channel ${channelId}`);
@@ -82,7 +82,7 @@ export class DataContextManager {
     }
 
     getChannelConnections(channelId: ChannelId): ReadonlySet<ClientConnection> | null {
-        const {contextChannels, contextChannelsByConnection} = this;
+        const { contextChannels, contextChannelsByConnection } = this;
         if (channelId === globalMessageChannel) {
             return new Set(contextChannelsByConnection.keys());
         }

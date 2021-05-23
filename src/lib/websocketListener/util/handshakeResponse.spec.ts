@@ -1,4 +1,4 @@
-import {handshakeResponse} from "./handshakeResponse";
+import { handshakeResponse } from "./handshakeResponse";
 
 describe("websocket handshake", () => {
 

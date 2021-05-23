@@ -1,15 +1,15 @@
-import {Command, Inject} from "quiver-framework";
-import {Logger} from "../../logger/service/Logger";
+import { Command, Inject } from "quiver-framework";
+import { Logger } from "../../logger/service/Logger";
 import fetch from "node-fetch";
-import {HttpStatusCode} from "../../httpServer/data/HttpStatusCode";
-import {Json} from "../../types/Json";
+import { HttpStatusCode } from "../../httpServer/data/HttpStatusCode";
+import { Json } from "../../types/Json";
 import {
     ValidateSocketConnectionEvent,
     ValidationError
 } from "../../websocketListener/event/ValidateSocketConnectionEvent";
-import {ConnectionValidationError} from "../data/ConnectionValidationError";
-import {isOperatorHandshakeResponse} from "../../websocketListener/data/OperatorHandshakeResponse";
-import {ClientConnectionPool} from "../../clientConnectionPool/model/ClientConnectionPool";
+import { ConnectionValidationError } from "../data/ConnectionValidationError";
+import { isOperatorHandshakeResponse } from "../../websocketListener/data/OperatorHandshakeResponse";
+import { ClientConnectionPool } from "../../clientConnectionPool/model/ClientConnectionPool";
 
 export class ValidateNewConnection implements Command<void> {
     @Inject()
@@ -20,15 +20,15 @@ export class ValidateNewConnection implements Command<void> {
     private readonly connectionPool: ClientConnectionPool;
 
     async execute() {
-        const {event: {addValidator}} = this;
+        const { event: { addValidator } } = this;
         addValidator(this.validateConnectionCount);
         addValidator(this.validateWithExternalApi);
     }
 
     readonly validateConnectionCount = async (): Promise<true | ValidationError> => {
         const {
-            event: {context: {id: contextId, maxConnectionCount}},
-            connectionPool: {getConnectionsByContext}
+            event: { context: { id: contextId, maxConnectionCount } },
+            connectionPool: { getConnectionsByContext }
         } = this;
 
         if (!maxConnectionCount || getConnectionsByContext(contextId).size < maxConnectionCount) {
@@ -46,7 +46,7 @@ export class ValidateNewConnection implements Command<void> {
             logger,
             event, event: {
                 descriptor,
-                context: {operatorApi}
+                context: { operatorApi }
             }
         } = this;
 
@@ -63,11 +63,11 @@ export class ValidateNewConnection implements Command<void> {
             body: JSON.stringify(descriptor)
         });
 
-        const {status} = request;
+        const { status } = request;
         if (status !== HttpStatusCode.Ok) {
             logger.error(`ConfigurationContextProvider wrong status:${status} while validating new connection`, JSON.stringify({
-                request: {descriptor},
-                response: {status, data: await request.text()}
+                request: { descriptor },
+                response: { status, data: await request.text() }
             }, null, ' '));
             return {
                 error: ConnectionValidationError.ApiConnectionError,

@@ -1,5 +1,5 @@
-import {Validator} from "ugd10a/validator";
-import {AccessRightsConstant, accessRightsConstantValidator} from "./AccessRightsConstant";
+import { Validator } from "ugd10a/validator";
+import { AccessRightsConstant, accessRightsConstantValidator } from "./AccessRightsConstant";
 
 export type AccessRights = AccessRightsConstant | {
     messages?: {
@@ -21,19 +21,19 @@ const accessPermissionsValidator = new Validator<AccessRightsList>({
         type: "object",
         optional: true,
         validator: new Validator<AccessRightsList["messages"]>({
-            postToIndividual: {type: "boolean", optional: true},
-            postToChannel: {type: "boolean", optional: true},
-            postMultiChannel: {type: "boolean", optional: true},
-            requestChannelCacheStats: {type: "boolean", optional: true},
-            clearChannelCache: {type: "boolean", optional: true},
+            postToIndividual: { type: "boolean", optional: true },
+            postToChannel: { type: "boolean", optional: true },
+            postMultiChannel: { type: "boolean", optional: true },
+            requestChannelCacheStats: { type: "boolean", optional: true },
+            clearChannelCache: { type: "boolean", optional: true },
         })
     },
     connection: {
         type: "object",
         optional: true,
         validator: new Validator<AccessRightsList["connection"]>({
-            retrieveStatus: {type: "boolean", optional: true},
-            drop: {type: "boolean", optional: true}
+            retrieveStatus: { type: "boolean", optional: true },
+            drop: { type: "boolean", optional: true }
         })
     }
 });

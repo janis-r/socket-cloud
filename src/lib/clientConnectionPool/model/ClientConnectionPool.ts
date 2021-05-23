@@ -1,14 +1,14 @@
-import {ClientConnection} from "./ClientConnection";
-import {ConnectionRemovedEvent} from "../event/ConnectionRemovedEvent";
-import {ConnectionState} from "../data/ConnectionState";
-import {ExternalId} from "../data/ExternalId";
-import {NewConnectionEvent} from "../event/NewConnectionEvent";
-import {EventDispatcher, Injectable} from "quiver-framework";
-import {ClientMessageEvent} from "../event/ClientMessageEvent";
-import {ConnectionId} from "../data/ConnectionId";
-import {ContextId} from "../../configurationContext/data/ContextId";
-import {Logger} from "../../logger/service/Logger";
-import {LoggerEntity} from "../../logger/data/LoggerEntity";
+import { ClientConnection } from "./ClientConnection";
+import { ConnectionRemovedEvent } from "../event/ConnectionRemovedEvent";
+import { ConnectionState } from "../data/ConnectionState";
+import { ExternalId } from "../data/ExternalId";
+import { NewConnectionEvent } from "../event/NewConnectionEvent";
+import { EventDispatcher, Injectable } from "quiver-framework";
+import { ClientMessageEvent } from "../event/ClientMessageEvent";
+import { ConnectionId } from "../data/ConnectionId";
+import { ContextId } from "../../configurationContext/data/ContextId";
+import { Logger } from "../../logger/service/Logger";
+import { LoggerEntity } from "../../logger/data/LoggerEntity";
 
 @Injectable()
 export class ClientConnectionPool {
@@ -24,21 +24,21 @@ export class ClientConnectionPool {
     }
 
     registerConnection(connection: ClientConnection): void {
-        const {eventDispatcher, byConnectionId, byContextAndExternalId, byContextId, log} = this;
-        const {id: connectionId, externalId, context: {id: contextId}, remoteAddress} = connection;
+        const { eventDispatcher, byConnectionId, byContextAndExternalId, byContextId, log } = this;
+        const { id: connectionId, externalId, context: { id: contextId }, remoteAddress } = connection;
 
-        log(`New connection: #${byConnectionId.size}`, {contextId, connectionId, externalId, remoteAddress});
+        log(`New connection: #${byConnectionId.size}`, { contextId, connectionId, externalId, remoteAddress });
 
         connection.addEventListener("error",
-            ({data}) => log('Connection error:', {connectionId, data}),
+            ({ data }) => log('Connection error:', { connectionId, data }),
             this
         );
-        connection.addEventListener("state-change", ({connection}) => this.removeConnection(connection), this)
-            .withGuards(({connection: {state}}) => state >= ConnectionState.Closing)
+        connection.addEventListener("state-change", ({ connection }) => this.removeConnection(connection), this)
+            .withGuards(({ connection: { state } }) => state >= ConnectionState.Closing)
             .once();
 
         connection.addEventListener("message",
-            ({connection, message}) => eventDispatcher.dispatchEvent(
+            ({ connection, message }) => eventDispatcher.dispatchEvent(
                 new ClientMessageEvent(connection, message)
             ),
             this
@@ -81,7 +81,7 @@ export class ClientConnectionPool {
     readonly getConnectionsByContext = (contextId: ContextId) => this.byContextId.get(contextId) || new Set([]);
 
     readonly getConnectionsByContextAndExternalId = (contextId: ContextId, externalId: ExternalId): Array<ClientConnection> => {
-        const {byContextAndExternalId} = this;
+        const { byContextAndExternalId } = this;
         if (!byContextAndExternalId.has(contextId)) {
             return [];
         }
@@ -94,9 +94,9 @@ export class ClientConnectionPool {
     };
 
     private removeConnection(connection: ClientConnection): void {
-        const {byConnectionId, byContextId, byContextAndExternalId, eventDispatcher, log} = this;
-        const {id: connectionId, externalId, context: {id: contextId}, remoteAddress} = connection;
-        log(`Remove connection: #${byConnectionId.size}`, {contextId, connectionId, externalId, remoteAddress});
+        const { byConnectionId, byContextId, byContextAndExternalId, eventDispatcher, log } = this;
+        const { id: connectionId, externalId, context: { id: contextId }, remoteAddress } = connection;
+        log(`Remove connection: #${byConnectionId.size}`, { contextId, connectionId, externalId, remoteAddress });
 
         connection.removeAllEventListeners(this);
 

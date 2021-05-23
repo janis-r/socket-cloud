@@ -1,6 +1,6 @@
-import {NextFunction, Request, Response} from "express";
-import {Json} from "../../types/Json";
-import {StringParser} from "../util/StringParser";
+import { NextFunction, Request, Response } from "express";
+import { Json } from "../../types/Json";
+import { StringParser } from "../util/StringParser";
 
 /**
  * @template L Data type of local data passed along the middleware
@@ -11,9 +11,10 @@ export class RequestContext<L = any> {
     private _fulfilled = false;
     private _ipAddress: string;
 
-    constructor(readonly request: Request,
-                readonly response: Response,
-                readonly next: NextFunction) {
+    constructor(
+        readonly request: Request,
+        readonly response: Response,
+        readonly next: NextFunction) {
 
     }
 
@@ -114,16 +115,16 @@ export class RequestContext<L = any> {
      */
     readonly sendFile = (path: string, params?: ResponseParams) => this.sendResponse("file", path, params);
 
-    private sendResponse(type: "json", data: Json, params: ResponseParams);
-    private sendResponse(type: "html" | "text" | "file", data: string, params: ResponseParams);
+    private sendResponse(type: "json", data: Json, params: ResponseParams): void;
+    private sendResponse(type: "html" | "text" | "file", data: string, params: ResponseParams): void;
     private sendResponse(type: "html" | "text" | "file" | "json", data: string | Json, params: ResponseParams): void {
         if (this._fulfilled) {
             throw new Error('Request is already fulfilled');
         }
 
-        const {response} = this;
+        const { response } = this;
         if (params) {
-            const {ttl, status, header} = params;
+            const { ttl, status, header } = params;
             if (ttl) {
                 response.header("Cache-Control", `max-age=${ttl}`);
             }

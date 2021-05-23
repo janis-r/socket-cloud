@@ -1,5 +1,5 @@
-import {WebsocketExtensionConfig} from "../config/WebsocketExtensionConfig";
-import {WebsocketExtensionAgent} from "./WebsocketExtensionAgent";
+import { WebsocketExtensionConfig } from "../config/WebsocketExtensionConfig";
+import { WebsocketExtensionAgent } from "./WebsocketExtensionAgent";
 
 export interface WebsocketExtension {
     /**

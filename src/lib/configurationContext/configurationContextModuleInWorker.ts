@@ -1,11 +1,11 @@
-import {ModuleConfig} from "quiver-framework";
-import {configurationContextModule} from "./configurationContextModule";
-import {DeleteConfigurationContextEvent} from "./event/DeleteConfigurationContextEvent";
-import {UpdateConfigurationContextEvent} from "./event/UpdateConfigurationContextEvent";
-import {ForwardConfigurationContextMessageToMaster} from "./command/ipc/ForwardConfigurationContextMessageToMaster";
-import {IpcMessageEvent} from "../ipcMessenger/event/IpcMessageEvent";
-import {configurationContextIpcScope} from "./data/ipc/configurationContextIpcScope";
-import {ForwardConfigurationContextMessageWithinWorker} from "./command/ipc/ForwardConfigurationContextMessageWithinWorker";
+import { ModuleConfig } from "quiver-framework";
+import { configurationContextModule } from "./configurationContextModule";
+import { DeleteConfigurationContextEvent } from "./event/DeleteConfigurationContextEvent";
+import { UpdateConfigurationContextEvent } from "./event/UpdateConfigurationContextEvent";
+import { ForwardConfigurationContextMessageToMaster } from "./command/ipc/ForwardConfigurationContextMessageToMaster";
+import { IpcMessageEvent } from "../ipcMessenger/event/IpcMessageEvent";
+import { configurationContextIpcScope } from "./data/ipc/configurationContextIpcScope";
+import { ForwardConfigurationContextMessageWithinWorker } from "./command/ipc/ForwardConfigurationContextMessageWithinWorker";
 
 export const configurationContextModuleInWorker: ModuleConfig = {
     requires: [
@@ -15,17 +15,17 @@ export const configurationContextModuleInWorker: ModuleConfig = {
         {
             event: DeleteConfigurationContextEvent.TYPE,
             command: ForwardConfigurationContextMessageToMaster,
-            guard: ({isForwarded}: DeleteConfigurationContextEvent) => !isForwarded
+            guard: ({ isForwarded }: DeleteConfigurationContextEvent) => !isForwarded
         },
         {
             event: UpdateConfigurationContextEvent.TYPE,
             command: ForwardConfigurationContextMessageToMaster,
-            guard: ({isForwarded}: UpdateConfigurationContextEvent) => !isForwarded
+            guard: ({ isForwarded }: UpdateConfigurationContextEvent) => !isForwarded
         },
         {
             event: IpcMessageEvent.TYPE,
             command: ForwardConfigurationContextMessageWithinWorker,
-            guard: ({message: {scope}}: IpcMessageEvent) => scope === configurationContextIpcScope
+            guard: ({ message: { scope } }: IpcMessageEvent) => scope === configurationContextIpcScope
         }
     ]
 };

@@ -1,13 +1,13 @@
-import {InjectionConfig, Injector, Module} from "quiver-framework";
-import {websocketListenerModule} from "../../lib/websocketListener/WebsocketListenerModule";
-import {ConfigurationContextProvider} from "../../lib/configurationContext/service/ConfigurationContextProvider";
-import {SocketDescriptor} from "../../lib/websocketListener/data/SocketDescriptor";
-import {PermessageDeflateConfig} from "../../lib/permessageDeflateExtension/config/PermessageDeflateConfig";
-import {PermessageDeflateExtensionModule} from "../../lib/permessageDeflateExtension/PermessageDeflateExtensionModule";
-import {ClientMessageEvent} from "../../lib/clientConnectionPool/event/ClientMessageEvent";
-import {EchoMessageCommand} from "./EchoMessageCommand";
-import {HttpServerConfig} from "../../lib/httpServer/config/HttpServerConfig";
-import {HttpServerRouter} from "../../lib/httpServer/service/HttpServerRouter";
+import { InjectionConfig, Module } from "quiver-framework";
+import { ClientMessageEvent } from "../../lib/clientConnectionPool/event/ClientMessageEvent";
+import { ConfigurationContextProvider } from "../../lib/configurationContext/service/ConfigurationContextProvider";
+import { HttpServerConfig } from "../../lib/httpServer/config/HttpServerConfig";
+import { HttpServerRouter } from "../../lib/httpServer/service/HttpServerRouter";
+import { PermessageDeflateConfig } from "../../lib/permessageDeflateExtension/config/PermessageDeflateConfig";
+import { PermessageDeflateExtensionModule } from "../../lib/permessageDeflateExtension/PermessageDeflateExtensionModule";
+import { SocketDescriptor } from "../../lib/websocketListener/data/SocketDescriptor";
+import { websocketListenerModule } from "../../lib/websocketListener/WebsocketListenerModule";
+import { EchoMessageCommand } from "./EchoMessageCommand";
 
 @Module({
     requires: [

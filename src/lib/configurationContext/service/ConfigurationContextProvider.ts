@@ -1,7 +1,7 @@
-import {Inject} from "quiver-framework";
-import {ConfigurationContext} from "../data/ConfigurationContext";
-import {ContextId} from "../data/ContextId";
-import {ConfigurationContextModel} from "../model/ConfigurationContextModel";
+import { Inject } from "quiver-framework";
+import { ConfigurationContext } from "../data/ConfigurationContext";
+import { ContextId } from "../data/ContextId";
+import { ConfigurationContextModel } from "../model/ConfigurationContextModel";
 
 /**
  * App level goto place for configuration context data.
@@ -19,7 +19,7 @@ export class ConfigurationContextProvider {
      * Get configuration context by context id
      */
     readonly getConfigurationContext = async (id: ContextId): Promise<ConfigurationContext | null> => {
-        const {contextCache, contextModel} = this;
+        const { contextCache, contextModel } = this;
         if (contextCache.has(id)) {
             return contextCache.get(id);
         }

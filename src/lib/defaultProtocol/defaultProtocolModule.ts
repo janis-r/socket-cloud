@@ -1,28 +1,28 @@
-import {Event, ModuleConfig} from "quiver-framework";
-import {ClientConnection} from "../clientConnectionPool/model/ClientConnection";
-import {clientConnectionPoolModule} from "../clientConnectionPool/clientConnectionPoolModule";
-import {ClientMessageEvent} from "../clientConnectionPool/event/ClientMessageEvent";
-import {ConnectionRemovedEvent} from "../clientConnectionPool/event/ConnectionRemovedEvent";
-import {NewConnectionEvent} from "../clientConnectionPool/event/NewConnectionEvent";
-import {configurationContextModule} from "../configurationContext/configurationContextModule";
-import {HandleNewConnection} from "./command/HandleNewConnection";
-import {HandleClientMessage} from "./command/HandleClientMessage";
-import {HandleRemovedConnection} from "./command/HandleRemovedConnection";
-import {defaultProtocolId} from "./data/defaultProtocolId";
-import {httpServerModule} from "../httpServer/httpServerModule";
-import {DataContextManagerProvider} from "./service/DataContextManagerProvider";
-import {IncomingClientMessageEvent} from "./event/IncomingClientMessageEvent";
-import {MessageType} from "./data/MessageType";
-import {UpdateClientSubscriptions} from "./command/UpdateClientSubscriptions";
-import {PrepareOutgoingClientMessage} from "./command/PrepareOutgoingClientMessage";
-import {OutgoingMessageEvent} from "./event/OutgoingMessageEvent";
-import {BroadcastOutgoingMessage} from "./command/BroadcastOutgoingMessage";
-import {RestoreClientSubscription} from "./command/RestoreClientSubscription";
-import {MessageManager} from "./service/MessageManager";
-import {authorizationModule} from "../authorization/authorizationModule";
-import {MessageManagerSqLite} from "./service/impl/MessageManagerSqLite";
+import { Event, ModuleConfig } from "quiver-framework";
+import { ClientConnection } from "../clientConnectionPool/model/ClientConnection";
+import { clientConnectionPoolModule } from "../clientConnectionPool/clientConnectionPoolModule";
+import { ClientMessageEvent } from "../clientConnectionPool/event/ClientMessageEvent";
+import { ConnectionRemovedEvent } from "../clientConnectionPool/event/ConnectionRemovedEvent";
+import { NewConnectionEvent } from "../clientConnectionPool/event/NewConnectionEvent";
+import { configurationContextModule } from "../configurationContext/configurationContextModule";
+import { HandleNewConnection } from "./command/HandleNewConnection";
+import { HandleClientMessage } from "./command/HandleClientMessage";
+import { HandleRemovedConnection } from "./command/HandleRemovedConnection";
+import { defaultProtocolId } from "./data/defaultProtocolId";
+import { httpServerModule } from "../httpServer/httpServerModule";
+import { DataContextManagerProvider } from "./service/DataContextManagerProvider";
+import { IncomingClientMessageEvent } from "./event/IncomingClientMessageEvent";
+import { MessageType } from "./data/MessageType";
+import { UpdateClientSubscriptions } from "./command/UpdateClientSubscriptions";
+import { PrepareOutgoingClientMessage } from "./command/PrepareOutgoingClientMessage";
+import { OutgoingMessageEvent } from "./event/OutgoingMessageEvent";
+import { BroadcastOutgoingMessage } from "./command/BroadcastOutgoingMessage";
+import { RestoreClientSubscription } from "./command/RestoreClientSubscription";
+import { MessageManager } from "./service/MessageManager";
+import { authorizationModule } from "../authorization/authorizationModule";
+import { MessageManagerSqLite } from "./service/impl/MessageManagerSqLite";
 
-const defaultProtocolGuard = ({data: {context: {protocol}}}: Event<ClientConnection>) => protocol === defaultProtocolId;
+const defaultProtocolGuard = ({ data: { context: { protocol } } }: Event<ClientConnection>) => protocol === defaultProtocolId;
 
 export const defaultProtocolModule: ModuleConfig = {
     requires: [
@@ -33,16 +33,16 @@ export const defaultProtocolModule: ModuleConfig = {
     ],
     mappings: [
         DataContextManagerProvider,
-        {map: MessageManager, useType: MessageManagerSqLite}
+        { map: MessageManager, useType: MessageManagerSqLite }
     ],
     commands: [
-        {event: NewConnectionEvent.TYPE, command: HandleNewConnection, guard: defaultProtocolGuard},
-        {event: ConnectionRemovedEvent.TYPE, command: HandleRemovedConnection, guard: defaultProtocolGuard},
-        {event: ClientMessageEvent.TYPE, command: HandleClientMessage, guard: defaultProtocolGuard},
+        { event: NewConnectionEvent.TYPE, command: HandleNewConnection, guard: defaultProtocolGuard },
+        { event: ConnectionRemovedEvent.TYPE, command: HandleRemovedConnection, guard: defaultProtocolGuard },
+        { event: ClientMessageEvent.TYPE, command: HandleClientMessage, guard: defaultProtocolGuard },
         {
             event: IncomingClientMessageEvent.TYPE,
             command: UpdateClientSubscriptions,
-            guard: ({message: {type}}: IncomingClientMessageEvent) => [
+            guard: ({ message: { type } }: IncomingClientMessageEvent) => [
                 MessageType.Subscribe,
                 MessageType.Unsubscribe
             ].includes(type)
@@ -50,14 +50,14 @@ export const defaultProtocolModule: ModuleConfig = {
         {
             event: IncomingClientMessageEvent.TYPE,
             command: PrepareOutgoingClientMessage,
-            guard: ({message: {type}}: IncomingClientMessageEvent) => type === MessageType.PushToServer
+            guard: ({ message: { type } }: IncomingClientMessageEvent) => type === MessageType.PushToServer
         },
         {
             event: IncomingClientMessageEvent.TYPE,
             command: RestoreClientSubscription,
-            guard: ({message: {type}}: IncomingClientMessageEvent) => type === MessageType.RestoreRequest
+            guard: ({ message: { type } }: IncomingClientMessageEvent) => type === MessageType.RestoreRequest
         },
-        {event: OutgoingMessageEvent.TYPE, command: BroadcastOutgoingMessage}
+        { event: OutgoingMessageEvent.TYPE, command: BroadcastOutgoingMessage }
     ]
 };
 

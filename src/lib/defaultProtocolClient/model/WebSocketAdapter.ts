@@ -1,7 +1,7 @@
-import {CloseCode} from "../../websocketConnection/data/CloseCode";
-import {ConnectionState} from "../../clientConnectionPool/data/ConnectionState";
-import {CallbackCollection} from "../../utils/CallbackCollection";
-import {Adapter} from "../data/Adapter";
+import { CloseCode } from "../../websocketConnection/data/CloseCode";
+import { ConnectionState } from "../../clientConnectionPool/data/ConnectionState";
+import { CallbackCollection } from "../../utils/CallbackCollection";
+import { Adapter } from "../data/Adapter";
 
 export class WebSocketAdapter implements Adapter {
 
@@ -15,9 +15,9 @@ export class WebSocketAdapter implements Adapter {
     constructor(url: string) {
         this.socket = new WebSocket(url);
         this.socket.onopen = () => this.onOpenCallback.execute();
-        this.socket.onmessage = ({data}) => this.onMessageCallback.execute(data);
+        this.socket.onmessage = ({ data }) => this.onMessageCallback.execute(data);
         this.socket.onerror = event => this.onErrorCallback.execute(event.toString());
-        this.socket.onclose = ({code, reason}) => this.onCloseCallback.execute({code, reason});
+        this.socket.onclose = ({ code, reason }) => this.onCloseCallback.execute({ code, reason });
     }
 
     readonly onOpen = this.onOpenCallback.manage;

@@ -1,10 +1,10 @@
-import {Command, Inject} from "quiver-framework";
-import {IpcMessageEvent} from "../../../ipcMessenger/event/IpcMessageEvent";
-import {IpcMessenger} from "../../../ipcMessenger/service/IpcMessenger";
-import {GetConnectionStatusApiIpcMessage} from "../data/ipc/GetConnectionStatusApiIpcMessage";
-import {ClientConnectionPool} from "../../../clientConnectionPool/model/ClientConnectionPool";
-import {connectionToConnectionStatus} from "../util/connectionToConnectionStatus";
-import {IpcMessage} from "../../../ipcMessenger/data/IpcMessage";
+import { Command, Inject } from "quiver-framework";
+import { IpcMessageEvent } from "../../../ipcMessenger/event/IpcMessageEvent";
+import { IpcMessenger } from "../../../ipcMessenger/service/IpcMessenger";
+import { GetConnectionStatusApiIpcMessage } from "../data/ipc/GetConnectionStatusApiIpcMessage";
+import { ClientConnectionPool } from "../../../clientConnectionPool/model/ClientConnectionPool";
+import { connectionToConnectionStatus } from "../util/connectionToConnectionStatus";
+import { IpcMessage } from "../../../ipcMessenger/data/IpcMessage";
 
 /**
  * Handle external request for client connection status forwarded to worker process from master.
@@ -19,8 +19,8 @@ export class HandleForwardedGetStatusIpcMessage implements Command {
     private readonly clientConnectionPool: ClientConnectionPool;
 
     execute(): Promise<void> | void {
-        const {event: {message}, messenger: {send}, clientConnectionPool: {getConnectionById}} = this;
-        const {payload, payload: {connectionId}} = message;
+        const { event: { message }, messenger: { send }, clientConnectionPool: { getConnectionById } } = this;
+        const { payload, payload: { connectionId } } = message;
 
         const connection = getConnectionById(connectionId);
         if (!connection) {
@@ -30,7 +30,7 @@ export class HandleForwardedGetStatusIpcMessage implements Command {
             // Otherwise respond with connection status found within this node
             const response: IpcMessage<GetConnectionStatusApiIpcMessage> = {
                 ...message,
-                payload: {...payload, status: connectionToConnectionStatus(connection)}
+                payload: { ...payload, status: connectionToConnectionStatus(connection) }
             };
             send(response);
         }

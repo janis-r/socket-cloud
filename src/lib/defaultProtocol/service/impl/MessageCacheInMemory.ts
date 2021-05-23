@@ -1,9 +1,9 @@
-import {Inject} from "quiver-framework";
-import {ChannelId} from "../../data/ChannelId";
-import {CachedMessage} from "../../data/cache/CachedMessage";
-import {MessageManager} from "../MessageManager";
-import {CacheFilter} from "../../data/cache/CacheFilter";
-import {ChannelMessageCache} from "../../util/ChannelMessageCache";
+import { Inject } from "quiver-framework";
+import { ChannelId } from "../../data/ChannelId";
+import { CachedMessage } from "../../data/cache/CachedMessage";
+import { MessageManager } from "../MessageManager";
+import { CacheFilter } from "../../data/cache/CacheFilter";
+import { ChannelMessageCache } from "../../util/ChannelMessageCache";
 
 /**
  * In memory implementation of message cache service - it should not be in use for a production env.

@@ -1,6 +1,6 @@
-import cluster, {Worker} from "cluster";
-import {cpus} from 'os';
-import {CallbackCollection} from "../../utils/CallbackCollection";
+import cluster, { Worker } from "cluster";
+import { cpus } from 'os';
+import { CallbackCollection } from "../../utils/CallbackCollection";
 
 export class WorkerManager {
 
@@ -16,8 +16,8 @@ export class WorkerManager {
         this.maxWorkers = cpus().length;
         console.log(`Starting worker manager on ${this.maxWorkers}/${cpus().length} CPUs`);
         cluster.on("exit", (worker, code, signal) => {
-            this.onWorkerExitCallback.execute({worker, code, signal});
-            console.log(`worker ${worker.id} died ${{code, signal}}`);
+            this.onWorkerExitCallback.execute({ worker, code, signal });
+            console.log(`worker ${worker.id} died ${{ code, signal }}`);
             // TODO: Should we respawn worker here or this could be due to some serious problem which will be only reiterated on respawn?
         });
 
@@ -25,7 +25,7 @@ export class WorkerManager {
     }
 
     private spawnWorkers(): void {
-        const {maxWorkers} = this;
+        const { maxWorkers } = this;
         let startedWorkers = 0;
         while (Object.keys(cluster.workers).length < maxWorkers) {
             const worker = cluster.fork();

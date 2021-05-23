@@ -1,8 +1,8 @@
-import {Inject} from "quiver-framework";
-import {Logger} from "../../logger/service/Logger";
-import {WebsocketExtension} from "./WebsocketExtension";
-import {parseWebsocketExtensionOffers} from "../util/parse-websocket-extension-offers";
-import {WebsocketExtensionAgent} from "./WebsocketExtensionAgent";
+import { Inject } from "quiver-framework";
+import { Logger } from "../../logger/service/Logger";
+import { WebsocketExtension } from "./WebsocketExtension";
+import { parseWebsocketExtensionOffers } from "../util/parse-websocket-extension-offers";
+import { WebsocketExtensionAgent } from "./WebsocketExtensionAgent";
 
 export class WebsocketExtensionRegistry {
 
@@ -28,7 +28,7 @@ export class WebsocketExtensionRegistry {
      * @param configOffers
      */
     getExtensionAgentsForConfiguration(configOffers: string): WebsocketExtensionAgent[] {
-        const {knownExtensions} = this;
+        const { knownExtensions } = this;
         const configurationOffers = parseWebsocketExtensionOffers(configOffers);
         const agents: WebsocketExtensionAgent[] = [];
         if (configurationOffers.size === 0) {

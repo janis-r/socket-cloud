@@ -1,5 +1,5 @@
-import {LogLevel} from "../data/LogLevel";
-import {LoggerEntity} from "../data/LoggerEntity";
+import { LogLevel } from "../data/LogLevel";
+import { LoggerEntity } from "../data/LoggerEntity";
 
 /**
  * System wide logging service

@@ -1,27 +1,27 @@
-import {Socket} from "net";
-import {ExecutionQueue} from "ugd10a";
-import {isPromise} from "ugd10a/validator";
-import {composeWebsocketFrame, fragmentWebsocketFrame} from "../../util/websocket-utils";
-import {DataFrame} from "../../data/DataFrame";
-import {WebsocketExtensionAgent} from "../../../websocketExtension/service/WebsocketExtensionAgent";
-import {debug} from "../WebsocketConnection";
+import { Socket } from "net";
+import { ExecutionQueue } from "ugd10a";
+import { isPromise } from "ugd10a/validator";
+import { composeWebsocketFrame, fragmentWebsocketFrame } from "../../util/websocket-utils";
+import { DataFrame } from "../../data/DataFrame";
+import { WebsocketExtensionAgent } from "../../../websocketExtension/service/WebsocketExtensionAgent";
+import { debug } from "../WebsocketConnection";
 
 export class OutgoingMessageBuffer {
 
     private readonly queue = new ExecutionQueue();
 
     constructor(private readonly socket: Socket,
-                private readonly extensions: Array<WebsocketExtensionAgent>,
-                private readonly fragmentSize: number) {
+        private readonly extensions: Array<WebsocketExtensionAgent>,
+        private readonly fragmentSize: number) {
     }
 
     async write(data: DataFrame): Promise<void> {
-        const {queue: {enqueue}} = this;
+        const { queue: { enqueue } } = this;
         await enqueue(async () => this.sendData(await this.prepareDataFrame(data)));
     }
 
     private async sendData(dataFrames: DataFrame[]): Promise<void> {
-        const {socket} = this;
+        const { socket } = this;
         for (const frame of dataFrames) {
             if (!socket.writable) {
                 console.log('Skipping some frames as socket.writable eq false');
@@ -47,7 +47,7 @@ export class OutgoingMessageBuffer {
     }
 
     private async extendOutgoingData(data: DataFrame): Promise<DataFrame> {
-        const {extensions} = this;
+        const { extensions } = this;
         if (!extensions || extensions.length === 0) {
             return data;
         }

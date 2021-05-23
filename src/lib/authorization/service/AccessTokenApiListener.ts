@@ -1,26 +1,26 @@
-import {Injectable} from "quiver-framework";
-import {HttpServerRouter} from "../../httpServer/service/HttpServerRouter";
-import {HttpRequestHandler} from "../../httpServer/data/HttpRequestHandler";
-import {HttpStatusCode} from "../../httpServer/data/HttpStatusCode";
-import {AccessTokenProvider} from "./AccessTokenProvider";
-import {AccessTokenDataModel} from "../model/AccessTokenDataModel";
-import {tokenMatchRegexp} from "../data/tokenMatchRegexp";
-import {contextIdMatchRegexp} from "../../configurationContext/data/contextIdMatchRegexp";
-import {AccessTokenApiConfig} from "../config/AccessTokenApiConfig";
-import {accessConfigurationValidator} from "../data/AccessConfiguration";
-import {ConfigurationContextProvider} from "../../configurationContext/service/ConfigurationContextProvider";
-import {authTokenErrorResponseParams, authTokenHeaderName} from "../data/auth-credentials";
+import { Injectable } from "quiver-framework";
+import { HttpServerRouter } from "../../httpServer/service/HttpServerRouter";
+import { HttpRequestHandler } from "../../httpServer/data/HttpRequestHandler";
+import { HttpStatusCode } from "../../httpServer/data/HttpStatusCode";
+import { AccessTokenProvider } from "./AccessTokenProvider";
+import { AccessTokenDataModel } from "../model/AccessTokenDataModel";
+import { tokenMatchRegexp } from "../data/tokenMatchRegexp";
+import { contextIdMatchRegexp } from "../../configurationContext/data/contextIdMatchRegexp";
+import { AccessTokenApiConfig } from "../config/AccessTokenApiConfig";
+import { accessConfigurationValidator } from "../data/AccessConfiguration";
+import { ConfigurationContextProvider } from "../../configurationContext/service/ConfigurationContextProvider";
+import { authTokenErrorResponseParams, authTokenHeaderName } from "../data/auth-credentials";
 
 @Injectable()
 export class AccessTokenApiListener {
     static readonly servicePath = "api/access-token";
 
     constructor(httpRouter: HttpServerRouter,
-                private readonly config: AccessTokenApiConfig,
-                private readonly tokenProvider: AccessTokenProvider,
-                private readonly tokenDataModel: AccessTokenDataModel,
-                private readonly contextProvider: ConfigurationContextProvider) {
-        const {servicePath: path} = AccessTokenApiListener;
+        private readonly config: AccessTokenApiConfig,
+        private readonly tokenProvider: AccessTokenProvider,
+        private readonly tokenDataModel: AccessTokenDataModel,
+        private readonly contextProvider: ConfigurationContextProvider) {
+        const { servicePath: path } = AccessTokenApiListener;
 
         const contextIdParam = `:contextId(${contextIdMatchRegexp})`;
         const tokenParam = `:token(${tokenMatchRegexp})`;
@@ -31,8 +31,8 @@ export class AccessTokenApiListener {
         httpRouter.delete(`/${path}/${contextIdParam}/${tokenParam}`, this.deleteToken);
     }
 
-    private readonly validateRequestHeaders: HttpRequestHandler = async ({sendText, header, next}) => {
-        const {config: {apiKey}} = this;
+    private readonly validateRequestHeaders: HttpRequestHandler = async ({ sendText, header, next }) => {
+        const { config: { apiKey } } = this;
         const requestKey = header(authTokenHeaderName);
 
         if (!requestKey) {
@@ -45,9 +45,9 @@ export class AccessTokenApiListener {
         }
     };
 
-    private readonly createAccessConfiguration: HttpRequestHandler = async ({param, body, sendJson, sendStatus}) => {
-        const {Ok, BadRequest} = HttpStatusCode;
-        const {contextProvider: {getConfigurationContext}, tokenDataModel: {createAccessEntry}} = this;
+    private readonly createAccessConfiguration: HttpRequestHandler = async ({ param, body, sendJson, sendStatus }) => {
+        const { Ok, BadRequest } = HttpStatusCode;
+        const { contextProvider: { getConfigurationContext }, tokenDataModel: { createAccessEntry } } = this;
 
         const contextId = param("contextId").asString();
         if (await getConfigurationContext(contextId) === null) {
@@ -62,28 +62,28 @@ export class AccessTokenApiListener {
         }
 
         if (!accessConfigurationValidator.validate(accessConfiguration)) {
-            sendJson(accessConfigurationValidator.lastError, {status: 400});
+            sendJson(accessConfigurationValidator.lastError, { status: 400 });
             return;
         }
 
         const token = await createAccessEntry(contextId, accessConfiguration);
         if (token) {
-            sendJson({token});
+            sendJson({ token });
         } else {
             sendStatus(BadRequest);
         }
     };
 
-    private readonly getTokensInfoByContext: HttpRequestHandler = async ({param, sendJson}) => {
-        const {tokenDataModel: {getTokensByContext}} = this;
+    private readonly getTokensInfoByContext: HttpRequestHandler = async ({ param, sendJson }) => {
+        const { tokenDataModel: { getTokensByContext } } = this;
         const contextId = param("contextId").asString();
         sendJson(await getTokensByContext(contextId));
     };
 
 
-    private readonly getTokenInfo: HttpRequestHandler = async ({param, sendJson, sendStatus}) => {
-        const {NotFound} = HttpStatusCode;
-        const {tokenDataModel: {getTokenData}} = this;
+    private readonly getTokenInfo: HttpRequestHandler = async ({ param, sendJson, sendStatus }) => {
+        const { NotFound } = HttpStatusCode;
+        const { tokenDataModel: { getTokenData } } = this;
 
         const contextId = param("contextId").asString();
         const token = param("token").asString();
@@ -91,7 +91,7 @@ export class AccessTokenApiListener {
         const data = await getTokenData(token);
         if (!data) {
             sendStatus(NotFound);
-        } else if(data.contextId !== contextId) { // Context id mismatch
+        } else if (data.contextId !== contextId) { // Context id mismatch
             // TODO: Log big fat notice in here
             sendStatus(NotFound);
         } else {
@@ -99,9 +99,9 @@ export class AccessTokenApiListener {
         }
     };
 
-    private readonly deleteToken: HttpRequestHandler = async ({param, sendStatus}) => {
-        const {Ok, NotFound} = HttpStatusCode;
-        const {tokenDataModel: {getTokenData, deleteTokenData}} = this;
+    private readonly deleteToken: HttpRequestHandler = async ({ param, sendStatus }) => {
+        const { Ok, NotFound } = HttpStatusCode;
+        const { tokenDataModel: { getTokenData, deleteTokenData } } = this;
 
         const contextId = param("contextId").asString();
         const token = param("token").asString();
@@ -109,7 +109,7 @@ export class AccessTokenApiListener {
         const data = await getTokenData(token);
         if (!data) {
             sendStatus(NotFound);
-        } else if(data.contextId !== contextId) { // Context id mismatch
+        } else if (data.contextId !== contextId) { // Context id mismatch
             // TODO: Log big fat notice in here
             sendStatus(NotFound);
         } else {

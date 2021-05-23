@@ -1,5 +1,5 @@
 import { ModuleConfig } from "quiver-framework";
-import {WebsocketExtensionRegistry} from "./service/WebsocketExtensionRegistry";
+import { WebsocketExtensionRegistry } from "./service/WebsocketExtensionRegistry";
 
 export const WebsocketExtensionModule: ModuleConfig = {
     mappings: [

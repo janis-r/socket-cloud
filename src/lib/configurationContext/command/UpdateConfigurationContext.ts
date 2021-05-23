@@ -1,6 +1,6 @@
-import {Command, Inject} from "quiver-framework";
-import {UpdateConfigurationContextEvent} from "../event/UpdateConfigurationContextEvent";
-import {ConfigurationContextProvider} from "../service/ConfigurationContextProvider";
+import { Command, Inject } from "quiver-framework";
+import { UpdateConfigurationContextEvent } from "../event/UpdateConfigurationContextEvent";
+import { ConfigurationContextProvider } from "../service/ConfigurationContextProvider";
 
 export class UpdateConfigurationContext implements Command {
 
@@ -10,7 +10,7 @@ export class UpdateConfigurationContext implements Command {
     private readonly event: UpdateConfigurationContextEvent;
 
     async execute(): Promise<void> {
-        const {event: {contextId}, contextProvider: {resetConfiguration}} = this;
+        const { event: { contextId }, contextProvider: { resetConfiguration } } = this;
         resetConfiguration(contextId);
     }
 

@@ -1,5 +1,5 @@
-import {ConfigurationContext} from "../data/ConfigurationContext";
-import {ContextId} from "../data/ContextId";
+import { ConfigurationContext } from "../data/ConfigurationContext";
+import { ContextId } from "../data/ContextId";
 
 /**
  * Data model that abstracts retrieval and saving of configuration context into external storage,

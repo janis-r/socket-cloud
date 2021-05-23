@@ -1,8 +1,8 @@
-import {SqLiteConnection} from "../../../sqLite/service/SqLiteConnection";
-import {AccessTokenDataModel} from "../AccessTokenDataModel";
-import {TokenData, tokenDataValidator} from "../../data/TokenData";
-import {ContextId} from "../../../configurationContext/data/ContextId";
-import {AccessConfiguration, accessConfigurationValidator} from "../../data/AccessConfiguration";
+import { SqLiteConnection } from "../../../sqLite/service/SqLiteConnection";
+import { AccessTokenDataModel } from "../AccessTokenDataModel";
+import { TokenData, tokenDataValidator } from "../../data/TokenData";
+import { ContextId } from "../../../configurationContext/data/ContextId";
+import { AccessConfiguration, accessConfigurationValidator } from "../../data/AccessConfiguration";
 
 export class AccessTokenDataModelSqLite implements AccessTokenDataModel {
 
@@ -67,7 +67,7 @@ export class AccessTokenDataModelSqLite implements AccessTokenDataModel {
             return [];
         }
 
-        return rows.map(({configuration}) => {
+        return rows.map(({ configuration }) => {
             let tokenData: unknown;
             try {
                 tokenData = JSON.parse(configuration);
@@ -84,7 +84,6 @@ export class AccessTokenDataModelSqLite implements AccessTokenDataModel {
     };
 
     readonly createAccessEntry = async (contextId: ContextId, permissions: AccessConfiguration): Promise<TokenData["token"]> => {
-
         if (!accessConfigurationValidator.validate(permissions)) {
             throw new Error(`Invalid access configuration: ${JSON.stringify(accessConfigurationValidator.lastError)}`);
         }
@@ -109,7 +108,7 @@ export class AccessTokenDataModelSqLite implements AccessTokenDataModel {
     };
 
     readonly deleteTokenData = async (tokenId: TokenData["token"]): Promise<boolean> => {
-        const {changes} = await this.db.run(`
+        const { changes } = await this.db.run(`
                     DELETE
                     FROM access_token
                     WHERE token = ?
@@ -120,7 +119,7 @@ export class AccessTokenDataModelSqLite implements AccessTokenDataModel {
     };
 
     private async createNewToken() {
-        const {db: {get}} = this;
+        const { db: { get } } = this;
         const token = new Array(3)
             .fill(0)
             .map(_ => Math.floor(Math.random() * 0xFFFFFF))

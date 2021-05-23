@@ -1,9 +1,9 @@
-import {toMilliseconds} from "ugd10a";
-import {CachedMessage} from "../data/cache/CachedMessage";
-import {ConfigurationContext} from "../../configurationContext/data/ConfigurationContext";
-import {CachingPolicy} from "../../configurationContext/data/CachingPolicy";
-import {CacheFilter} from "../data/cache/CacheFilter";
-import {CallbackCollection} from "../../utils/CallbackCollection";
+import { toMilliseconds } from "ugd10a";
+import { CachedMessage } from "../data/cache/CachedMessage";
+import { ConfigurationContext } from "../../configurationContext/data/ConfigurationContext";
+import { CachingPolicy } from "../../configurationContext/data/CachingPolicy";
+import { CacheFilter } from "../data/cache/CacheFilter";
+import { CallbackCollection } from "../../utils/CallbackCollection";
 
 export class ChannelMessageCache {
 
@@ -18,12 +18,12 @@ export class ChannelMessageCache {
     readonly onEmpty = this.onEmptyCallback.manage;
 
     constructor(readonly context: ConfigurationContext,
-                readonly channelId: string) {
+        readonly channelId: string) {
     }
 
     addMessage(message: CachedMessage): void {
-        const {cleanupInterval} = ChannelMessageCache;
-        const {messages, cacheConfig: {cacheSize}, clearOutdatedMessages} = this;
+        const { cleanupInterval } = ChannelMessageCache;
+        const { messages, cacheConfig: { cacheSize }, clearOutdatedMessages } = this;
 
         // Add message to cache
         messages.push(message);
@@ -38,11 +38,11 @@ export class ChannelMessageCache {
     }
 
     getMessages(filter: CacheFilter = {}): Array<CachedMessage> {
-        const {messages} = this;
+        const { messages } = this;
 
         this.clearOutdatedMessages();
 
-        const {maxAge, maxLength, messageId} = filter;
+        const { maxAge, maxLength, messageId } = filter;
         const minEpoch = maxAge ? Date.now() - maxAge : null;
 
         const output = new Array<CachedMessage>();
@@ -67,7 +67,7 @@ export class ChannelMessageCache {
     }
 
     private readonly clearOutdatedMessages = () => {
-        const {messages, cacheConfig: {cacheTime}} = this;
+        const { messages, cacheConfig: { cacheTime } } = this;
         const minEpoch = Date.now() - cacheTime;
 
         while (messages.length > 0) {
@@ -87,8 +87,8 @@ export class ChannelMessageCache {
     };
 
     get cacheConfig(): CachingPolicy {
-        const {channelId, context: {cachingPolicy, channelConfig}} = this;
-        const {maxCacheSize, maxCacheTime} = ChannelMessageCache;
+        const { channelId, context: { cachingPolicy, channelConfig } } = this;
+        const { maxCacheSize, maxCacheTime } = ChannelMessageCache;
 
         const cacheSize = channelConfig?.[channelId]?.cachingPolicy?.cacheSize ?? cachingPolicy?.cacheSize;
         const cacheTime = channelConfig?.[channelId]?.cachingPolicy?.cacheTime ?? cachingPolicy?.cacheTime;

@@ -1,7 +1,7 @@
 /**
  * Endpoints MAY use the following pre-defined status codes when sending a Close frame.
  */
-import {valueBelongsToEnum} from "ugd10a";
+import { valueBelongsToEnum } from "ugd10a";
 
 export enum CloseCode {
 

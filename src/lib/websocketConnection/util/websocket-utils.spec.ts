@@ -1,6 +1,6 @@
-import {composeWebsocketFrame, decomposeWebSocketFrame, fragmentWebsocketFrame} from "./websocket-utils";
-import {DataFrame} from "../data/DataFrame";
-import {DataFrameType} from "../data/DataFrameType";
+import { composeWebsocketFrame, decomposeWebSocketFrame, fragmentWebsocketFrame } from "./websocket-utils";
+import { DataFrame } from "../data/DataFrame";
+import { DataFrameType } from "../data/DataFrameType";
 
 describe("websocket-utils", () => {
 
@@ -59,10 +59,10 @@ describe("websocket-utils", () => {
         const fragments = fragmentWebsocketFrame(bigFrameData, chunkSize);
 
         expect(fragments.length).toBe(numChunks);
-        expect(fragments.some(({payload}) => payload.length !== chunkSize)).toBe(false);
+        expect(fragments.some(({ payload }) => payload.length !== chunkSize)).toBe(false);
 
-        const {type: bigType, rsv1: bigRsv1, rsv2: bigRsv2, rsv3: bigRsv3} = bigFrameData;
-        fragments.forEach(({type, rsv1, rsv2, rsv3}, index) => {
+        const { type: bigType, rsv1: bigRsv1, rsv2: bigRsv2, rsv3: bigRsv3 } = bigFrameData;
+        fragments.forEach(({ type, rsv1, rsv2, rsv3 }, index) => {
             if (index === 0) {
                 expect([bigType, bigRsv1, bigRsv2, bigRsv3,]).toMatchObject([type, rsv1, rsv2, rsv3]);
             } else {
@@ -70,7 +70,7 @@ describe("websocket-utils", () => {
             }
         });
 
-        expect(fragments.slice(0, fragments.length - 1).some(({isFinal}) => isFinal)).toBe(false);
+        expect(fragments.slice(0, fragments.length - 1).some(({ isFinal }) => isFinal)).toBe(false);
         expect(fragments[fragments.length - 1].isFinal).toBe(true);
 
     });

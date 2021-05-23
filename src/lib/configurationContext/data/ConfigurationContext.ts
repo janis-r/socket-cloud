@@ -1,4 +1,4 @@
-import {Validator} from "ugd10a/validator";
+import { Validator } from "ugd10a/validator";
 
 export abstract class ConfigurationContext {
     // Unique id of configuration context
@@ -51,8 +51,8 @@ export abstract class ConfigurationContext {
 }
 
 const cashingPolicyValidator = new Validator<ConfigurationContext["cachingPolicy"]>({
-    cacheTime: {type: "number", optional: true},
-    cacheSize: {type: "number", optional: true}
+    cacheTime: { type: "number", optional: true },
+    cacheSize: { type: "number", optional: true }
 });
 
 const perChannelConfigValidator = new Validator<ConfigurationContext["channelConfig"][0]>({
@@ -70,28 +70,28 @@ const individualMessageConfigValidator = new Validator<ConfigurationContext["ind
 });
 
 export const configurationContextValidator = new Validator<ConfigurationContext>({
-    id: {type: "string", notEmpty: true, validator: ({length}: string) => length >= 2 && length <= 50},
-    protocol: {type: "string", notEmpty: true},
-    maxConnectionCount: {type: "number", optional: true},
+    id: { type: "string", notEmpty: true, validator: ({ length }: string) => length >= 2 && length <= 50 },
+    protocol: { type: "string", notEmpty: true },
+    maxConnectionCount: { type: "number", optional: true },
     operatorApi: {
         validator: new Validator<ConfigurationContext["operatorApi"]>({
-            url: {type: "string"},
+            url: { type: "string" },
             connection: {
                 type: "object",
                 optional: true,
                 validator: new Validator<ConfigurationContext["operatorApi"]["connection"]>({
-                    doHandshake: {type: "boolean", optional: true},
-                    reportNew: {type: "boolean", optional: true},
-                    reportDropped: {type: "boolean", optional: true}
+                    doHandshake: { type: "boolean", optional: true },
+                    reportNew: { type: "boolean", optional: true },
+                    reportDropped: { type: "boolean", optional: true }
                 })
             }
         }).validate,
         optional: true
     },
-    pingTimeout: {type: "number", optional: true},
-    outgoingMessageFragmentSize: {type: "number", optional: true},
-    maxPayloadSize: {type: "number", optional: true},
-    compressData: {type: "boolean", optional: true},
+    pingTimeout: { type: "number", optional: true },
+    outgoingMessageFragmentSize: { type: "number", optional: true },
+    maxPayloadSize: { type: "number", optional: true },
+    compressData: { type: "boolean", optional: true },
     cachingPolicy: {
         optional: true,
         validator: cashingPolicyValidator

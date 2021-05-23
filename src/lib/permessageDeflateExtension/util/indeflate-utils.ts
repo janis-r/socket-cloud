@@ -1,5 +1,5 @@
 import * as zlib from "zlib";
-import {DeflateRaw, InflateRaw, ZlibOptions} from "zlib";
+import { DeflateRaw, InflateRaw, ZlibOptions } from "zlib";
 
 const trailerBytes = Buffer.from([0x00, 0x00, 0xff, 0xff]);
 

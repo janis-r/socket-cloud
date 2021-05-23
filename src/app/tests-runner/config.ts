@@ -1,6 +1,6 @@
-import {toMilliseconds} from "ugd10a";
-import {ConfigurationContext} from "../../lib/configurationContext/data/ConfigurationContext";
-import {defaultProtocolId} from "../../lib/defaultProtocol/data/defaultProtocolId";
+import { toMilliseconds } from "ugd10a";
+import { ConfigurationContext } from "../../lib/configurationContext/data/ConfigurationContext";
+import { defaultProtocolId } from "../../lib/defaultProtocol/data/defaultProtocolId";
 
 
 export const debug = true;
@@ -24,7 +24,7 @@ export const configurationContext: ConfigurationContext = {
         cacheTime: defaultCacheTime
     },
     channelConfig: {
-        [cachedChannelName]: {cachingPolicy: {cacheSize: 100}},
-        [notCachedChannelName]: {cachingPolicy: {}}
+        [cachedChannelName]: { cachingPolicy: { cacheSize: 100 } },
+        [notCachedChannelName]: { cachingPolicy: {} }
     }
 };

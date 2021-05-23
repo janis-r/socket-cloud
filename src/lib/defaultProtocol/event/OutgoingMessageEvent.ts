@@ -1,11 +1,11 @@
-import {Event} from "quiver-framework";
-import {ContextId} from "../../configurationContext/data/ContextId";
-import {PushToClientMessage} from "../data/serverMessage/PushToClientMessage";
+import { Event } from "quiver-framework";
+import { ContextId } from "../../configurationContext/data/ContextId";
+import { PushToClientMessage } from "../data/serverMessage/PushToClientMessage";
 
 export class OutgoingMessageEvent extends Event {
     static readonly TYPE = Symbol("outgoing-message");
 
-    static serialize({contextId, message}: OutgoingMessageEvent): ConstructorParameters<typeof OutgoingMessageEvent> {
+    static serialize({ contextId, message }: OutgoingMessageEvent): ConstructorParameters<typeof OutgoingMessageEvent> {
         return [contextId, message];
     }
 

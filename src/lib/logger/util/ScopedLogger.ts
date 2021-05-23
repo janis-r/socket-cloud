@@ -1,5 +1,5 @@
-import {toMilliseconds} from "ugd10a";
-import {setTimeout} from "timers";
+import { toMilliseconds } from "ugd10a";
+import { setTimeout } from "timers";
 
 export class ScopedLogger {
 
@@ -31,7 +31,7 @@ export class ScopedLogger {
      * @param data Anything that should be added to log
      */
     log(data: any): this {
-        const {_committed, dataLog, startTime} = this;
+        const { _committed, dataLog, startTime } = this;
         if (_committed) {
             throw new Error(`Can't log - already committed`);
         }
@@ -63,7 +63,7 @@ export class ScopedLogger {
     };
 
     private saveLoggedData(): void {
-        const {dataLog, save} = this;
+        const { dataLog, save } = this;
         if (dataLog.length) {
             save(JSON.stringify(dataLog));
         }

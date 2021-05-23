@@ -1,22 +1,23 @@
-import {WebsocketExtensionAgent} from "../../websocketExtension/service/WebsocketExtensionAgent";
-import {getDeflator, getInflator} from "../util/indeflate-utils";
-import {DataFrame} from "../../websocketConnection/data/DataFrame";
-import {DataFrameType} from "../../websocketConnection/data/DataFrameType";
+import { WebsocketExtensionAgent } from "../../websocketExtension/service/WebsocketExtensionAgent";
+import { getDeflator, getInflator } from "../util/indeflate-utils";
+import { DataFrame } from "../../websocketConnection/data/DataFrame";
+import { DataFrameType } from "../../websocketConnection/data/DataFrameType";
 
-const {TextFrame, BinaryFrame} = DataFrameType;
+const { TextFrame, BinaryFrame } = DataFrameType;
 
 export class PermessageDeflateAgent implements WebsocketExtensionAgent {
 
     private _inflate: ReturnType<typeof getInflator>;
     private _deflate: ReturnType<typeof getDeflator>;
 
-    constructor(readonly config: AgentConfig,
-                readonly configOfferResponse: string
+    constructor(
+        readonly config: AgentConfig,
+        readonly configOfferResponse: string
     ) {
     }
 
     async incomingDataPipe(dataFrame: DataFrame) {
-        const {type, rsv1, payload} = dataFrame;
+        const { type, rsv1, payload } = dataFrame;
         if (![TextFrame, BinaryFrame].includes(type) || !rsv1) {
             return dataFrame;
         }
@@ -29,7 +30,7 @@ export class PermessageDeflateAgent implements WebsocketExtensionAgent {
     }
 
     async outgoingDataPipe(dataFrame: DataFrame) {
-        const {type, rsv1, payload} = dataFrame;
+        const { type, rsv1, payload } = dataFrame;
         if (![TextFrame, BinaryFrame].includes(type)) {
             return dataFrame;
         }
@@ -49,8 +50,8 @@ export class PermessageDeflateAgent implements WebsocketExtensionAgent {
             return this._inflate;
         }
 
-        const {allowPeerContextTakeover: allowTakeover, peerWindowBits: windowBits} = this.config;
-        const executor = getInflator({windowBits});
+        const { allowPeerContextTakeover: allowTakeover, peerWindowBits: windowBits } = this.config;
+        const executor = getInflator({ windowBits });
         if (allowTakeover) {
             this._inflate = executor;
         }
@@ -62,8 +63,8 @@ export class PermessageDeflateAgent implements WebsocketExtensionAgent {
             return this._deflate;
         }
 
-        const {allowOwnContextTakeover: allowTakeover, ownWindowBits: windowBits} = this.config;
-        const executor = getDeflator({windowBits});
+        const { allowOwnContextTakeover: allowTakeover, ownWindowBits: windowBits } = this.config;
+        const executor = getDeflator({ windowBits });
 
         if (allowTakeover) {
             return this._deflate = executor;

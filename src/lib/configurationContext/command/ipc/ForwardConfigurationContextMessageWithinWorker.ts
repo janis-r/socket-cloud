@@ -1,11 +1,11 @@
-import {Command, EventDispatcher, Inject} from "quiver-framework";
-import {IpcMessageEvent} from "../../../ipcMessenger/event/IpcMessageEvent";
+import { Command, EventDispatcher, Inject } from "quiver-framework";
+import { IpcMessageEvent } from "../../../ipcMessenger/event/IpcMessageEvent";
 import {
     ConfigurationConfigIpcMessageType,
     configurationConfigIpcMessageValidator
 } from "../../data/ipc/ConfigurationConfigIpcMessage";
-import {DeleteConfigurationContextEvent} from "../../event/DeleteConfigurationContextEvent";
-import {UpdateConfigurationContextEvent} from "../../event/UpdateConfigurationContextEvent";
+import { DeleteConfigurationContextEvent } from "../../event/DeleteConfigurationContextEvent";
+import { UpdateConfigurationContextEvent } from "../../event/UpdateConfigurationContextEvent";
 
 export class ForwardConfigurationContextMessageWithinWorker implements Command {
 
@@ -15,12 +15,12 @@ export class ForwardConfigurationContextMessageWithinWorker implements Command {
     private eventDispatcher: EventDispatcher;
 
     async execute(): Promise<void> {
-        const {event: {message: {payload}}, eventDispatcher} = this;
+        const { event: { message: { payload } }, eventDispatcher } = this;
         if (!configurationConfigIpcMessageValidator.validate(payload)) {
             throw new Error(`Invalid incoming ConfigurationConfigIpcMessage encountered: ${JSON.stringify(payload)} `);
         }
 
-        const {type, contextId} = payload;
+        const { type, contextId } = payload;
         switch (type) {
             case ConfigurationConfigIpcMessageType.Update:
                 eventDispatcher.dispatchEvent(new UpdateConfigurationContextEvent(contextId, true));

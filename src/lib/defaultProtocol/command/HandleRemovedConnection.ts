@@ -1,6 +1,6 @@
-import {Command, Inject} from "quiver-framework";
-import {ConnectionRemovedEvent} from "../../clientConnectionPool/event/ConnectionRemovedEvent";
-import {DataContextManagerProvider} from "../service/DataContextManagerProvider";
+import { Command, Inject } from "quiver-framework";
+import { ConnectionRemovedEvent } from "../../clientConnectionPool/event/ConnectionRemovedEvent";
+import { DataContextManagerProvider } from "../service/DataContextManagerProvider";
 
 export class HandleRemovedConnection implements Command {
 
@@ -13,9 +13,9 @@ export class HandleRemovedConnection implements Command {
         const {
             event: {
                 connection,
-                connection: {context: {id: contextId}}
+                connection: { context: { id: contextId } }
             },
-            dataContextManagerProvider: {getContextManager, resetContextManager}
+            dataContextManagerProvider: { getContextManager, resetContextManager }
         } = this;
 
         const manager = await getContextManager(contextId);

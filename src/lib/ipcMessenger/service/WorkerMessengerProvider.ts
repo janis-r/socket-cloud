@@ -1,8 +1,8 @@
-import {IpcMessenger} from "./IpcMessenger";
-import {WorkerManager} from "../../workerManager/service/WorkerManager";
-import {EventDispatcher, Inject, PostConstruct} from "quiver-framework";
-import {Logger} from "../../logger/service/Logger";
-import {IpcMessageEvent} from "../event/IpcMessageEvent";
+import { IpcMessenger } from "./IpcMessenger";
+import { WorkerManager } from "../../workerManager/service/WorkerManager";
+import { EventDispatcher, Inject, PostConstruct } from "quiver-framework";
+import { Logger } from "../../logger/service/Logger";
+import { IpcMessageEvent } from "../event/IpcMessageEvent";
 
 export class WorkerMessengerProvider {
 
@@ -19,17 +19,17 @@ export class WorkerMessengerProvider {
 
     @PostConstruct()
     private init() {
-        const {workerManager: {onNewWorker}, eventDispatcher} = this;
+        const { workerManager: { onNewWorker }, eventDispatcher } = this;
         onNewWorker(worker => {
-            const {onMessage} = this.getMessenger(worker.id);
+            const { onMessage } = this.getMessenger(worker.id);
             onMessage(message => eventDispatcher.dispatchEvent(new IpcMessageEvent(message, worker.id)));
         });
     }
 
     readonly getMessenger = (workerId: number) => {
-        const {messengerCache, workerManager: {workers}, logger: {error}} = this;
+        const { messengerCache, workerManager: { workers }, logger: { error } } = this;
         if (!messengerCache.has(workerId)) {
-            const worker = workers.find(({id}) => id === workerId);
+            const worker = workers.find(({ id }) => id === workerId);
             if (!worker) {
                 error(`WorkerMessengerProvider:getMessenger - worker with id ${JSON.stringify(workerId)} not found`);
                 return null;

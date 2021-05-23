@@ -1,4 +1,4 @@
-import {launchServer} from "./util/server-utils";
+import { launchServer } from "./util/server-utils";
 
 (async () => {
     let i = 0;

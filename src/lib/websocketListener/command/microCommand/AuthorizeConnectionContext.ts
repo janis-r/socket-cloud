@@ -1,9 +1,9 @@
-import {Command, EventDispatcher, Inject} from "quiver-framework";
-import {SocketDescriptor} from "../../data/SocketDescriptor";
-import {ValidateSocketConnectionEvent} from "../../event/ValidateSocketConnectionEvent";
-import {WebsocketConnectionValidationRequest} from "../../event/WebsocketConnectionValidationRequest";
-import {Logger} from "../../../logger/service/Logger";
-import {ConfigurationContextProvider} from "../../../configurationContext/service/ConfigurationContextProvider";
+import { Command, EventDispatcher, Inject } from "quiver-framework";
+import { SocketDescriptor } from "../../data/SocketDescriptor";
+import { ValidateSocketConnectionEvent } from "../../event/ValidateSocketConnectionEvent";
+import { WebsocketConnectionValidationRequest } from "../../event/WebsocketConnectionValidationRequest";
+import { Logger } from "../../../logger/service/Logger";
+import { ConfigurationContextProvider } from "../../../configurationContext/service/ConfigurationContextProvider";
 import url from "url";
 
 export class AuthorizeConnectionContext implements Command<boolean> {
@@ -31,15 +31,15 @@ export class AuthorizeConnectionContext implements Command<boolean> {
                         'x-forwarded-for': xForwardedForHeader,
                         'sec-websocket-version': websocketVersion
                     },
-                    connection: {remoteAddress},
+                    connection: { remoteAddress },
                     socket,
                     url
                 },
                 requestInfo
             },
-            logger: {error, debug},
+            logger: { error, debug },
             eventDispatcher,
-            configurationContextProvider: {getConfigurationContext}
+            configurationContextProvider: { getConfigurationContext }
         } = this;
 
         const forwardedFor = xForwardedForHeader ? xForwardedForHeader.split(",") : null;
@@ -97,7 +97,7 @@ export class AuthorizeConnectionContext implements Command<boolean> {
 }
 
 function extractContextIdFromUrl(connectionUrl: string): string | null {
-    const {pathname} = url.parse(connectionUrl, true);
+    const { pathname } = url.parse(connectionUrl, true);
     const contextId = pathname.replace("/", "");
     if (!contextId) {
         return null;

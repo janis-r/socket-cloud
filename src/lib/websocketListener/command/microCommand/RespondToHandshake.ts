@@ -1,7 +1,7 @@
-import {Command, Inject} from "quiver-framework";
-import {WebsocketConnectionValidationRequest} from "../../event/WebsocketConnectionValidationRequest";
-import {Logger} from "../../../logger/service/Logger";
-import {handshakeResponse} from "../../util/handshakeResponse";
+import { Command, Inject } from "quiver-framework";
+import { WebsocketConnectionValidationRequest } from "../../event/WebsocketConnectionValidationRequest";
+import { Logger } from "../../../logger/service/Logger";
+import { handshakeResponse } from "../../util/handshakeResponse";
 
 export class RespondToHandshake implements Command<boolean> {
 
@@ -13,10 +13,10 @@ export class RespondToHandshake implements Command<boolean> {
 
     execute() {
         const {
-            logger: {debug},
+            logger: { debug },
             event: {
                 request: {
-                    headers: {'sec-websocket-key': secWebSocketKeyHeader}
+                    headers: { 'sec-websocket-key': secWebSocketKeyHeader }
                 },
                 socket, requestInfo, extensions
             }
@@ -37,7 +37,7 @@ export class RespondToHandshake implements Command<boolean> {
         ];
 
         if (extensions && extensions.length > 0) {
-            responseHeaders.push('Sec-WebSocket-Extensions: ' + extensions.map(({configOfferResponse}) => configOfferResponse).join(", "))
+            responseHeaders.push('Sec-WebSocket-Extensions: ' + extensions.map(({ configOfferResponse }) => configOfferResponse).join(", "))
         }
 
         // debug('>> responseHeaders:', responseHeaders);

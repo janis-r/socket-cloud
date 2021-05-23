@@ -1,7 +1,7 @@
-import {HttpServerRouter} from "../service/HttpServerRouter";
-import {HttpRequestHandler} from "./HttpRequestHandler";
-import {HttpMethod} from "./HttpMethod";
-import {isSingleRouter} from "../util/isSingleRouter";
+import { HttpServerRouter } from "../service/HttpServerRouter";
+import { HttpRequestHandler } from "./HttpRequestHandler";
+import { HttpMethod } from "./HttpMethod";
+import { isSingleRouter } from "../util/isSingleRouter";
 
 /**
  * Semi functional router that serves only as a holder of http methods to handlers mapping.
@@ -13,7 +13,7 @@ export class Router implements HttpServerRouter {
     readonly routes: ReadonlyMap<Method, ReadonlyMap<string, HttpRequestHandler[]>> = this._routes;
 
     private addRoute(method: Method, path: string, handlers: HttpRequestHandler[]): void {
-        const {_routes} = this;
+        const { _routes } = this;
         if (!_routes.has(method)) {
             _routes.set(method, new Map([[path, handlers]]));
         } else {
@@ -21,9 +21,9 @@ export class Router implements HttpServerRouter {
         }
     }
 
-    use(path: string, ...handlers: HttpRequestHandler[]);
-    use(path: string, router: Router);
-    use(path: string, ...handlers: HttpRequestHandler[] | [Router]) {
+    use(path: string, ...handlers: HttpRequestHandler[]): this;
+    use(path: string, router: Router): this;
+    use(path: string, ...handlers: HttpRequestHandler[] | [Router]): this {
         if (isSingleRouter(handlers)) {
             // TODO: ......
             throw new Error(`Not implemented`);

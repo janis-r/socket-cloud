@@ -1,7 +1,7 @@
-import {SqLiteConnection} from "../../../sqLite/service/SqLiteConnection";
-import {ConfigurationContextModel} from "../ConfigurationContextModel";
-import {ContextId} from "../../data/ContextId";
-import {ConfigurationContext, configurationContextValidator} from "../../data/ConfigurationContext";
+import { SqLiteConnection } from "../../../sqLite/service/SqLiteConnection";
+import { ConfigurationContextModel } from "../ConfigurationContextModel";
+import { ContextId } from "../../data/ContextId";
+import { ConfigurationContext, configurationContextValidator } from "../../data/ConfigurationContext";
 
 export class ConfigurationContextModelSqLite implements ConfigurationContextModel {
 
@@ -28,7 +28,7 @@ export class ConfigurationContextModelSqLite implements ConfigurationContextMode
     }
 
     readonly deleteConfiguration = async (contextId: ContextId): Promise<boolean> => {
-        const {changes} = await this.db.run(`
+        const { changes } = await this.db.run(`
                     DELETE
                     FROM context_config
                     WHERE id = ?
@@ -69,7 +69,7 @@ export class ConfigurationContextModelSqLite implements ConfigurationContextMode
             throw new Error(`Cannot save invalid configuration context - err: ${JSON.stringify(configurationContextValidator.lastError)}`);
         }
 
-        const {changes} = await this.db.run(`
+        const { changes } = await this.db.run(`
                     INSERT OR
                     REPLACE
                     INTO context_config(id, configuration)

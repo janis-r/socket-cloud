@@ -1,9 +1,9 @@
-import {Command, Inject} from "quiver-framework";
-import {IpcMessage} from "../../ipcMessenger/data/IpcMessage";
-import {IpcMessageEvent} from "../../ipcMessenger/event/IpcMessageEvent";
-import {WorkerMessengerProvider} from "../../ipcMessenger/service/WorkerMessengerProvider";
-import {DataSyncMessage, DataSyncMessageType} from "../data/ipc/DataSyncMessage";
-import {WorkerManager} from "../../workerManager/service/WorkerManager";
+import { Command, Inject } from "quiver-framework";
+import { IpcMessage } from "../../ipcMessenger/data/IpcMessage";
+import { IpcMessageEvent } from "../../ipcMessenger/event/IpcMessageEvent";
+import { WorkerMessengerProvider } from "../../ipcMessenger/service/WorkerMessengerProvider";
+import { DataSyncMessage, DataSyncMessageType } from "../data/ipc/DataSyncMessage";
+import { WorkerManager } from "../../workerManager/service/WorkerManager";
 
 export class ForwardDataSyncMessageToNodes implements Command {
 
@@ -18,14 +18,14 @@ export class ForwardDataSyncMessageToNodes implements Command {
 
     execute(): void {
         const {
-            event: {message, workerId},
-            workerManager: {workerIds},
-            messengerProvider: {getMessenger},
+            event: { message, workerId },
+            workerManager: { workerIds },
+            messengerProvider: { getMessenger },
             responses
         } = this;
 
-        workerIds.filter(id => id !== workerId).map(id => getMessenger(id)).forEach(async ({sendAndReceive}) => {
-            const {data} = await sendAndReceive<DataSyncMessage<number>>(message);
+        workerIds.filter(id => id !== workerId).map(id => getMessenger(id)).forEach(async ({ sendAndReceive }) => {
+            const { data } = await sendAndReceive<DataSyncMessage<number>>(message);
             responses.push(data);
 
             if (responses.length === workerIds.length - 1) {
@@ -36,8 +36,8 @@ export class ForwardDataSyncMessageToNodes implements Command {
 
     private respondToActionWorker(): void {
         const {
-            event: {message, workerId},
-            messengerProvider: {getMessenger},
+            event: { message, workerId },
+            messengerProvider: { getMessenger },
             responses
         } = this;
 

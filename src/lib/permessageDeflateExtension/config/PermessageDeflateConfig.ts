@@ -1,4 +1,4 @@
-import {WindowBits} from "../data/WindowBits";
+import { WindowBits } from "../data/WindowBits";
 
 export abstract class PermessageDeflateConfig {
 

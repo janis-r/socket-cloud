@@ -1,6 +1,6 @@
 import * as crypto from "crypto";
-import {DataFrame} from "../data/DataFrame";
-import {DataFrameType} from "../data/DataFrameType";
+import { DataFrame } from "../data/DataFrame";
+import { DataFrameType } from "../data/DataFrameType";
 
 /**
  * Decompose binary representation of websocket data frame into value object
@@ -17,7 +17,7 @@ export function decomposeWebSocketFrame(buffer: Buffer): Readonly<DataFrame> {
         return slice;
     };
 
-    const {type, isFinal, rsv1, rsv2, rsv3, payloadLength, masked} = decomposeHeader(read(2));
+    const { type, isFinal, rsv1, rsv2, rsv3, payloadLength, masked } = decomposeHeader(read(2));
 
     let extendedPayloadLength: number;
     if (payloadLength === 126) {
@@ -29,7 +29,7 @@ export function decomposeWebSocketFrame(buffer: Buffer): Readonly<DataFrame> {
     const maskBytes = masked ? getMaskBytes(read(4)) : null;
     const payload = read(extendedPayloadLength ?? payloadLength);
     maskBytes && applyXorMask(payload, maskBytes);
-    return {type, isFinal, rsv1, rsv2, rsv3, payload, masked};
+    return { type, isFinal, rsv1, rsv2, rsv3, payload, masked };
 }
 
 /**
@@ -37,7 +37,7 @@ export function decomposeWebSocketFrame(buffer: Buffer): Readonly<DataFrame> {
  * @param dataFrame
  */
 export function composeWebsocketFrame(dataFrame: DataFrame): Buffer {
-    const {type, payload, isFinal, rsv1, rsv2, rsv3, masked} = dataFrame;
+    const { type, payload, isFinal, rsv1, rsv2, rsv3, masked } = dataFrame;
 
     const headerBytes = Buffer.alloc(2);
     // First byte consists of FIN and RSV(1-3) bits
@@ -54,7 +54,7 @@ export function composeWebsocketFrame(dataFrame: DataFrame): Buffer {
         headerBytes[1] |= 0x1 << 7;
     }
     // Rest of second bytes is a payload length or marker of extended payload length type
-    const {declaredPayloadValue, extendedPayloadSize} = calculatePayloadProps(payload.length);
+    const { declaredPayloadValue, extendedPayloadSize } = calculatePayloadProps(payload.length);
     headerBytes[1] |= declaredPayloadValue;
 
     const extendedPayloadBytes = extendedPayloadSize ? Buffer.alloc(extendedPayloadSize) : null;
@@ -79,7 +79,7 @@ export function composeWebsocketFrame(dataFrame: DataFrame): Buffer {
 }
 
 export function fragmentWebsocketFrame(data: DataFrame, fragmentSize: number): Array<DataFrame> {
-    const {type, rsv1, rsv2, rsv3, payload} = data;
+    const { type, rsv1, rsv2, rsv3, payload } = data;
 
     if (!fragmentSize || payload.length <= fragmentSize) {
         return [data];
@@ -144,14 +144,14 @@ export const spawnFrameData = (
         rsv3 = false,
         masked = false
     }: Partial<Exclude<DataFrame, "type">> = {}): DataFrame => ({
-    type,
-    payload,
-    isFinal,
-    rsv1,
-    rsv2,
-    rsv3,
-    masked
-});
+        type,
+        payload,
+        isFinal,
+        rsv1,
+        rsv2,
+        rsv3,
+        masked
+    });
 
 export function decomposeHeader(data: Buffer): Pick<DataFrame, "type" | "isFinal" | "rsv1" | "rsv2" | "rsv3"> & { payloadLength: number, masked: boolean } {
     const firstByte = data.readUInt8(0);
@@ -165,7 +165,7 @@ export function decomposeHeader(data: Buffer): Pick<DataFrame, "type" | "isFinal
     const secondByte = data.readUInt8(1);
     const payloadLength = secondByte & 0x7F;
     const masked = !!((secondByte >>> 7) & 0x1);
-    return {type, isFinal, rsv1, rsv2, rsv3, payloadLength, masked};
+    return { type, isFinal, rsv1, rsv2, rsv3, payloadLength, masked };
 }
 
 export function read64BitPayloadLength(data: Buffer): number {

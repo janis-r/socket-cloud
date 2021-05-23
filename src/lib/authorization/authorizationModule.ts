@@ -1,8 +1,8 @@
-import {ModuleConfig} from "quiver-framework";
-import {AccessTokenProvider} from "./service/AccessTokenProvider";
-import {AccessTokenDataModel} from "./model/AccessTokenDataModel";
-import {AccessTokenDataModelSqLite} from "./model/impl/AccessTokenDataModelSqLite";
-import {AccessTokenApiListener} from "./service/AccessTokenApiListener";
+import { ModuleConfig } from "quiver-framework";
+import { AccessTokenProvider } from "./service/AccessTokenProvider";
+import { AccessTokenDataModel } from "./model/AccessTokenDataModel";
+import { AccessTokenDataModelSqLite } from "./model/impl/AccessTokenDataModelSqLite";
+import { AccessTokenApiListener } from "./service/AccessTokenApiListener";
 
 export const authorizationModule: ModuleConfig = {
     requires: [
@@ -10,8 +10,8 @@ export const authorizationModule: ModuleConfig = {
     ],
     mappings: [
         AccessTokenProvider,
-        {map: AccessTokenDataModel, useType: AccessTokenDataModelSqLite},
-        {map: AccessTokenApiListener, instantiate: true}
+        { map: AccessTokenDataModel, useType: AccessTokenDataModelSqLite },
+        { map: AccessTokenApiListener, instantiate: true }
     ]
 };
 

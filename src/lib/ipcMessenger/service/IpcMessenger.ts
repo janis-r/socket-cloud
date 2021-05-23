@@ -1,8 +1,8 @@
-import cluster, {Worker} from "cluster";
-import {toMilliseconds} from "ugd10a";
-import {IpcMessage, IpcMessageId, ipcMessageUtil} from "../data/IpcMessage";
-import {nextIpcMessageId} from "../util/nextIpcMessageId";
-import {CallbackCollection} from "../../utils/CallbackCollection";
+import cluster, { Worker } from "cluster";
+import { toMilliseconds } from "ugd10a";
+import { IpcMessage, IpcMessageId, ipcMessageUtil } from "../data/IpcMessage";
+import { nextIpcMessageId } from "../util/nextIpcMessageId";
+import { CallbackCollection } from "../../utils/CallbackCollection";
 import MessageListener = NodeJS.MessageListener;
 
 export class IpcMessenger {
@@ -45,13 +45,13 @@ export class IpcMessenger {
     }
 
     private readonly messageHandler: MessageListener = message => {
-        const {responseQueue, onMessageCallback} = this;
+        const { responseQueue, onMessageCallback } = this;
 
         if (!ipcMessageUtil.validate(message)) {
             throw new Error(`Unknown IPC response: ${JSON.stringify(message)} - ${JSON.stringify(ipcMessageUtil.lastError)}`);
         }
 
-        const {id, payload} = message;
+        const { id, payload } = message;
         if (responseQueue.has(id)) {
             responseQueue.get(id)(payload);
         } else {
@@ -64,7 +64,7 @@ export class IpcMessenger {
      * @param message A message to be sent.
      */
     readonly send = (message: IpcMessageWithOptionalId): void => {
-        const {transport: {sendMessage}} = this;
+        const { transport: { sendMessage } } = this;
         if (!message.id) {
             message.id = nextIpcMessageId();
         }
@@ -77,7 +77,7 @@ export class IpcMessenger {
      * @param message
      */
     readonly sendAndReceive = <T>(message: IpcMessageWithOptionalId) => new Promise<T>((resolve, reject) => {
-        const {responseQueue, transport: {sendMessage}} = this;
+        const { responseQueue, transport: { sendMessage } } = this;
 
         if (!message?.id) {
             message.id = nextIpcMessageId();

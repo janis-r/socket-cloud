@@ -1,5 +1,5 @@
-import {HttpRequestHandler} from "../data/HttpRequestHandler";
-import {Router} from "../data/Router";
+import { HttpRequestHandler } from "../data/HttpRequestHandler";
+import { Router } from "../data/Router";
 
 export abstract class HttpServerRouter {
 

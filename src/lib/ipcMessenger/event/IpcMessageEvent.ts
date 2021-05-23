@@ -1,5 +1,5 @@
-import {Event} from "quiver-framework";
-import {IpcMessage} from "../data/IpcMessage";
+import { Event } from "quiver-framework";
+import { IpcMessage } from "../data/IpcMessage";
 
 /**
  * @template P IpcMessage payload data type
